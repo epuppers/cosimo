@@ -5,7 +5,6 @@ import {
   CheckSquare,
   Calendar,
   BarChart3,
-  Circle,
   ChevronRight,
   ArrowLeft,
   Settings,
@@ -15,7 +14,6 @@ import {
   Plus,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { Badge } from "~/components/ui/badge";
 import { Switch } from "~/components/ui/switch";
 import { Slider } from "~/components/ui/slider";
 import {
@@ -50,52 +48,36 @@ function useActiveTab() {
 /** Renders the full task list inside the task popover */
 function TaskPanelContent({ tasks }: { tasks: TaskData[] }) {
   return (
-    <div className="space-y-0">
-      <div className="flex items-center justify-between border-b border-border pb-2">
-        <span className="font-[var(--font-pixel)] text-xs font-semibold text-foreground">
-          Assigned Tasks
-        </span>
-        <Badge variant="secondary" className="font-[var(--font-mono)] text-[10px]">
+    <div>
+      <div className="th-dropdown-header flex items-center justify-between">
+        <span>Assigned Tasks</span>
+        <span className="inline-flex min-w-[14px] items-center justify-center rounded-[var(--r-sm)] bg-[var(--red)] px-[5px] font-[family-name:var(--mono)] text-[9px] font-bold text-white"
+          style={{ border: '1px solid', borderColor: 'var(--red-hi) var(--red-lo) var(--red-lo) var(--red-hi)' }}>
           {tasks.length}
-        </Badge>
+        </span>
       </div>
 
-      <div className="space-y-0 py-1">
+      <div>
         {tasks.map((task, i) => (
           <div
             key={i}
-            className="flex items-start gap-2.5 rounded-sm px-1 py-2 transition-colors hover:bg-accent"
+            className={`task-item${task.urgent ? " urgent" : ""}`}
           >
-            <Circle
-              className={`mt-0.5 size-2.5 flex-shrink-0 ${
-                task.urgent
-                  ? "fill-[var(--red)] text-[var(--red)]"
-                  : "text-muted-foreground"
-              }`}
-            />
+            <div className={`task-dot`} />
             <div className="min-w-0 flex-1">
-              <div className="text-xs font-medium text-foreground">{task.title}</div>
-              <div className="font-[var(--font-mono)] text-[10px] text-muted-foreground">
-                {task.meta}
-              </div>
+              <div className="task-title">{task.title}</div>
+              <div className="task-meta">{task.meta}</div>
             </div>
             {task.urgent && (
-              <Badge
-                variant="destructive"
-                className="flex-shrink-0 font-[var(--font-mono)] text-[9px] uppercase"
-              >
-                Urgent
-              </Badge>
+              <span className="task-priority urgent-label">Urgent</span>
             )}
           </div>
         ))}
       </div>
 
-      <div className="border-t border-border pt-2">
-        <Button variant="ghost" size="sm" className="w-full text-xs text-muted-foreground">
-          View all tasks
-        </Button>
-      </div>
+      <button type="button" className="th-dropdown-footer">
+        View all tasks
+      </button>
     </div>
   );
 }
@@ -142,70 +124,51 @@ function CalendarPanelContent({ calendar }: { calendar: CalendarData }) {
   const weekDays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   return (
-    <div className="space-y-0">
-      <div className="border-b border-border pb-2">
-        <span className="font-[var(--font-pixel)] text-xs font-semibold text-foreground">
-          {calendar.month}
-        </span>
+    <div>
+      <div className="th-dropdown-header">
+        {calendar.month}
       </div>
 
       {/* Mini calendar grid */}
-      <div className="py-2">
-        <div className="mb-1 grid grid-cols-7 gap-0">
+      <div className="mini-cal">
+        <div className="mini-cal-days">
           {weekDays.map((d) => (
-            <div
-              key={d}
-              className="text-center font-[var(--font-mono)] text-[9px] font-semibold text-muted-foreground"
-            >
-              {d}
-            </div>
+            <div key={d}>{d}</div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-0">
+        <div className="mini-cal-grid">
           {cells.map((cell, i) => (
             <div
               key={i}
-              className={`relative flex size-7 items-center justify-center font-[var(--font-mono)] text-[10px] ${
+              className={`mcg-day${
                 cell.day === null
-                  ? ""
+                  ? " empty"
                   : cell.isToday
-                    ? "rounded-sm bg-[var(--violet-3)] font-bold text-white"
-                    : "text-foreground"
-              }`}
+                    ? " today"
+                    : ""
+              }${cell.hasEvent && !cell.isToday ? " has-event" : ""}`}
             >
               {cell.day}
-              {cell.hasEvent && !cell.isToday && (
-                <span className="absolute bottom-0.5 left-1/2 size-1 -translate-x-1/2 rounded-full bg-[var(--violet-3)]" />
-              )}
-              {cell.hasEvent && cell.isToday && (
-                <span className="absolute bottom-0.5 left-1/2 size-1 -translate-x-1/2 rounded-full bg-white dark:bg-white" />
-              )}
             </div>
           ))}
         </div>
       </div>
 
       {/* Events list */}
-      <div className="border-t border-border pt-2">
-        <div className="mb-1.5 font-[var(--font-pixel)] text-[10px] font-semibold text-muted-foreground">
-          Upcoming
-        </div>
-        <div className="space-y-1.5">
-          {calendar.events.map((ev, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <span
-                className="mt-1.5 size-2 flex-shrink-0 rounded-full"
-                style={{ background: ev.color }}
-              />
-              <div>
-                <div className="text-xs font-medium text-foreground">{ev.title}</div>
-                <div className="font-[var(--font-mono)] text-[10px] text-muted-foreground">
-                  {ev.meta}
-                </div>
-              </div>
+      <div>
+        <div className="th-dropdown-header">Upcoming</div>
+        {calendar.events.map((ev, i) => (
+          <div key={i} className="cal-event">
+            <div
+              className="cal-event-dot"
+              style={{ background: ev.color }}
+            />
+            <div>
+              <div className="cal-event-title">{ev.title}</div>
+              <div className="cal-event-meta">{ev.meta}</div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -219,67 +182,54 @@ function UsagePanelContent({ usage }: { usage: UsageData }) {
   const percent = parseFloat(usage.percentUsed) || 0;
 
   return (
-    <div className="space-y-0">
-      <div className="border-b border-border pb-2">
-        <span className="font-[var(--font-pixel)] text-xs font-semibold text-foreground">
-          Credit Usage — March 2026
-        </span>
+    <div>
+      <div className="th-dropdown-header">
+        Credit Usage — March 2026
       </div>
 
-      {/* Usage bar */}
-      <div className="py-3">
-        <div className="mb-1 flex items-baseline justify-between">
-          <span className="font-[var(--font-mono)] text-lg font-bold text-foreground">
-            {usage.percentUsed}
-          </span>
-          <span className="font-[var(--font-mono)] text-[10px] text-muted-foreground">
-            used this period
-          </span>
+      {/* Usage gauge readout */}
+      <div className="usage-meter-wrap">
+        <div className="usage-gauge">
+          <div className="usage-gauge-value">{usage.percentUsed}</div>
+          <div className="usage-gauge-unit">used this period</div>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+        {/* Progress bar */}
+        <div className="mt-2 h-2 w-full overflow-hidden rounded-[var(--r-sm)] bg-[var(--taupe-1)]">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[var(--violet-3)] via-[var(--berry-3)] to-[var(--red)] transition-all"
+            className="h-full rounded-[var(--r-sm)] bg-gradient-to-r from-[var(--violet-3)] via-[var(--berry-3)] to-[var(--red)] transition-all"
             style={{ width: `${Math.min(percent, 100)}%` }}
           />
         </div>
       </div>
 
       {/* Stats rows */}
-      <div className="space-y-1.5 border-t border-border pt-2">
-        <UsageRow label="Plan Limit" value={usage.planLimit} />
-        <UsageRow label="Used" value={usage.used} />
-        <UsageRow label="Remaining" value={usage.remaining} highlight />
-        <div className="my-1 h-px bg-border" />
-        <UsageRow label="Overage" value={usage.overage} />
-        <UsageRow label="Renews" value={usage.renews} />
+      <div className="usage-stats px-3 pb-2">
+        <div className="usage-stat-row">
+          <span className="usage-stat-label">Plan Limit</span>
+          <span className="usage-stat-value">{usage.planLimit}</span>
+        </div>
+        <div className="usage-stat-row">
+          <span className="usage-stat-label">Used</span>
+          <span className="usage-stat-value">{usage.used}</span>
+        </div>
+        <div className="usage-stat-row">
+          <span className="usage-stat-label">Remaining</span>
+          <span className="usage-stat-value usage-stat-highlight">{usage.remaining}</span>
+        </div>
+        <div className="usage-stat-divider" />
+        <div className="usage-stat-row">
+          <span className="usage-stat-label">Overage</span>
+          <span className="usage-stat-value">{usage.overage}</span>
+        </div>
+        <div className="usage-stat-row">
+          <span className="usage-stat-label">Renews</span>
+          <span className="usage-stat-value">{usage.renews}</span>
+        </div>
       </div>
     </div>
   );
 }
 
-/** Single row in the usage stats panel */
-function UsageRow({
-  label,
-  value,
-  highlight = false,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="font-[var(--font-mono)] text-[10px] text-muted-foreground">{label}</span>
-      <span
-        className={`font-[var(--font-mono)] text-[10px] font-semibold ${
-          highlight ? "text-[var(--violet-3)]" : "text-foreground"
-        }`}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
 
 // ======== Header Panel Buttons ========
 
@@ -307,7 +257,7 @@ function TaskButton() {
           </span>
         )}
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-72 p-3">
+      <PopoverContent align="end" className="th-dropdown-panel w-[300px] p-0">
         <TaskPanelContent tasks={tasks} />
       </PopoverContent>
     </Popover>
@@ -332,11 +282,11 @@ function CalendarButton() {
       >
         <Calendar className="size-3.5" />
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-64 p-3">
+      <PopoverContent align="end" className="th-dropdown-panel w-[280px] p-0">
         {calendar ? (
           <CalendarPanelContent calendar={calendar} />
         ) : (
-          <div className="text-sm text-muted-foreground">Loading...</div>
+          <div className="p-3 font-[family-name:var(--mono)] text-[11px] text-[var(--taupe-3)]">Loading...</div>
         )}
       </PopoverContent>
     </Popover>
@@ -361,11 +311,11 @@ function UsageButton() {
       >
         <BarChart3 className="size-3.5" />
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-72 p-3">
+      <PopoverContent align="end" className="th-dropdown-panel w-[300px] p-0">
         {usage ? (
           <UsagePanelContent usage={usage} />
         ) : (
-          <div className="text-sm text-muted-foreground">Loading...</div>
+          <div className="p-3 font-[family-name:var(--mono)] text-[11px] text-[var(--taupe-3)]">Loading...</div>
         )}
       </PopoverContent>
     </Popover>
