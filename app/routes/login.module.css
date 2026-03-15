@@ -267,6 +267,47 @@
 }
 
 /* ============================================
+   DARK MODE — AUTH PANEL
+   ============================================ */
+
+:global(.dark) .loginAuth {
+  background: var(--surface-1);
+  border-color: var(--surface-3);
+}
+
+:global(.dark) .authTitle {
+  color: var(--taupe-1);
+}
+
+:global(.dark) .ssoBtn {
+  color: var(--taupe-1);
+  background: var(--surface-2);
+  border-color: var(--surface-3) var(--surface-0) var(--surface-0) var(--surface-3);
+}
+
+:global(.dark) .ssoBtn:hover {
+  background: var(--berry-4);
+  border-color: var(--berry-3) var(--berry-5) var(--berry-5) var(--berry-3);
+  color: var(--berry-1);
+}
+
+:global(.dark) .ssoBtn:active {
+  border-color: var(--berry-5) var(--berry-3) var(--berry-3) var(--berry-5);
+}
+
+:global(.dark) .authFooterLink {
+  color: var(--violet-2);
+}
+
+:global(.dark) .authFooterLink:hover {
+  color: var(--berry-2);
+}
+
+:global(.dark) .authBadge {
+  color: var(--taupe-3);
+}
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 

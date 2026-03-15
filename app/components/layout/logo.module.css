@@ -96,6 +96,24 @@
 /* Row 3 — bottom: 1 sphere */
 .heroSphere:nth-child(6) { top: 69.6px; left: 39.6px; }
 
+/* Responsive: smaller hero spheres on narrow screens */
+@media (max-width: 900px) {
+  .heroSpheres {
+    width: 72px;
+    height: 66px;
+  }
+  .heroSphere {
+    width: 24px;
+    height: 24px;
+  }
+  .heroSphere:nth-child(1) { top: 0; left: 0; }
+  .heroSphere:nth-child(2) { top: 0; left: 26.4px; }
+  .heroSphere:nth-child(3) { top: 0; left: 52.8px; }
+  .heroSphere:nth-child(4) { top: 23.4px; left: 13.2px; }
+  .heroSphere:nth-child(5) { top: 23.4px; left: 39.6px; }
+  .heroSphere:nth-child(6) { top: 46.8px; left: 26.4px; }
+}
+
 /* Reduced motion: disable glow animation */
 @media (prefers-reduced-motion: reduce) {
   .heroLogoMark {
