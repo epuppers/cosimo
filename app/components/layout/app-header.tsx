@@ -7,15 +7,11 @@ import {
   BarChart3,
   ChevronRight,
   ArrowLeft,
-  Settings,
-  LogOut,
   Sun,
   Moon,
   Plus,
 } from "lucide-react";
-import { Button } from "~/components/ui/button";
 import { Switch } from "~/components/ui/switch";
-import { Slider } from "~/components/ui/slider";
 import {
   Popover,
   PopoverContent,
@@ -326,27 +322,6 @@ function UsageButton() {
 
 const FONT_SIZE_LABELS = ["Default", "105%", "110%", "115%", "120%"] as const;
 
-/** Profile menu item row — reusable for main menu items */
-function ProfileMenuItem({
-  children,
-  onClick,
-  className = "",
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-  className?: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex w-full cursor-default items-center gap-2 rounded-md px-2 py-1.5 text-sm text-foreground outline-none transition-colors hover:bg-accent focus-visible:bg-accent ${className}`}
-    >
-      {children}
-    </button>
-  );
-}
-
 /** Appearance & Accessibility sub-panel content */
 function AppearancePanel({ onBack }: { onBack: () => void }) {
   const theme = useThemeStore((s) => s.theme);
@@ -362,37 +337,28 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
   const highContrast = useThemeStore((s) => s.highContrast);
   const toggleHighContrast = useThemeStore((s) => s.toggleHighContrast);
 
-  const handleSliderChange = useCallback(
-    (val: number | readonly number[]) => {
-      const v = Array.isArray(val) ? val[0] : val;
-      setPurpleIntensity(v);
-    },
-    [setPurpleIntensity],
-  );
-
   return (
-    <div className="space-y-3">
+    <div className="profile-menu-subpanel" style={{ display: 'flex' }}>
       {/* Back header */}
-      <div className="flex items-center gap-2 border-b border-border pb-2">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          aria-label="Back to profile menu"
-        >
+      <button
+        type="button"
+        onClick={onBack}
+        className="profile-menu-subpanel-header"
+      >
+        <span className="profile-menu-back-icon">
           <ArrowLeft className="size-3.5" />
-        </button>
-        <span className="font-[var(--font-pixel)] text-xs font-semibold text-foreground">
-          Appearance
         </span>
-      </div>
+        <span className="profile-menu-subpanel-title">Appearance</span>
+      </button>
 
-      {/* Dark mode */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-foreground">
+      <div className="profile-menu-divider" />
+
+      {/* Dark mode toggle */}
+      <div className="profile-menu-theme" role="button" tabIndex={0} onClick={toggleTheme} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleTheme(); }}>
+        <span className="profile-menu-theme-label">
           {theme === "dark" ? <Moon className="size-3.5" /> : <Sun className="size-3.5" />}
-          <span>Dark Mode</span>
-        </div>
+          Dark Mode
+        </span>
         <Switch
           size="sm"
           checked={theme === "dark"}
@@ -400,47 +366,44 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
         />
       </div>
 
-      {/* Purple intensity */}
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-foreground">Purple Intensity</span>
-          <span className="font-[var(--font-mono)] text-[10px] text-muted-foreground">
-            {purpleIntensity}%
-          </span>
+      {/* Purple intensity slider */}
+      <div className="profile-menu-contrast">
+        <div className="profile-menu-contrast-header">
+          <span className="profile-menu-contrast-label">Purple Intensity</span>
+          <span className="profile-menu-contrast-value">{purpleIntensity}%</span>
         </div>
-        <Slider
-          value={[purpleIntensity]}
+        <input
+          type="range"
+          className="profile-menu-slider"
           min={0}
           max={100}
-          onValueChange={handleSliderChange}
+          value={purpleIntensity}
+          onChange={(e) => setPurpleIntensity(Number(e.target.value))}
         />
       </div>
 
       {/* Text size */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-foreground">Text Size</span>
-        <div className="flex items-center gap-1.5">
-          <span className="font-[var(--font-mono)] text-[10px] text-muted-foreground">
-            {FONT_SIZE_LABELS[fontSizeLevel]}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="size-6 p-0"
-            onClick={cycleFontSize}
-            aria-label="Cycle text size"
-          >
-            <Plus className="size-3" />
-          </Button>
-        </div>
+      <div className="profile-menu-font-size">
+        <span className="profile-menu-font-size-label">Text Size</span>
+        <button
+          type="button"
+          className="profile-menu-font-size-btn"
+          onClick={cycleFontSize}
+          aria-label="Cycle text size"
+        >
+          {FONT_SIZE_LABELS[fontSizeLevel]}
+          <Plus className="size-2.5" />
+        </button>
       </div>
 
-      {/* Separator */}
-      <div className="h-px bg-border" />
+      <div className="profile-menu-divider" />
+
+      {/* Accessibility section */}
+      <div className="profile-menu-section-label">Accessibility</div>
 
       {/* Dyslexia font */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-foreground">Dyslexia Font</span>
+      <div className="profile-menu-toggle-row">
+        <span className="profile-menu-toggle-label">Dyslexia Font</span>
         <Switch
           size="sm"
           checked={dyslexiaFont}
@@ -449,8 +412,8 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* Reduced motion */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-foreground">Reduced Motion</span>
+      <div className="profile-menu-toggle-row">
+        <span className="profile-menu-toggle-label">Reduced Motion</span>
         <Switch
           size="sm"
           checked={reducedMotion}
@@ -459,8 +422,8 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* High contrast */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-foreground">High Contrast</span>
+      <div className="profile-menu-toggle-row">
+        <span className="profile-menu-toggle-label">High Contrast</span>
         <Switch
           size="sm"
           checked={highContrast}
@@ -498,44 +461,39 @@ function ProfileAvatar() {
       >
         E
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-64 p-2">
+      <PopoverContent align="end" className="th-dropdown-panel th-dropdown-profile p-0" style={{ width: view === "appearance" ? 240 : 200 }}>
         {view === "main" ? (
-          <div>
+          <div className="profile-menu-view">
             {/* User info */}
-            <div className="flex items-center gap-2.5 px-2 py-2">
-              <div className="flex size-8 items-center justify-center rounded-[var(--r-md)] bg-[var(--violet-3)] font-[family-name:var(--mono)] text-[11px] font-bold text-white">
-                E
-              </div>
+            <div className="profile-menu-user-info">
+              <div className="profile-menu-user-avatar">E</div>
               <div className="min-w-0">
-                <div className="text-sm font-medium text-foreground">Eliot Puplett</div>
-                <div className="font-[var(--font-mono)] text-[10px] text-muted-foreground">
-                  e.puplett@medici.com
-                </div>
+                <div className="profile-menu-user-name">Eliot Puplett</div>
+                <div className="profile-menu-user-email">e.puplett@medici.com</div>
               </div>
             </div>
 
-            <div className="-mx-2 my-1 h-px bg-border" />
+            <div className="profile-menu-divider" />
 
             {/* Appearance & Accessibility */}
-            <ProfileMenuItem onClick={() => setView("appearance")}>
-              <Settings className="size-3.5 text-muted-foreground" />
-              <span className="flex-1 text-left">Appearance & Accessibility</span>
-              <ChevronRight className="size-3.5 text-muted-foreground" />
-            </ProfileMenuItem>
+            <button type="button" className="profile-menu-item" onClick={() => setView("appearance")}>
+              <span>Appearance</span>
+              <span className="profile-menu-item-chevron">
+                <ChevronRight className="size-3.5" />
+              </span>
+            </button>
 
             {/* Account Settings */}
-            <ProfileMenuItem onClick={handleAccountSettings}>
-              <Settings className="size-3.5 text-muted-foreground" />
-              <span className="flex-1 text-left">Account Settings</span>
-            </ProfileMenuItem>
+            <button type="button" className="profile-menu-item" onClick={handleAccountSettings}>
+              <span>Account Settings</span>
+            </button>
 
-            <div className="-mx-2 my-1 h-px bg-border" />
+            <div className="profile-menu-divider" />
 
             {/* Sign Out */}
-            <ProfileMenuItem className="text-destructive hover:text-destructive">
-              <LogOut className="size-3.5" />
-              <span className="flex-1 text-left">Sign Out</span>
-            </ProfileMenuItem>
+            <button type="button" className="profile-menu-item profile-menu-signout">
+              <span>Sign Out</span>
+            </button>
           </div>
         ) : (
           <AppearancePanel onBack={() => setView("main")} />
