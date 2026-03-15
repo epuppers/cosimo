@@ -3,13 +3,13 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  ChevronUp,
   Search,
   Plus,
   Brain,
   BookOpen,
   Network,
 } from "lucide-react";
+import { cn } from "~/lib/utils";
 import { LogoMark } from "~/components/layout/logo";
 import { useUIStore } from "~/stores/ui-store";
 import { ThreadList } from "~/components/chat/thread-list";
@@ -21,9 +21,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
   SidebarProvider,
   useSidebar,
 } from "~/components/ui/sidebar";
@@ -94,44 +91,40 @@ function BrainNav() {
   }
 
   return (
-    <SidebarGroup className="p-2">
-      <div className="flex items-center justify-between px-2">
-        <div className="font-[family-name:var(--mono)] text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--taupe-3)]">
-          Brain
-        </div>
+    <div className="brain-nav mt-auto border-t border-[var(--taupe-4)] px-1.5 pb-1.5">
+      <div className="flex items-center justify-between">
+        <div className="sidebar-section-label px-2 pt-2 pb-1">Brain</div>
         <button
           onClick={toggleBrainNav}
           aria-label={brainNavCollapsed ? "Expand Brain nav" : "Collapse Brain nav"}
-          className="flex size-[22px] items-center justify-center rounded-[var(--r-sm)] border border-transparent bg-transparent text-[var(--taupe-3)] hover:border-[var(--taupe-2)] hover:bg-[rgba(var(--violet-3-rgb),0.08)] hover:text-[var(--violet-3)]"
+          className="mr-1.5 flex size-5 items-center justify-center rounded-[var(--r-sm)] border-none bg-transparent text-[var(--taupe-3)] transition-colors hover:bg-[rgba(var(--white-pure-rgb),0.08)] hover:text-[var(--taupe-1)] focus-visible:outline-2 focus-visible:outline-[var(--violet-3)] focus-visible:outline-offset-1 active:bg-[rgba(var(--white-pure-rgb),0.12)]"
         >
-          {brainNavCollapsed ? (
-            <ChevronUp className="size-3" />
-          ) : (
-            <ChevronDown className="size-3" />
-          )}
+          <ChevronDown className={cn("size-2.5 transition-transform", brainNavCollapsed && "-rotate-90")} />
         </button>
       </div>
       {!brainNavCollapsed && (
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {brainItems.map((item) => (
-              <SidebarMenuItem key={item.path}>
-                <SidebarMenuButton
-                  isActive={location.pathname === item.path}
-                  tooltip={item.label}
-                  render={<Link to={item.path} />}
-                  size="sm"
-                  className="font-[family-name:var(--mono)] text-[10px] text-[var(--taupe-3)] hover:bg-[rgba(var(--white-pure-rgb),0.04)] hover:text-[var(--taupe-1)] data-active:border data-active:border-solid data-active:border-[var(--chinese-3)] data-active:bg-[var(--chinese-4)] data-active:text-[var(--taupe-1)]"
-                >
-                  <item.icon className="size-3.5" />
-                  <span>{item.label}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroupContent>
+        <div className="flex flex-col gap-0.5">
+          {brainItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "brain-nav-btn flex items-center gap-2 rounded-[var(--r-md)] px-2.5 py-[7px] font-[family-name:var(--mono)] text-[11px] text-[var(--taupe-2)] no-underline transition-colors",
+                  "hover:bg-[rgba(var(--white-pure-rgb),0.06)] hover:text-[var(--taupe-1)]",
+                  "focus-visible:outline-2 focus-visible:outline-[var(--violet-3)] focus-visible:outline-offset-1",
+                  isActive && "bg-[var(--berry-5)] text-[var(--berry-1)]"
+                )}
+              >
+                <item.icon className={cn("size-3.5 shrink-0 opacity-70", isActive && "opacity-100")} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
       )}
-    </SidebarGroup>
+    </div>
   );
 }
 

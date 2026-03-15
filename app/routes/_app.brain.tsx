@@ -16,9 +16,9 @@ export default function BrainRoute() {
   const location = useLocation();
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-[var(--off-white)] dark:bg-[var(--surface-0)]">
       {/* Section tabs */}
-      <nav className="flex shrink-0 gap-1 border-b border-border px-4 pt-2">
+      <nav className="flex shrink-0 gap-1 border-b border-[var(--taupe-2)] px-4 pt-2 dark:border-[var(--taupe-4)]">
         {BRAIN_SECTIONS.map((section) => {
           const isActive = location.pathname.startsWith(section.path);
           return (
@@ -26,16 +26,16 @@ export default function BrainRoute() {
               key={section.path}
               to={section.path}
               className={cn(
-                'relative px-3 py-2 text-xs font-medium transition-colors',
-                'hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-t-md',
+                'relative px-3 py-2 font-[family-name:var(--pixel)] text-[11px] uppercase tracking-[0.08em] transition-colors',
+                'hover:text-[var(--taupe-5)] dark:hover:text-[var(--taupe-1)] focus-visible:outline-2 focus-visible:outline-[var(--violet-3)] focus-visible:outline-offset-1 rounded-t-[var(--r-md)]',
                 isActive
-                  ? 'text-foreground'
-                  : 'text-muted-foreground'
+                  ? 'text-[var(--taupe-5)] dark:text-[var(--taupe-1)]'
+                  : 'text-[var(--taupe-3)]'
               )}
             >
               {section.label}
               {isActive && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--violet-3)]" />
               )}
             </Link>
           );
