@@ -178,7 +178,7 @@ export function EntityGraph({ graphData, selectedEntityId, onSelectEntity }: Ent
             <div key={cat.id} className="graph-legend-item">
               <span
                 className="graph-legend-dot"
-                style={{ backgroundColor: rgb?.core ?? '#888' }}
+                style={{ backgroundColor: CATEGORY_COLORS[cat.id]?.core ?? 'var(--taupe-3)' }}
               />
               <span className="graph-legend-label">{cat.label}</span>
               <span className="graph-legend-count">{cat.count}</span>
@@ -247,7 +247,7 @@ export function EntityGraph({ graphData, selectedEntityId, onSelectEntity }: Ent
                 y1={edge.from.y}
                 x2={edge.to.x}
                 y2={edge.to.y}
-                stroke={rgb?.core ?? '#888'}
+                style={{ stroke: CATEGORY_COLORS[edge.category]?.core ?? 'var(--taupe-3)' }}
                 strokeWidth={0.8}
               />
             );
@@ -275,7 +275,7 @@ export function EntityGraph({ graphData, selectedEntityId, onSelectEntity }: Ent
                 <circle
                   r={pn.radius + 6}
                   fill="none"
-                  stroke={rgb?.core ?? '#888'}
+                  style={{ stroke: CATEGORY_COLORS[pn.category]?.core ?? 'var(--taupe-3)' }}
                   strokeWidth={2}
                   opacity={0.5}
                 />
@@ -284,16 +284,18 @@ export function EntityGraph({ graphData, selectedEntityId, onSelectEntity }: Ent
               <circle
                 r={isSelected ? pn.radius + 2 : pn.radius}
                 fill={`url(#grad-${pn.category})`}
-                stroke={isSelected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.12)'}
+                style={{
+                  stroke: isSelected ? 'rgba(var(--white-pure-rgb), 0.5)' : 'rgba(var(--white-pure-rgb), 0.12)',
+                  transition: 'r 0.2s ease',
+                }}
                 strokeWidth={isSelected ? 2 : 1}
-                style={{ transition: 'r 0.2s ease' }}
               />
               {/* Label */}
               <text
                 y={pn.radius + 14}
                 textAnchor="middle"
                 className="text-[9px] font-semibold"
-                style={{ fontFamily: 'var(--mono)', fill: 'rgba(255,255,255,0.85)' }}
+                style={{ fontFamily: 'var(--mono)', fill: 'rgba(var(--white-pure-rgb), 0.85)' }}
               >
                 {pn.node.label}
               </text>
@@ -302,7 +304,7 @@ export function EntityGraph({ graphData, selectedEntityId, onSelectEntity }: Ent
                 y={pn.radius + 24}
                 textAnchor="middle"
                 className="text-[7px]"
-                style={{ fontFamily: 'var(--sans)', fill: 'rgba(255,255,255,0.5)' }}
+                style={{ fontFamily: 'var(--sans)', fill: 'rgba(var(--white-pure-rgb), 0.5)' }}
               >
                 {pn.node.sub}
               </text>
