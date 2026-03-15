@@ -2646,6 +2646,434 @@
   border-bottom-color: var(--surface-3);
 }
 
+/* ============================================
+   FILE PANEL — Right-side resizable panel
+   ============================================ */
+
+.file-panel {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  background: var(--white);
+  border-left: 2px solid var(--taupe-2);
+  border-radius: var(--r-lg);
+}
+
+.dark .file-panel {
+  background: var(--surface-1);
+  border-left-color: var(--surface-0);
+}
+
+/* ---- Header ---- */
+.file-panel-header {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  padding: 0 6px;
+  min-height: 38px;
+  background: var(--white);
+  border-bottom: 1px solid var(--taupe-2);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.dark .file-panel-header {
+  background: var(--surface-1);
+  border-bottom-color: var(--surface-3);
+}
+
+/* ---- Tabs ---- */
+.file-panel-tabs {
+  display: flex;
+  gap: 0;
+}
+
+.file-panel-tab {
+  padding: 0 12px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--taupe-3);
+  background: var(--taupe-1);
+  border: 1px solid var(--taupe-2);
+  border-bottom: 1px solid var(--taupe-2);
+  cursor: pointer;
+  margin-bottom: -1px;
+  margin-top: 6px;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  transition: color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.file-panel-tab:hover {
+  color: var(--taupe-5);
+  background: var(--berry-1);
+}
+
+.file-panel-tab.active {
+  color: var(--berry-3);
+  background: var(--off-white);
+  border-color: var(--taupe-2) var(--taupe-2) transparent var(--taupe-2);
+  z-index: 2;
+  margin-top: 4px;
+}
+
+.file-panel-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--violet-3);
+  border-radius: var(--r-md) var(--r-md) 0 0;
+}
+
+.dark .file-panel-tab {
+  background: rgba(0,0,0,0.25);
+  border-color: var(--surface-3);
+}
+
+.dark .file-panel-tab:hover {
+  color: var(--taupe-5);
+  background: var(--berry-1);
+}
+
+.dark .file-panel-tab.active {
+  color: var(--taupe-5);
+  background: var(--off-white);
+  border-color: var(--surface-3) var(--surface-3) transparent var(--surface-3);
+}
+
+.dark .file-panel-tab.active::before {
+  background: var(--violet-2);
+}
+
+/* ---- Close button ---- */
+.file-panel-close {
+  padding: 4px 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--taupe-4);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+}
+
+.file-panel-close:hover {
+  color: var(--red);
+  background: rgba(var(--red-rgb),0.08);
+  border-color: var(--red);
+}
+
+/* ---- File bar (dark bar at top of spreadsheet) ---- */
+.fp-file-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--taupe-5);
+  border-bottom: 1px solid var(--taupe-4);
+}
+
+.dark .fp-file-bar {
+  background: var(--surface-2);
+}
+
+.fp-file-icon {
+  font-size: 12px;
+  color: var(--green);
+}
+
+.fp-file-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--taupe-1);
+}
+
+.dark .fp-file-name {
+  color: var(--taupe-4);
+}
+
+/* ---- Formula bar ---- */
+.fp-formula-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--off-white);
+  border-bottom: 1px solid var(--taupe-2);
+  min-height: 28px;
+}
+
+.dark .fp-formula-bar {
+  background: var(--surface-1);
+  border-bottom-color: var(--surface-3);
+}
+
+.fp-cell-ref {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--taupe-5);
+  background: var(--white);
+  border: 1px solid;
+  padding: 2px 8px;
+  min-width: 36px;
+  text-align: center;
+  border-radius: var(--r-md);
+}
+
+.dark .fp-cell-ref {
+  background: var(--surface-0);
+  color: var(--taupe-1);
+}
+
+.fp-formula {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--taupe-4);
+  flex: 1;
+}
+
+.dark .fp-formula {
+  color: var(--taupe-2);
+}
+
+/* ---- Spreadsheet grid ---- */
+.fp-sheet-wrap {
+  flex: 1;
+  overflow: auto;
+}
+
+.fp-sheet {
+  min-width: 600px;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.fp-sheet th {
+  padding: 4px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--taupe-3);
+  background: var(--off-white);
+  border: 1px solid var(--taupe-2);
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.dark .fp-sheet th {
+  background: var(--surface-1);
+  color: var(--taupe-2);
+  border-color: var(--surface-3);
+}
+
+.fp-row-header {
+  width: 32px;
+  min-width: 32px;
+}
+
+.fp-sheet td {
+  padding: 4px 8px;
+  color: var(--taupe-5);
+  border: 1px solid var(--taupe-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.08s;
+}
+
+.dark .fp-sheet td {
+  color: var(--taupe-1);
+  border-color: var(--surface-3);
+}
+
+.fp-sheet td:first-child {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--taupe-3);
+  background: var(--off-white);
+  text-align: center;
+  width: 32px;
+  cursor: default;
+}
+
+.dark .fp-sheet td:first-child {
+  background: var(--surface-1);
+  color: var(--taupe-2);
+}
+
+.fp-sheet td:hover {
+  background: rgba(var(--violet-3-rgb),0.06);
+}
+
+.fp-sheet td.fp-cell-selected {
+  outline: 2px solid var(--violet-3);
+  outline-offset: -1px;
+  background: rgba(var(--violet-3-rgb),0.08);
+}
+
+.fp-sheet td.fp-cell-number {
+  text-align: right;
+}
+
+.fp-sheet td.fp-cell-formula {
+  color: var(--violet-3);
+}
+
+/* ============================================
+   FOLDER VIEW
+   ============================================ */
+.fp-folder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--off-white);
+  border-bottom: 1px solid var(--taupe-2);
+}
+
+.dark .fp-folder-header {
+  background: var(--surface-1);
+  border-bottom-color: var(--surface-3);
+}
+
+.fp-folder-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--taupe-3);
+}
+
+.fp-folder-count {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--taupe-3);
+}
+
+.fp-file-list {
+  padding: 6px;
+}
+
+.fp-file-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.12s;
+  border-radius: var(--r-md);
+}
+
+.fp-file-item:hover {
+  background: var(--berry-1);
+  border-color: var(--taupe-2);
+}
+
+.dark .fp-file-item:hover {
+  background: var(--surface-2);
+  border-color: var(--surface-3);
+}
+
+.fp-file-item.active {
+  background: var(--off-white);
+  border: 1px solid;
+  border-color: var(--taupe-2) var(--taupe-3) var(--taupe-3) var(--taupe-2);
+}
+
+.dark .fp-file-item.active {
+  background: var(--surface-2);
+  border-color: var(--taupe-2);
+}
+
+.fp-file-item-icon {
+  width: 28px;
+  height: 28px;
+  background: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--white);
+  flex-shrink: 0;
+  border-radius: var(--r-md);
+}
+
+.dark .fp-file-item-icon {
+  color: var(--off-white);
+}
+
+.fp-file-item-info {
+  flex: 1;
+}
+
+.fp-file-item-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--taupe-5);
+}
+
+.dark .fp-file-item-name {
+  color: var(--taupe-1);
+}
+
+.fp-file-item-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--taupe-3);
+  margin-top: 2px;
+}
+
+/* ---- Resize handle ---- */
+.resize-handle {
+  width: 5px;
+  cursor: col-resize;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 32px;
+  background: repeating-linear-gradient(
+    180deg,
+    var(--taupe-3) 0px,
+    var(--taupe-3) 2px,
+    transparent 2px,
+    transparent 5px
+  );
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.resize-handle:hover::after,
+.resize-handle.dragging::after {
+  opacity: 1;
+}
+
 /* ======== Blink Cursor (alias for stream-cursor-blink) ======== */
 @keyframes blink-cursor {
   0%, 100% { opacity: 1; }

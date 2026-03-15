@@ -5,17 +5,6 @@
 // Opens via useChatStore.filePanelOpen.
 
 import { useEffect, useState } from 'react';
-import { X, Table2, FolderTree, FileSpreadsheet } from 'lucide-react';
-import { Button } from '~/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/components/ui/table';
-import { ScrollArea } from '~/components/ui/scroll-area';
 import { useChatStore } from '~/stores/chat-store';
 import { useResizePanel } from '~/hooks/use-resize-panel';
 import { getSpreadsheet } from '~/services/panels';
@@ -34,6 +23,7 @@ export function FilePanel() {
 
   const [activeTab, setActiveTab] = useState<PanelTab>('spreadsheet');
   const [spreadsheet, setSpreadsheet] = useState<SpreadsheetData | null>(null);
+  const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
   const { currentWidth, isDragging, handleMouseDown } = useResizePanel({
     initialWidth: 480,
     minWidth: 320,
@@ -52,74 +42,66 @@ export function FilePanel() {
 
   if (!isOpen) return null;
 
+  // Get selected cell display info
+  const cellRef = selectedCell
+    ? `${String.fromCharCode(65 + selectedCell.col)}${selectedCell.row + 1}`
+    : 'A1';
+  const cellFormula = selectedCell && spreadsheet
+    ? spreadsheet.rows[selectedCell.row]?.cells[selectedCell.col] ?? ''
+    : spreadsheet?.columns[0] ?? '';
+
   return (
-    <div
-      className={cn(
-        'relative flex h-full flex-col border-l border-border bg-background',
-        isDragging && 'select-none'
-      )}
-      style={{ width: currentWidth }}
-    >
+    <>
       {/* Resize handle */}
       <div
-        className="absolute left-0 top-0 z-10 h-full w-1 cursor-col-resize hover:bg-primary/20 active:bg-primary/30"
+        className={cn('resize-handle', isDragging && 'dragging')}
         onMouseDown={handleMouseDown}
       />
 
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <FileSpreadsheet className="size-4 text-muted-foreground" />
-          <span className="font-[var(--font-mono)] text-xs font-semibold uppercase tracking-wider text-foreground">
-            Files
-          </span>
+      <div
+        className={cn('file-panel h-full', isDragging && 'select-none')}
+        style={{ width: currentWidth }}
+        aria-label="File panel"
+      >
+        {/* Header with tabs */}
+        <div className="file-panel-header">
+          <div className="file-panel-tabs">
+            <button
+              className={cn('file-panel-tab', activeTab === 'spreadsheet' && 'active')}
+              onClick={() => setActiveTab('spreadsheet')}
+            >
+              Viewer
+            </button>
+            <button
+              className={cn('file-panel-tab', activeTab === 'folder' && 'active')}
+              onClick={() => setActiveTab('folder')}
+            >
+              Files
+            </button>
+          </div>
+          <button
+            className="file-panel-close"
+            onClick={close}
+            aria-label="Close file panel"
+          >
+            ✕
+          </button>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-7"
-          onClick={close}
-          aria-label="Close file panel"
-        >
-          <X className="size-3.5" />
-        </Button>
-      </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-border">
-        <button
-          className={cn(
-            'flex items-center gap-1.5 px-4 py-2 text-xs font-medium transition-colors',
-            activeTab === 'spreadsheet'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-muted-foreground hover:text-foreground'
-          )}
-          onClick={() => setActiveTab('spreadsheet')}
-        >
-          <Table2 className="size-3.5" />
-          Spreadsheet
-        </button>
-        <button
-          className={cn(
-            'flex items-center gap-1.5 px-4 py-2 text-xs font-medium transition-colors',
-            activeTab === 'folder'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-muted-foreground hover:text-foreground'
-          )}
-          onClick={() => setActiveTab('folder')}
-        >
-          <FolderTree className="size-3.5" />
-          Folder
-        </button>
+        {/* Content */}
+        {activeTab === 'spreadsheet' ? (
+          <SpreadsheetView
+            data={spreadsheet}
+            selectedCell={selectedCell}
+            onSelectCell={setSelectedCell}
+            cellRef={cellRef}
+            cellFormula={cellFormula}
+          />
+        ) : (
+          <FolderView />
+        )}
       </div>
-
-      {/* Content */}
-      {activeTab === 'spreadsheet' ? (
-        <SpreadsheetView data={spreadsheet} />
-      ) : (
-        <FolderView />
-      )}
-    </div>
+    </>
   );
 }
 
@@ -129,86 +111,107 @@ export function FilePanel() {
 
 interface SpreadsheetViewProps {
   data: SpreadsheetData | null;
+  selectedCell: { row: number; col: number } | null;
+  onSelectCell: (cell: { row: number; col: number } | null) => void;
+  cellRef: string;
+  cellFormula: string;
 }
 
-/** Renders spreadsheet data in a scrollable table. */
-function SpreadsheetView({ data }: SpreadsheetViewProps) {
+/** Renders spreadsheet data with file bar, formula bar, and grid. */
+function SpreadsheetView({ data, selectedCell, onSelectCell, cellRef, cellFormula }: SpreadsheetViewProps) {
   if (!data) {
     return (
-      <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+      <div className="flex flex-1 items-center justify-center font-[family-name:var(--mono)] text-[11px] text-[var(--taupe-3)]">
         Loading…
       </div>
     );
   }
 
   return (
-    <ScrollArea className="flex-1">
-      <div className="min-w-max">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              {/* Row number column */}
-              <TableHead className="w-8 bg-muted/30 text-center font-[var(--font-mono)] text-[10px] text-muted-foreground">
-                #
-              </TableHead>
+    <>
+      {/* Dark file bar */}
+      <div className="fp-file-bar">
+        <span className="fp-file-icon">▦</span>
+        <span className="fp-file-name">Hilgard_Fund_II_Fee_Analysis.xlsx</span>
+      </div>
+
+      {/* Formula bar */}
+      <div className="fp-formula-bar">
+        <span className="fp-cell-ref bevel-inset">{cellRef}</span>
+        <span className="fp-formula">{cellFormula}</span>
+      </div>
+
+      {/* Spreadsheet grid */}
+      <div className="fp-sheet-wrap">
+        <table className="fp-sheet">
+          <thead>
+            <tr>
+              <th className="fp-row-header"></th>
               {data.columns.map((col) => (
-                <TableHead
-                  key={col}
-                  className="bg-muted/30 text-center font-[var(--font-mono)] text-[10px] font-semibold text-muted-foreground"
-                >
-                  {col}
-                </TableHead>
+                <th key={col}>{col}</th>
               ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.rows.map((row) => {
+            </tr>
+          </thead>
+          <tbody>
+            {data.rows.map((row, rowIdx) => {
               const isEmpty = row.cells.every((c) => c === '');
               const isTotal = row.cells[0] === 'TOTAL';
               return (
-                <TableRow
+                <tr
                   key={row.row}
                   className={cn(
-                    'hover:bg-muted/10',
                     isEmpty && 'h-4',
-                    isTotal && 'border-t-2 border-foreground/20 font-semibold'
+                    isTotal && 'font-semibold'
                   )}
                 >
-                  <TableCell className="w-8 text-center font-[var(--font-mono)] text-[10px] text-muted-foreground/50">
-                    {row.row}
-                  </TableCell>
-                  {row.cells.map((cell, i) => (
-                    <TableCell
-                      key={`${row.row}-${i}`}
-                      className={cn(
-                        'whitespace-nowrap px-2 py-1 font-[var(--font-mono)] text-[11px]',
-                        cell.startsWith('$') && 'text-right',
-                        cell.endsWith('%') && 'text-right'
-                      )}
-                    >
-                      {cell}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                  <td>{row.row}</td>
+                  {row.cells.map((cell, colIdx) => {
+                    const isSelected = selectedCell?.row === rowIdx && selectedCell?.col === colIdx;
+                    const isNumber = cell.startsWith('$') || cell.endsWith('%') || /^[\d,.]+$/.test(cell);
+                    return (
+                      <td
+                        key={`${row.row}-${colIdx}`}
+                        className={cn(
+                          isSelected && 'fp-cell-selected',
+                          isNumber && 'fp-cell-number'
+                        )}
+                        onClick={() => onSelectCell({ row: rowIdx, col: colIdx })}
+                      >
+                        {cell}
+                      </td>
+                    );
+                  })}
+                </tr>
               );
             })}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       </div>
-    </ScrollArea>
+    </>
   );
 }
 
 // ============================================
-// FolderView — placeholder file tree
+// FolderView — file list with icons
 // ============================================
 
-/** Placeholder folder tree view. */
+/** Folder file list matching reference design. */
 function FolderView() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-2 p-4 text-muted-foreground">
-      <FolderTree className="size-8 opacity-30" />
-      <p className="text-xs">Folder view coming soon</p>
-    </div>
+    <>
+      <div className="fp-folder-header">
+        <span className="fp-folder-title">Thread Files</span>
+        <span className="fp-folder-count">1 file</span>
+      </div>
+      <div className="fp-file-list">
+        <div className="fp-file-item active">
+          <div className="fp-file-item-icon">▦</div>
+          <div className="fp-file-item-info">
+            <div className="fp-file-item-name">Hilgard_Fund_II_Fee_Analysis.xlsx</div>
+            <div className="fp-file-item-meta">Generated by Cosimo · Feb 22, 4:16 PM · 12 rows</div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
