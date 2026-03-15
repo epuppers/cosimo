@@ -17,7 +17,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-pixel: 'ChicagoFLF', monospace;
+  --font-pixel: 'ChicagoFLF', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
   --font-sans: 'DM Sans', sans-serif;
 }
@@ -292,7 +292,7 @@
 }
 
 @theme inline {
-  --font-pixel: 'ChicagoFLF', monospace;
+  --font-pixel: 'ChicagoFLF', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
   --font-sans: 'DM Sans', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
