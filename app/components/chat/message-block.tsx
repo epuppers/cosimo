@@ -100,7 +100,7 @@ function UserMessage({ message, isWorkflowThread }: { message: Message; isWorkfl
         {/* Message body */}
         <div className="msg-body">
           {message.commandChip && (
-            <span className="mr-2 inline-block rounded-[var(--r-sm)] bg-[var(--violet-3)] px-2 py-0.5 font-[family-name:var(--mono)] text-[11px] font-semibold text-white">
+            <span className="wf-command-chip mr-2">
               {message.commandChip}
             </span>
           )}
