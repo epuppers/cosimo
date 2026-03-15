@@ -1992,6 +1992,245 @@
   border-color: rgba(var(--amber-rgb), 0.3);
 }
 
+/* ======== Cosimo Thinking / Reasoning / Streaming ======== */
+
+.cosimo-thinking {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.thinking-cube {
+  width: 8px;
+  height: 8px;
+  background: var(--violet-2);
+  border: 1px solid;
+  border-color: var(--violet-1) var(--violet-4) var(--violet-4) var(--violet-1);
+  animation: cube-wave 1.8s ease-in-out infinite;
+}
+
+.thinking-cube:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.thinking-cube:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.cosimo-thinking.fading {
+  transition: opacity 0.5s ease;
+  opacity: 0;
+}
+
+/* Cosimo Reasoning (Train of Thought) */
+.cosimo-reasoning {
+  margin: 4px 0 4px 30px;
+  border: 2px solid;
+  border-color: var(--taupe-2) var(--taupe-4) var(--taupe-4) var(--taupe-2);
+  background: var(--off-white);
+  overflow: hidden;
+  border-radius: var(--r-md);
+}
+
+.reasoning-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--taupe-5);
+  border-bottom: 1px solid var(--taupe-4);
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+}
+
+.reasoning-header-icon {
+  font-size: 10px;
+  color: var(--violet-2);
+}
+
+.reasoning-header-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--taupe-1);
+  letter-spacing: 0.05em;
+}
+
+.reasoning-pulse {
+  width: 6px;
+  height: 6px;
+  background: var(--violet-2);
+  border: 1px solid var(--violet-3);
+  animation: reason-pulse 1.5s ease-in-out infinite;
+  margin-left: auto;
+}
+
+.reasoning-steps {
+  padding: 8px 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.reasoning-step-item {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--taupe-4);
+  padding: 3px 0;
+  border-bottom: 1px solid var(--taupe-1);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.reasoning-step-item:last-child { border-bottom: none; }
+
+.reasoning-step-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reasoning-flag {
+  color: var(--amber);
+  font-weight: 600;
+}
+
+/* Reasoning collapse transition */
+.cosimo-reasoning.collapsing {
+  max-height: 300px;
+  transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+}
+
+.cosimo-reasoning.collapsed {
+  max-height: 38px;
+  overflow: hidden;
+}
+
+.cosimo-reasoning.collapsed .reasoning-steps {
+  display: none;
+}
+
+.cosimo-reasoning.collapsed .reasoning-header-label {
+  color: var(--taupe-3);
+}
+
+.cosimo-reasoning.collapsed .reasoning-pulse {
+  animation: none;
+  opacity: 0.3;
+}
+
+/* Dark mode — reasoning */
+.dark .cosimo-reasoning {
+  border-color: var(--taupe-2);
+}
+
+.dark .reasoning-header {
+  background: var(--surface-2);
+}
+
+.dark .reasoning-header-label {
+  color: var(--taupe-4);
+}
+
+.dark .reasoning-step-item {
+  border-bottom-color: var(--surface-3);
+}
+
+.dark .cosimo-reasoning.collapsed .reasoning-header-label {
+  color: var(--taupe-2);
+}
+
+/* Erabor Response Sections */
+.erabor-section {
+  margin: 12px 0 12px 30px;
+  border: 2px solid;
+  border-color: var(--taupe-2) var(--taupe-4) var(--taupe-4) var(--taupe-2);
+  background: var(--white);
+  border-radius: var(--r-md);
+}
+
+.erabor-section-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--taupe-1);
+  padding: 6px 12px;
+  background: var(--taupe-5);
+  border-bottom: 1px solid var(--taupe-4);
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+}
+
+.erabor-section-body {
+  padding: 4px 0;
+}
+
+.erabor-kv {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 5px 12px;
+  border-bottom: 1px solid var(--taupe-1);
+}
+
+.erabor-kv:last-child { border-bottom: none; }
+
+.erabor-k {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--taupe-3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+
+.erabor-v {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--taupe-5);
+  text-align: right;
+}
+
+.erabor-v.erabor-flag {
+  color: var(--amber);
+}
+
+/* Stream cursor */
+.stream-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  background: var(--violet-3);
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  animation: blink-cursor 0.6s step-end infinite;
+}
+
+/* Dark mode — erabor */
+.dark .erabor-section {
+  border-color: var(--taupe-2);
+}
+
+.dark .erabor-section-title {
+  background: var(--surface-2);
+  color: var(--taupe-4);
+}
+
+.dark .erabor-kv {
+  border-bottom-color: var(--surface-3);
+}
+
+.dark .erabor-v {
+  color: var(--taupe-1);
+}
+
+.dark .erabor-v.erabor-flag {
+  color: var(--amber);
+}
+
 /* ======== Chat Input Area ======== */
 
 .input-area {

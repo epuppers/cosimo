@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Badge } from '~/components/ui/badge';
 import { cn } from '~/lib/utils';
 import { useThemeStore } from '~/stores/theme-store';
 import { useChatStore } from '~/stores/chat-store';
@@ -12,14 +11,14 @@ import { useChatStore } from '~/stores/chat-store';
 const REASONING_STEPS = [
   'Locating Erabor Partners LP Agreement (executed Dec 2024)...',
   'Extracting Section 4 — Management Fee & Carry provisions',
-  'GP commitment: 3.5% of total commitments ($7.0M on $200M fund) — <span class="text-[var(--amber)] font-semibold">above our standard 2.5%</span>',
+  'GP commitment: 3.5% of total commitments ($7.0M on $200M fund) — <span class="reasoning-flag">above our standard 2.5%</span>',
   'Fee structure: 2.0% on committed during investment period, step-down to 1.5% on invested capital post-Year 5',
   'Scanning for side letter provisions...',
   'Found 3 side letters — Northgate Capital, Westbridge RE, and one redacted entity',
-  'Northgate side letter grants MFN on fees + co-invest priority — <span class="text-[var(--amber)] font-semibold">non-standard</span>',
+  'Northgate side letter grants MFN on fees + co-invest priority — <span class="reasoning-flag">non-standard</span>',
   'Cross-referencing clawback language against Fund III template...',
   'Clawback: interim clawback with annual true-up, 100% GP obligation — matches standard',
-  'Key person clause names Marcus Tilden + one other — <span class="text-[var(--amber)] font-semibold">single-trigger suspension</span>, not our standard dual-trigger',
+  'Key person clause names Marcus Tilden + one other — <span class="reasoning-flag">single-trigger suspension</span>, not our standard dual-trigger',
   'Compiling summary with flagged deviations...',
 ];
 
@@ -206,22 +205,9 @@ function tokenizeHTML(html: string): HTMLToken[] {
 /** Animated thinking cubes — 3 small squares that bounce and rotate */
 function ThinkingCubes({ fading }: { fading: boolean }) {
   return (
-    <div
-      className={cn(
-        'flex items-center gap-1.5 py-1 transition-opacity duration-500',
-        fading && 'opacity-0'
-      )}
-    >
+    <div className={cn('cosimo-thinking', fading && 'fading')}>
       {[0, 1, 2].map((i) => (
-        <div
-          key={i}
-          className="h-2 w-2 rounded-full animate-thinking-cube"
-          style={{
-            background: 'radial-gradient(circle at 35% 35%, var(--violet-2), var(--violet-4))',
-            boxShadow: 'inset 1px 1px 2px rgba(255,255,255,0.4), inset -1px -1px 2px rgba(0,0,0,0.15)',
-            animationDelay: `${i * 0.2}s`,
-          }}
-        />
+        <div key={i} className="thinking-cube" />
       ))}
     </div>
   );
@@ -230,27 +216,17 @@ function ThinkingCubes({ fading }: { fading: boolean }) {
 /** Reasoning panel — shows "Cosimo is thinking..." with steps appearing one by one */
 function ReasoningPanel({ visibleSteps }: { visibleSteps: number }) {
   return (
-    <div className="ml-8 my-1 rounded-[var(--r-md)] border-2 border-[var(--taupe-2)] border-r-[var(--taupe-4)] border-b-[var(--taupe-4)] dark:border-[var(--taupe-2)] bg-[var(--off-white)] dark:bg-[var(--surface-1)] overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-[var(--taupe-5)] dark:bg-[var(--surface-2)] border-b border-[var(--taupe-4)] dark:border-[var(--surface-3)]">
-        <span className="text-[10px] text-[var(--violet-2)]">◆</span>
-        <span className="font-[var(--font-mono)] text-[11px] font-semibold text-[var(--taupe-1)] dark:text-[var(--taupe-4)] tracking-wider">
-          Cosimo is thinking...
-        </span>
-        <div
-          className="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--violet-2)] border border-[var(--violet-3)] animate-reasoning-pulse"
-        />
+    <div className="cosimo-reasoning">
+      <div className="reasoning-header">
+        <span className="reasoning-header-icon">◆</span>
+        <span className="reasoning-header-label">Cosimo is thinking...</span>
+        <div className="reasoning-pulse" />
       </div>
-      {/* Steps */}
-      <div className="px-3 py-2 max-h-[300px] overflow-y-auto">
+      <div className="reasoning-steps">
         {REASONING_STEPS.map((step, i) => (
           <div
             key={i}
-            className={cn(
-              'font-[var(--font-mono)] text-[11px] leading-relaxed text-[var(--taupe-4)] py-[3px] border-b border-[var(--taupe-1)] dark:border-[var(--surface-3)] last:border-b-0',
-              'transition-all duration-300',
-              i < visibleSteps ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
-            )}
+            className={cn('reasoning-step-item', i < visibleSteps && 'visible')}
             dangerouslySetInnerHTML={{ __html: step }}
           />
         ))}
@@ -262,28 +238,23 @@ function ReasoningPanel({ visibleSteps }: { visibleSteps: number }) {
 /** Renders a structured section block (title + key-value rows) */
 function SectionBlock({ section, visibleRows, showCursor }: { section: StreamSection; visibleRows: number; showCursor: boolean }) {
   return (
-    <div className="ml-8 my-3 rounded-[var(--r-md)] border-2 border-[var(--taupe-2)] border-r-[var(--taupe-4)] border-b-[var(--taupe-4)] dark:border-[var(--taupe-2)] bg-[var(--white)] dark:bg-[var(--surface-1)] overflow-hidden">
-      <div className="font-[var(--font-mono)] text-[11px] font-bold uppercase tracking-widest text-[var(--taupe-1)] dark:text-[var(--taupe-4)] px-3 py-1.5 bg-[var(--taupe-5)] dark:bg-[var(--surface-2)] border-b border-[var(--taupe-4)] dark:border-[var(--surface-3)]">
+    <div className="erabor-section">
+      <div className="erabor-section-title">
         {section.title}
         {showCursor && visibleRows === 0 && <StreamCursor />}
       </div>
-      <div className="py-1">
+      <div className="erabor-section-body">
         {section.rows.map((row, i) => (
           <div
             key={i}
             className={cn(
-              'flex justify-between items-baseline gap-4 px-3 py-[5px] border-b border-[var(--taupe-1)] dark:border-[var(--surface-3)] last:border-b-0',
+              'erabor-kv',
               'transition-all duration-200',
               i < visibleRows ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
             )}
           >
-            <span className="font-[var(--font-mono)] text-[11px] text-[var(--taupe-3)] uppercase tracking-wider shrink-0">
-              {row.key}
-            </span>
-            <span className={cn(
-              'font-[var(--font-mono)] text-[12px] font-semibold text-right',
-              row.flag ? 'text-[var(--amber)]' : 'text-[var(--taupe-5)] dark:text-[var(--taupe-4)]'
-            )}>
+            <span className="erabor-k">{row.key}</span>
+            <span className={cn('erabor-v', row.flag && 'erabor-flag')}>
               {row.value}
             </span>
             {showCursor && i === visibleRows - 1 && <StreamCursor />}
@@ -296,9 +267,7 @@ function SectionBlock({ section, visibleRows, showCursor }: { section: StreamSec
 
 /** Blinking cursor shown during streaming */
 function StreamCursor() {
-  return (
-    <span className="inline-block w-[2px] h-3.5 bg-[var(--violet-3)] ml-0.5 align-text-bottom animate-stream-cursor" />
-  );
+  return <span className="stream-cursor" />;
 }
 
 /** Renders a text block with typewriter effect */
@@ -342,7 +311,7 @@ function TextBlockStreaming({ html, onDone, showCursor }: { html: string; onDone
   }, [html, reducedMotion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="text-sm leading-relaxed text-foreground [&_p]:mb-2 [&_p:last-child]:mb-0 [&_strong]:font-semibold">
+    <div className="msg-body pl-[30px]">
       <span dangerouslySetInnerHTML={{ __html: displayHTML }} />
       {showCursor && !isDone && <StreamCursor />}
     </div>
@@ -495,36 +464,22 @@ export function MessageStream() {
   }, [schedule, softScroll, setStreaming]);
 
   return (
-    <div className="mb-4 relative">
+    <div className="msg-block">
       <div>
         {/* Header: Cosimo avatar + name + timestamp + latency + model badge */}
-        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-          <div className="flex h-6 w-6 items-center justify-center rounded-[var(--r-md)] bg-[var(--violet-3)] text-[10px] font-bold text-white border border-[var(--violet-2)] border-b-[var(--violet-5)] border-r-[var(--violet-5)]">
-            ◆
-          </div>
-          <span className="font-[var(--font-sans)] text-sm font-medium text-foreground">
-            Cosimo
-          </span>
-          <span className="text-xs text-muted-foreground">3:30 PM</span>
+        <div className="msg-header">
+          <div className="msg-badge msg-badge-ai">◆</div>
+          <span className="msg-sender">Cosimo</span>
+          <span className="msg-timestamp">3:30 PM</span>
           {showLatency && (
-            <Badge
-              variant="outline"
-              className="font-[var(--font-mono)] text-[10px] px-1.5 py-0 h-4 border-border text-muted-foreground"
-            >
-              4.2s
-            </Badge>
+            <span className="model-badge">4.2s</span>
           )}
-          <Badge
-            variant="outline"
-            className="font-[var(--font-mono)] text-[10px] px-1.5 py-0 h-4 border-border text-muted-foreground"
-          >
-            Expert
-          </Badge>
+          <span className="model-badge">Expert</span>
         </div>
 
         {/* Phase 1: Thinking cubes */}
         {phase === 'thinking' && (
-          <div className="pl-8">
+          <div style={{ paddingLeft: 30 }}>
             <ThinkingCubes fading={thinkingFading} />
           </div>
         )}
@@ -536,7 +491,7 @@ export function MessageStream() {
 
         {/* Phase 3 / Done: Streamed reply */}
         {(phase === 'streaming' || phase === 'done') && (
-          <div className="pl-8">
+          <div>
             {STREAM_BLOCKS.slice(0, visibleBlocks).map((block, i) => {
               const isActive = i === activeBlockIdx && !streamDone;
 
@@ -555,7 +510,7 @@ export function MessageStream() {
                 return (
                   <div
                     key={i}
-                    className="text-sm leading-relaxed text-foreground [&_p]:mb-2 [&_p:last-child]:mb-0 [&_strong]:font-semibold"
+                    className="msg-body pl-[30px]"
                     dangerouslySetInnerHTML={{ __html: block.html }}
                   />
                 );
@@ -590,19 +545,11 @@ export function MessageStream() {
 
         {/* Feedback buttons shown after streaming is done */}
         {streamDone && (
-          <div className="pl-8 mt-1.5 flex gap-1">
-            <button
-              className="flex h-6 w-6 items-center justify-center rounded-[var(--r-md)] border border-transparent text-muted-foreground transition-colors hover:border-border hover:text-green-500 hover:bg-green-500/10 dark:hover:text-green-400 dark:hover:bg-green-500/20"
-              title="Good response"
-              aria-label="Good response"
-            >
+          <div className="msg-feedback" style={{ paddingLeft: 30 }}>
+            <button className="feedback-btn up" title="Good response" aria-label="Good response">
               <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
             </button>
-            <button
-              className="flex h-6 w-6 items-center justify-center rounded-[var(--r-md)] border border-transparent text-muted-foreground transition-colors hover:border-border hover:text-red-500 hover:bg-red-500/10 dark:hover:text-red-400 dark:hover:bg-red-500/20"
-              title="Poor response"
-              aria-label="Poor response"
-            >
+            <button className="feedback-btn down" title="Poor response" aria-label="Poor response">
               <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>
             </button>
           </div>
