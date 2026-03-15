@@ -1,95 +1,300 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+@import "./a11y.css";
+
+/* Google Fonts: IBM Plex Mono + DM Sans */
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap");
+
+/* ChicagoFLF pixel font */
+@font-face {
+  font-family: 'ChicagoFLF';
+  src: url('/fonts/ChicagoFLF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
-
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+  --font-pixel: 'ChicagoFLF', monospace;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-sans: 'DM Sans', sans-serif;
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* ============================================
+     shadcn required variables — mapped from Medici tokens.css
+     ============================================ */
+  --background: #F8F6FA;       /* --off-white */
+  --foreground: #2D2D2E;       /* --taupe-5 */
+  --card: #FFFFFF;             /* --white */
+  --card-foreground: #2D2D2E;  /* --taupe-5 */
+  --popover: #FFFFFF;
+  --popover-foreground: #2D2D2E;
+  --primary: #74418F;          /* --violet-3 */
+  --primary-foreground: #FFFFFF;
+  --secondary: #E8E6EC;        /* --taupe-1 */
+  --secondary-foreground: #2D2D2E;
+  --muted: #E8E6EC;            /* --taupe-1 */
+  --muted-foreground: #87868B; /* --taupe-3 */
+  --accent: #E8E6EC;           /* --taupe-1 */
+  --accent-foreground: #2D2D2E;
+  --destructive: #C04848;      /* --red */
+  --border: #B4B2B9;           /* --taupe-2 */
+  --input: #B4B2B9;            /* --taupe-2 */
+  --ring: #74418F;             /* --violet-3 */
+  --radius: 0.375rem;          /* 6px = --r-lg */
+
+  /* Sidebar variables */
+  --sidebar: #F8F6FA;
+  --sidebar-foreground: #2D2D2E;
+  --sidebar-primary: #74418F;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E8E6EC;
+  --sidebar-accent-foreground: #2D2D2E;
+  --sidebar-border: #B4B2B9;
+  --sidebar-ring: #74418F;
+
+  /* Chart colors */
+  --chart-1: #74418F;
+  --chart-2: #A383B4;
+  --chart-3: #749CB5;
+  --chart-4: #3D8B40;
+  --chart-5: #B8862B;
+
+  /* ============================================
+     Medici custom extensions — full token set
+     ============================================ */
+
+  /* Taupe scale */
+  --taupe-1: #E8E6EC;
+  --taupe-2: #B4B2B9;
+  --taupe-3: #87868B;
+  --taupe-4: #5A595C;
+  --taupe-5: #2D2D2E;
+
+  /* Berry scale */
+  --berry-1: #E0D0E1;
+  --berry-2: #C4A6C5;
+  --berry-3: #8B4F8D;
+  --berry-4: #5D355E;
+  --berry-5: #2E1A2F;
+
+  /* Blue scale */
+  --blue-1: #CCE7F8;
+  --blue-2: #9BD0F2;
+  --blue-3: #749CB5;
+
+  /* Violet scale */
+  --violet-1: #D8C8E2;
+  --violet-2: #A383B4;
+  --violet-3: #74418F;
+  --violet-4: #4D2B5F;
+  --violet-5: #271630;
+
+  /* Chinese scale */
+  --chinese-1: #D8CAD9;
+  --chinese-2: #A891AD;
+  --chinese-3: #7F6485;
+  --chinese-4: #4A2E50;
+  --chinese-5: #2A182E;
+
+  /* Semantic colors */
+  --white: #FFFFFF;
+  --off-white: #F8F6FA;
+  --green: #3D8B40;
+  --red: #C04848;
+  --amber: #B8862B;
+
+  /* Bevel highlight/shadow pairs */
+  --green-hi: #5aad5c;
+  --green-lo: #2a6b2c;
+  --red-hi: #e06060;
+  --red-lo: #802020;
+
+  /* Dark surface depth scale */
+  --surface-0: #0e0e10;
+  --surface-1: #1a1a1d;
+  --surface-2: #28282d;
+  --surface-3: #2a2a2f;
+  --surface-graph: #0a0a0e;
+  --surface-graph-bg: #0e0d12;
+
+  /* Light text for dark backgrounds */
+  --text-light: #f0eef4;
+
+  /* Red hover/pressed shade */
+  --red-dark: #b84040;
+
+  /* RGB triplets for alpha usage */
+  --violet-3-rgb: 116,65,143;
+  --berry-3-rgb: 139,79,141;
+  --green-rgb: 61,139,64;
+  --red-rgb: 192,72,72;
+  --amber-rgb: 184,134,43;
+  --blue-3-rgb: 116,156,181;
+  --taupe-3-rgb: 135,134,139;
+  --black-rgb: 0,0,0;
+  --white-pure-rgb: 255,255,255;
+  --surface-tooltip-rgb: 45,45,46;
+  --cosimo-error-rgb: 194,59,34;
+
+  /* Font families (CSS custom properties for direct use) */
+  --pixel: 'ChicagoFLF', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+
+  /* Border radii */
+  --r-xs: 2px;
+  --r-sm: 3px;
+  --r-md: 4px;
+  --r-lg: 6px;
+  --r-pill: 9px;
 }
 
+/* ============================================
+   DARK MODE — mapped from tokens.css [data-theme="dark"]
+   ============================================ */
+
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* shadcn required variables — dark mode */
+  --background: #18181b;       /* --off-white dark */
+  --foreground: #e0dee5;       /* --taupe-5 dark */
+  --card: #1f1f23;             /* --white dark */
+  --card-foreground: #e0dee5;
+  --popover: #1f1f23;
+  --popover-foreground: #e0dee5;
+  --primary: #8855a8;          /* --violet-3 dark */
+  --primary-foreground: #FFFFFF;
+  --secondary: #28282d;        /* --taupe-1 dark */
+  --secondary-foreground: #e0dee5;
+  --muted: #28282d;
+  --muted-foreground: #76757c; /* --taupe-3 dark */
+  --accent: #28282d;
+  --accent-foreground: #e0dee5;
+  --destructive: #e05555;      /* --red dark */
+  --border: #36363c;           /* --taupe-2 dark */
+  --input: #36363c;
+  --ring: #8855a8;
+
+  /* Sidebar — dark */
+  --sidebar: #1f1f23;
+  --sidebar-foreground: #e0dee5;
+  --sidebar-primary: #8855a8;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #28282d;
+  --sidebar-accent-foreground: #e0dee5;
+  --sidebar-border: #36363c;
+  --sidebar-ring: #8855a8;
+
+  /* Chart colors — dark */
+  --chart-1: #8855a8;
+  --chart-2: #6a4a80;
+  --chart-3: #8cb8d4;
+  --chart-4: #4caf50;
+  --chart-5: #d4a030;
+
+  /* ============================================
+     Medici custom extensions — dark mode overrides
+     ============================================ */
+
+  /* Taupe scale — flipped */
+  --taupe-1: #28282d;
+  --taupe-2: #36363c;
+  --taupe-3: #76757c;
+  --taupe-4: #adacb2;
+  --taupe-5: #e0dee5;
+
+  /* Surfaces */
+  --white: #1f1f23;
+  --off-white: #18181b;
+
+  /* Berry — dark tints */
+  --berry-1: #2e1f2f;
+  --berry-2: #5a3a5c;
+  --berry-3: #a860aa;
+  --berry-4: #5D355E;
+  --berry-5: #2E1A2F;
+
+  /* Blue */
+  --blue-1: #1a2d3c;
+  --blue-2: #406e8c;
+  --blue-3: #8cb8d4;
+
+  /* Violet — dark tints */
+  --violet-1: #241a2f;
+  --violet-2: #6a4a80;
+  --violet-3: #8855a8;
+  --violet-4: #4D2B5F;
+  --violet-5: #271630;
+
+  /* Chinese — dark tints */
+  --chinese-1: #261a28;
+  --chinese-2: #4e3854;
+  --chinese-3: #8a6c92;
+  --chinese-4: #4A2E50;
+  --chinese-5: #2A182E;
+
+  /* Semantic — brightened for dark-bg legibility */
+  --green: #4caf50;
+  --red: #e05555;
+  --amber: #d4a030;
+
+  /* Bevel pairs — dark mode */
+  --green-hi: #5cb85e;
+  --green-lo: #2d7a2f;
+  --red-hi: #e06868;
+  --red-lo: #901818;
+
+  /* Dark surface depth */
+  --surface-0: #0e0e10;
+  --surface-1: #1a1a1d;
+  --surface-2: #28282d;
+  --surface-3: #2a2a2f;
+  --surface-graph: #0a0a0e;
+  --surface-graph-bg: #0e0d12;
+
+  /* Light text */
+  --text-light: #f0eef4;
+
+  /* Red hover/pressed shade */
+  --red-dark: #a03838;
+
+  /* RGB triplets — dark mode */
+  --violet-3-rgb: 136,85,168;
+  --berry-3-rgb: 168,96,170;
+  --green-rgb: 76,175,80;
+  --red-rgb: 224,85,85;
+  --amber-rgb: 212,160,48;
+  --blue-3-rgb: 140,184,212;
+  --taupe-3-rgb: 118,117,124;
+}
+
+/* ============================================
+   HIGH CONTRAST TOKEN OVERRIDES
+   ============================================ */
+
+[data-a11y-contrast="high"] {
+  --taupe-1: #CCC9D0;
+  --taupe-2: #908E96;
+  --taupe-3: #5A595E;
+  --taupe-4: #3A3A3C;
+}
+
+.dark[data-a11y-contrast="high"],
+[data-a11y-contrast="high"] .dark {
+  --taupe-1: #3a3a42;
+  --taupe-2: #55555e;
+  --taupe-3: #9b9aa2;
+  --taupe-4: #c8c6ce;
+  --taupe-5: #f0eef5;
 }
 
 @theme inline {
-  --font-sans: 'Geist Variable', sans-serif;
+  --font-pixel: 'ChicagoFLF', monospace;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-sans: 'DM Sans', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -140,4 +345,235 @@ body {
   html {
     @apply font-sans;
   }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--taupe-3);
+    border: 1px solid var(--taupe-2);
+    border-radius: var(--r-sm);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--taupe-4); }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: var(--taupe-2);
+    border-color: var(--taupe-1);
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--taupe-3);
+  }
+}
+
+@layer components {
+  /* ======== Beveled 3D Borders ======== */
+
+  /* Raised bevel — light top-left, dark bottom-right */
+  .bevel {
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--taupe-2) var(--taupe-3) var(--taupe-3) var(--taupe-2);
+  }
+
+  /* Inset/pressed bevel — dark top-left, light bottom-right */
+  .bevel-inset {
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--taupe-3) var(--taupe-1) var(--taupe-1) var(--taupe-3);
+  }
+
+  /* Dark mode: flatten bevels — 3D effect is subtle on dark surfaces */
+  .dark .bevel,
+  .dark .bevel-inset {
+    border-color: var(--taupe-2);
+  }
+
+  /* ======== Label Mono ======== */
+  .label-mono {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--taupe-3);
+  }
+
+  /* ======== Overview Grid & Key-Value Rows ======== */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .overview-grid .detail-section {
+    margin-bottom: 0;
+  }
+
+  .overview-full {
+    grid-column: 1 / -1;
+  }
+
+  .kv-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--taupe-1);
+  }
+
+  .kv-row:last-child {
+    border-bottom: none;
+  }
+
+  .kv-key {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--taupe-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .kv-val {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--taupe-5);
+  }
+}
+
+/* ======== Workflow Pulse Animation ======== */
+@keyframes wf-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-wf-pulse {
+  animation: wf-pulse 2s ease-in-out infinite;
+}
+
+/* Reduced motion override for pulse is handled by a11y.css blanket rule */
+
+/* ======== Erabor Streaming Animations ======== */
+@keyframes thinking-cube {
+  0% { transform: translateY(0); }
+  20% { transform: translateY(-10px); }
+  40%, 100% { transform: translateY(0); }
+}
+
+.animate-thinking-cube {
+  animation: thinking-cube 1.8s ease-in-out infinite;
+}
+
+@keyframes reasoning-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.animate-reasoning-pulse {
+  animation: reasoning-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes stream-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-stream-cursor {
+  animation: stream-cursor-blink 0.6s step-end infinite;
+}
+
+/* ======== Typing Bounce (three-dot thinking indicator) ======== */
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.animate-typing-bounce {
+  animation: typing-bounce 1.4s ease-in-out infinite;
+}
+
+/* ======== Workflow Pulse Node (flow graph running status) ======== */
+@keyframes wf-pulse-node {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-wf-pulse-node {
+  animation: wf-pulse-node 2s ease-in-out infinite;
+}
+
+/* ======== Pulse Step (running node glow) ======== */
+@keyframes pulse-step {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--violet-3-rgb),0.3); }
+  50% { box-shadow: 0 0 0 4px rgba(var(--violet-3-rgb),0.1); }
+}
+
+.animate-pulse-step {
+  animation: pulse-step 2s ease-in-out infinite;
+}
+
+/* ======== Pulse Step Dark ======== */
+@keyframes pulse-step-dark {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--violet-3-rgb),0.3); }
+  50% { box-shadow: 0 0 0 4px rgba(var(--violet-3-rgb),0.1); }
+}
+
+/* ======== youPulse (user indicator) ======== */
+@keyframes youPulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+.animate-you-pulse {
+  animation: youPulse 2s ease-in-out infinite;
+}
+
+/* ======== Cube Wave (thinking cube animation) ======== */
+@keyframes cube-wave {
+  0% { transform: translateY(0) rotate(0deg); }
+  20% { transform: translateY(-10px) rotate(0deg); }
+  40%, 100% { transform: translateY(0) rotate(360deg); }
+}
+
+.animate-cube-wave {
+  animation: cube-wave 1.8s ease-in-out infinite;
+}
+
+/* ======== Spin Retry (error retry button) ======== */
+@keyframes spin-retry {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-retry {
+  animation: spin-retry 1s linear infinite;
+}
+
+/* ======== Profile Panel Slide Animations ======== */
+@keyframes profile-slide-right {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes profile-slide-left {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-profile-slide-right {
+  animation: profile-slide-right 0.15s ease-out;
+}
+
+.animate-profile-slide-left {
+  animation: profile-slide-left 0.15s ease-out;
+}
+
+/* ======== Blink Cursor (alias for stream-cursor-blink) ======== */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ======== Reason Pulse (alias for reasoning-pulse) ======== */
+@keyframes reason-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
