@@ -161,7 +161,7 @@ export function TemplateDetail({ template, run }: TemplateDetailProps) {
           </span>
 
           {/* Version badge */}
-          <span className="wf-detail-meta-badge" style={{ color: 'var(--taupe-3)', borderColor: 'var(--taupe-2)' }}>
+          <span className="wf-detail-meta-badge wf-detail-meta-badge-muted">
             v{template.version}
           </span>
 

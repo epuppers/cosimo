@@ -11,7 +11,7 @@ export function OverviewTab({ template }: { template: WorkflowTemplate }) {
   const lastRunTime = lastRun ? lastRun.time : '—';
   const lastRunStatus = lastRun ? lastRun.status : '—';
   const lastRunStatusClass =
-    lastRunStatus === 'success' ? 'text-green' : lastRunStatus === 'failed' ? ' text-[var(--red)]' : '';
+    lastRunStatus === 'success' ? 'text-green' : lastRunStatus === 'failed' ? 'text-red' : '';
 
   return (
     <div className="overview-grid">

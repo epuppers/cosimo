@@ -4107,6 +4107,16 @@
   border-radius: var(--r-sm);
 }
 
+.wf-detail-meta-badge-muted {
+  color: var(--taupe-3);
+  border-color: var(--taupe-2);
+}
+
+.dark .wf-detail-meta-badge-muted {
+  color: var(--taupe-4);
+  border-color: var(--taupe-3);
+}
+
 .wf-detail-meta-chip {
   display: inline-flex;
   align-items: center;
@@ -4931,6 +4941,7 @@
 }
 
 .text-green { color: var(--green); }
+.text-red { color: var(--red); }
 
 /* Runs tab dark mode */
 .dark .run-row { background: var(--surface-1); border-color: var(--taupe-2); }

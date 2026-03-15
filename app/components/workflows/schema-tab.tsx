@@ -51,7 +51,7 @@ export function SchemaTab({ template }: { template: WorkflowTemplate }) {
       </div>
 
       {/* Output Schema */}
-      <div className="detail-section bevel" style={{ marginTop: 12 }}>
+      <div className="detail-section bevel mt-3">
         <div className="detail-section-bar">
           <div className="art-stripe" />
           <span className="detail-section-title">Output Schema</span>
