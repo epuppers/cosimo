@@ -5608,3 +5608,31 @@
   0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }
 }
+
+/* ======== Cosimo Panel ======== */
+
+/* Typing indicator dots */
+.cosimo-typing-dot {
+  animation: typing-bounce 1.4s ease-in-out infinite;
+  box-shadow: inset 0 -1px 2px rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.08);
+  background: radial-gradient(circle at 35% 30%, var(--violet-3), var(--violet-4));
+}
+
+.dark .cosimo-typing-dot {
+  box-shadow: inset 0 -1px 2px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.12);
+}
+
+[data-a11y-motion="reduce"] .cosimo-typing-dot {
+  animation: none;
+}
+
+/* Sheet overlay — retro tint */
+.cosimo-panel-sheet ~ [data-slot="sheet-overlay"],
+[data-slot="sheet-content"].cosimo-panel-sheet + [data-slot="sheet-overlay"] {
+  /* handled by shadcn defaults, just ensure dark mode is slightly more opaque */
+}
+
+/* Panel slide animation — gate by reduced motion */
+[data-a11y-motion="reduce"] [data-slot="sheet-content"] {
+  transition: none !important;
+}
