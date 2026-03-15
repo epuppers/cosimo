@@ -4027,6 +4027,435 @@
   background: rgba(var(--violet-3-rgb), 0.12);
 }
 
+/* ============================================
+   WORKFLOW DETAIL VIEW
+   ============================================ */
+
+.wf-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.wf-detail-header {
+  padding: 14px 20px 0;
+  background: var(--white);
+}
+
+.wf-detail-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.back-btn {
+  padding: 3px 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--taupe-3);
+  background: transparent;
+  border: 1px solid var(--taupe-2);
+  cursor: pointer;
+  transition: all 0.1s;
+  border-radius: var(--r-sm);
+}
+
+.back-btn:hover {
+  color: var(--taupe-5);
+  border-color: var(--taupe-4);
+}
+
+.back-btn:active {
+  border-color: var(--taupe-4) var(--taupe-1) var(--taupe-1) var(--taupe-4);
+}
+
+.back-btn:focus-visible {
+  outline: 2px solid var(--violet-3);
+  outline-offset: 2px;
+}
+
+.wf-detail-name {
+  font-family: var(--pixel);
+  font-size: 22px;
+  color: var(--taupe-5);
+  letter-spacing: 0.5px;
+}
+
+.wf-detail-desc {
+  font-size: 13px;
+  color: var(--taupe-3);
+  margin-bottom: 12px;
+  margin-left: 2px;
+}
+
+.wf-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.wf-detail-meta-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: var(--r-sm);
+}
+
+.wf-detail-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--taupe-3);
+  background: rgba(var(--taupe-3-rgb), 0.08);
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+}
+
+.wf-detail-meta-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--taupe-2);
+}
+
+.wf-detail-meta-text {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--taupe-3);
+}
+
+/* Two-column layout */
+.wf-detail-columns {
+  flex: 1;
+  display: flex;
+  gap: 0;
+  overflow: hidden;
+}
+
+.wf-detail-graph-col {
+  position: relative;
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0 16px 16px;
+}
+
+.wf-detail-info-col {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 14px 16px 0;
+  border-left: 1px solid var(--taupe-1);
+}
+
+/* Flow graph container */
+.flow-graph-container {
+  flex: 1;
+  border: 2px solid;
+  border-color: var(--taupe-3) var(--taupe-1) var(--taupe-1) var(--taupe-3);
+  background: var(--off-white);
+  overflow: hidden;
+  position: relative;
+  border-radius: var(--r-lg);
+}
+
+.flow-graph-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flow-graph-placeholder-text {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--taupe-2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Tabs */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--taupe-2);
+  position: relative;
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--taupe-3);
+  background: var(--taupe-1);
+  border: 1px solid var(--taupe-2);
+  border-bottom: 1px solid var(--taupe-2);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: color 0.15s, background 0.15s;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  margin-bottom: -1px;
+  position: relative;
+  z-index: 1;
+}
+
+.tab-btn:hover {
+  color: var(--taupe-5);
+  background: var(--berry-1);
+}
+
+.tab-btn.active {
+  color: var(--violet-3);
+  background: var(--off-white);
+  border-color: var(--taupe-2) var(--taupe-2) transparent var(--taupe-2);
+  z-index: 2;
+}
+
+.tab-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--violet-3);
+  border-radius: var(--r-md) var(--r-md) 0 0;
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid var(--violet-3);
+  outline-offset: -2px;
+}
+
+/* Tab content */
+.wf-detail-info-col .tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 0;
+}
+
+/* Detail sections (used in tabs) */
+.detail-section {
+  background: var(--white);
+  border: 2px solid;
+  border-color: var(--taupe-2) var(--taupe-3) var(--taupe-3) var(--taupe-2);
+  margin-bottom: 12px;
+  border-radius: var(--r-md);
+}
+
+.detail-section-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--taupe-5);
+  border-bottom: 1px solid var(--taupe-4);
+}
+
+.detail-section-body {
+  padding: 14px;
+}
+
+/* Config rows (for key-value pairs in detail sections) */
+.config-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--taupe-1);
+}
+
+.config-row:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.config-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--taupe-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  min-width: 140px;
+  padding-top: 2px;
+}
+
+.config-value {
+  font-size: 13px;
+  color: var(--taupe-5);
+  line-height: 1.5;
+}
+
+/* Action buttons for detail view */
+.wf-detail-run-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 14px;
+  color: var(--white);
+  background: var(--violet-3);
+  border: 1px solid;
+  border-color: var(--violet-2) var(--violet-4) var(--violet-4) var(--violet-2);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+
+.wf-detail-run-btn:hover {
+  background: var(--violet-4);
+}
+
+.wf-detail-run-btn:active {
+  border-color: var(--violet-4) var(--violet-2) var(--violet-2) var(--violet-4);
+}
+
+.wf-detail-run-btn:focus-visible {
+  outline: 2px solid var(--violet-3);
+  outline-offset: 2px;
+}
+
+.wf-detail-actions-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 8px;
+  color: var(--taupe-3);
+  background: transparent;
+  border: 1px solid var(--taupe-2);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.1s;
+}
+
+.wf-detail-actions-btn:hover {
+  color: var(--taupe-5);
+  border-color: var(--taupe-4);
+  background: var(--berry-1);
+}
+
+.wf-detail-actions-btn:active {
+  border-color: var(--taupe-4) var(--taupe-1) var(--taupe-1) var(--taupe-4);
+}
+
+.wf-detail-actions-btn:focus-visible {
+  outline: 2px solid var(--violet-3);
+  outline-offset: 2px;
+}
+
+/* Workflow Detail — Dark Mode */
+.dark .wf-detail-header {
+  background: var(--surface-1);
+}
+
+.dark .wf-detail-name {
+  color: var(--taupe-1);
+}
+
+.dark .wf-detail-info-col {
+  border-left-color: var(--surface-3);
+}
+
+.dark .flow-graph-container {
+  border-color: var(--surface-3);
+  background: var(--surface-1);
+}
+
+.dark .flow-graph-placeholder-text {
+  color: var(--taupe-3);
+}
+
+.dark .wf-detail-meta-chip {
+  background: rgba(var(--taupe-3-rgb), 0.12);
+}
+
+.dark .wf-detail-meta-sep {
+  background: var(--surface-3);
+}
+
+.dark .back-btn {
+  border-color: var(--taupe-2);
+}
+
+.dark .back-btn:hover {
+  color: var(--taupe-5);
+  border-color: var(--taupe-3);
+}
+
+.dark .tab-bar {
+  border-bottom-color: var(--surface-3);
+}
+
+.dark .tab-btn {
+  background: rgba(0,0,0,0.25);
+  border-color: var(--surface-3);
+}
+
+.dark .tab-btn:hover {
+  color: var(--taupe-5);
+  background: var(--berry-1);
+}
+
+.dark .tab-btn.active {
+  background: var(--off-white);
+  border-color: var(--surface-3) var(--surface-3) transparent var(--surface-3);
+}
+
+.dark .tab-btn.active::before {
+  background: var(--violet-2);
+}
+
+.dark .detail-section {
+  border-color: var(--taupe-2);
+}
+
+.dark .detail-section-bar {
+  background: var(--surface-2);
+  border-bottom-color: var(--taupe-2);
+}
+
+.dark .detail-section-body {
+  background: var(--surface-1);
+}
+
+.dark .config-row {
+  border-bottom-color: var(--surface-3);
+}
+
+.dark .config-value {
+  color: var(--taupe-1);
+}
+
+.dark .wf-detail-run-btn {
+  border-color: var(--violet-3);
+}
+
+.dark .wf-detail-actions-btn {
+  border-color: var(--taupe-3);
+}
+
+.dark .wf-detail-actions-btn:hover {
+  color: var(--taupe-1);
+  background: var(--surface-2);
+}
+
 /* ======== Blink Cursor (alias for stream-cursor-blink) ======== */
 @keyframes blink-cursor {
   0%, 100% { opacity: 1; }

@@ -5,11 +5,8 @@
 import { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
-import { ChevronLeft, Play, MoreHorizontal, Sparkles, Copy, Archive } from 'lucide-react';
+import { Play, MoreHorizontal, Sparkles, Copy, Archive } from 'lucide-react';
 import { findRunThread } from '~/services/workflows';
-import { Button } from '~/components/ui/button';
-import { Badge } from '~/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '~/components/ui/tabs';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -36,21 +33,45 @@ interface TemplateDetailProps {
   run?: WorkflowRun;
 }
 
-/** Maps template status to badge styling */
-function statusBadgeClass(status: WorkflowTemplate['status']): string {
-  const classes: Record<WorkflowTemplate['status'], string> = {
-    active: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300',
-    draft: 'bg-secondary text-secondary-foreground',
-    paused: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
-    archived: 'bg-secondary text-muted-foreground',
-  };
-  return classes[status];
-}
-
 /** Capitalizes the first letter of a status string */
 function statusLabel(status: string): string {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
+
+/** Maps trigger type to display icon */
+function triggerIcon(type: string): string {
+  const icons: Record<string, string> = {
+    'folder-watch': '📁',
+    'manual': '▶',
+    'schedule': '🕐',
+    'email': '✉',
+    'chat-command': '💬',
+    'chained': '🔗',
+  };
+  return icons[type] || '▶';
+}
+
+/** Maps trigger type to display label */
+function triggerLabel(type: string): string {
+  const labels: Record<string, string> = {
+    'folder-watch': 'Folder Watch',
+    'manual': 'Manual',
+    'schedule': 'Schedule',
+    'email': 'Email',
+    'chat-command': 'Chat Command',
+    'chained': 'Chained',
+  };
+  return labels[type] || type;
+}
+
+const TAB_KEYS = ['overview', 'schema', 'triggers', 'runs', 'lessons'] as const;
+const TAB_LABELS: Record<string, string> = {
+  overview: 'Overview',
+  schema: 'Schema',
+  triggers: 'Triggers',
+  runs: 'Runs',
+  lessons: 'Lessons',
+};
 
 /**
  * Main container for viewing a workflow template's detail.
@@ -121,126 +142,123 @@ export function TemplateDetail({ template, run }: TemplateDetailProps) {
     : undefined;
 
   return (
-    <div className="flex h-full flex-col">
-      {/* Header row */}
-      <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleBack}
-          className="gap-1 text-muted-foreground"
-        >
-          <ChevronLeft className="size-4" />
-          Back to Library
-        </Button>
-
-        <div className="flex flex-1 items-center gap-2">
-          <h2 className="font-mono text-sm font-semibold text-foreground">
-            {template.title}
-          </h2>
-          <Badge
-            className={cn(
-              'border-transparent text-xs',
-              statusBadgeClass(template.status)
-            )}
-          >
-            {statusLabel(template.status)}
-          </Badge>
+    <div className="wf-detail">
+      {/* Header */}
+      <div className="wf-detail-header">
+        <div className="wf-detail-top">
+          <button className="back-btn" onClick={handleBack}>
+            ← Back
+          </button>
+          <span className="wf-detail-name">{template.title}</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button variant="outline" size="icon-xs" aria-label="Template actions">
-                  <MoreHorizontal className="size-4" />
-                </Button>
-              }
-            />
-            <DropdownMenuContent align="end" sideOffset={6}>
-              <DropdownMenuItem onClick={() => openCosimoPanel({ type: 'template', text: template.title })}>
-                <Sparkles className="size-4" />
-                Edit with Cosimo
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Copy className="size-4" />
-                Duplicate
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Archive className="size-4" />
-                Archive
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="wf-detail-desc">{template.description}</div>
 
-          <Button size="sm" className="gap-1.5" onClick={handleRun}>
-            <Play className="size-3.5" />
-            Run
-          </Button>
+        <div className="wf-detail-meta">
+          {/* Status badge */}
+          <span className={cn('wf-detail-meta-badge', `status-${template.status}`)}>
+            {statusLabel(template.status)}
+          </span>
+
+          {/* Version badge */}
+          <span className="wf-detail-meta-badge" style={{ color: 'var(--taupe-3)', borderColor: 'var(--taupe-2)' }}>
+            v{template.version}
+          </span>
+
+          <div className="wf-detail-meta-sep" />
+
+          {/* Trigger chip */}
+          <span className="wf-detail-meta-chip">
+            {triggerIcon(template.triggerType)} {triggerLabel(template.triggerType)}
+          </span>
+
+          <div className="wf-detail-meta-sep" />
+
+          {/* Created by */}
+          <span className="wf-detail-meta-text">
+            by {template.createdBy} · {template.createdDate}
+          </span>
+
+          {/* Spacer + actions */}
+          <div className="ml-auto flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="wf-detail-actions-btn" aria-label="Template actions">
+                <MoreHorizontal className="size-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" sideOffset={6}>
+                <DropdownMenuItem onClick={() => openCosimoPanel({ type: 'template', text: template.title })}>
+                  <Sparkles className="size-4" />
+                  Edit with Cosimo
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Copy className="size-4" />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Archive className="size-4" />
+                  Archive
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <button className="wf-detail-run-btn" onClick={handleRun}>
+              <Play className="size-3.5" />
+              Run
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Two-column layout */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="wf-detail-columns">
         {/* Left column — Flow graph */}
-        <div
-          ref={graphContainerRef}
-          className="relative w-[60%] overflow-hidden border-r border-border bg-muted/30 dark:bg-muted/10"
-        >
-          <FlowGraph
-            nodes={template.nodes}
-            edges={template.edges}
-            selectedNodeId={selectedNodeId ?? undefined}
-            onNodeSelect={handleNodeSelect}
-            nodeStatuses={run?.nodeStatuses}
-          />
-
-          {/* Node popover */}
-          {selectedNode && (
-            <NodePopover
-              node={selectedNode}
-              templateId={template.id}
-              open={popoverOpen}
-              onClose={handleClosePopover}
-              anchorPosition={anchorPosition}
+        <div className="wf-detail-graph-col" ref={graphContainerRef}>
+          <div className="flow-graph-container">
+            <FlowGraph
+              nodes={template.nodes}
+              edges={template.edges}
+              selectedNodeId={selectedNodeId ?? undefined}
+              onNodeSelect={handleNodeSelect}
+              nodeStatuses={run?.nodeStatuses}
             />
-          )}
+
+            {/* Node popover */}
+            {selectedNode && (
+              <NodePopover
+                node={selectedNode}
+                templateId={template.id}
+                open={popoverOpen}
+                onClose={handleClosePopover}
+                anchorPosition={anchorPosition}
+              />
+            )}
+          </div>
         </div>
 
         {/* Right column — Tabs */}
-        <div className="flex w-[40%] flex-col overflow-hidden">
-          <Tabs
-            value={activeTab}
-            onValueChange={setTab}
-            className="flex h-full flex-col"
-          >
-            <TabsList className="mx-3 mt-3 shrink-0">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="schema">Schema</TabsTrigger>
-              <TabsTrigger value="triggers">Triggers</TabsTrigger>
-              <TabsTrigger value="runs">Runs</TabsTrigger>
-              <TabsTrigger value="lessons">Lessons</TabsTrigger>
-            </TabsList>
+        <div className="wf-detail-info-col">
+          {/* Tab bar */}
+          <div className="tab-bar">
+            {TAB_KEYS.map((key) => (
+              <button
+                key={key}
+                className={cn('tab-btn', activeTab === key && 'active')}
+                onClick={() => setTab(key)}
+              >
+                {TAB_LABELS[key]}
+              </button>
+            ))}
+          </div>
 
-            <div className="flex-1 overflow-y-auto px-3 py-3">
-              <TabsContent value="overview">
-                <OverviewTab template={template} />
-              </TabsContent>
-              <TabsContent value="schema">
-                <SchemaTab template={template} />
-              </TabsContent>
-              <TabsContent value="triggers">
-                <TriggersTab template={template} />
-              </TabsContent>
-              <TabsContent value="runs">
-                <RunsTab template={template} />
-              </TabsContent>
-              <TabsContent value="lessons">
-                <LessonsTab template={template} />
-              </TabsContent>
-            </div>
-          </Tabs>
+          {/* Tab content */}
+          <div className="tab-content">
+            {activeTab === 'overview' && <OverviewTab template={template} />}
+            {activeTab === 'schema' && <SchemaTab template={template} />}
+            {activeTab === 'triggers' && <TriggersTab template={template} />}
+            {activeTab === 'runs' && <RunsTab template={template} />}
+            {activeTab === 'lessons' && <LessonsTab template={template} />}
+          </div>
         </div>
       </div>
     </div>
