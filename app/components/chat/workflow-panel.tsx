@@ -161,7 +161,7 @@ export function WorkflowPanel({ run }: WorkflowPanelProps) {
                   </div>
                 ))}
                 {run.outputManifest[0]?.path && (
-                  <div className="wf-panel-file-meta" style={{ marginTop: 4, marginLeft: 0 }}>
+                  <div className="wf-panel-file-meta mt-1">
                     {run.outputManifest[0].path}
                   </div>
                 )}

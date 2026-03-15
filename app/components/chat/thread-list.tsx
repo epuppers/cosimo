@@ -29,7 +29,7 @@ interface ThreadListProps {
 function RunStatusIndicator({ status }: { status: "running" | "waiting" }) {
   if (status === "waiting") {
     return (
-      <span className="inline-flex items-center gap-1 font-[var(--font-mono)] text-[10px] text-[var(--amber)]">
+      <span className="inline-flex items-center gap-1 font-[family-name:var(--mono)] text-[10px] text-[var(--amber)]">
         <span className="inline-block size-1.5 rounded-full bg-[var(--amber)]" />
         Waiting
       </span>
@@ -37,7 +37,7 @@ function RunStatusIndicator({ status }: { status: "running" | "waiting" }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-1 font-[var(--font-mono)] text-[10px] text-[var(--violet-3)]">
+    <span className="inline-flex items-center gap-1 font-[family-name:var(--mono)] text-[10px] text-[var(--violet-3)]">
       <span className="inline-block size-1.5 rounded-full bg-[var(--violet-3)] animate-[wf-pulse_2s_ease-in-out_infinite] motion-reduce:animate-none" />
       Running
     </span>
