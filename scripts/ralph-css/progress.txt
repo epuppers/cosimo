@@ -1,0 +1,67 @@
+# CSS Restoration Progress Log
+
+## Patterns (add reusable patterns here as you discover them)
+
+### Tailwind + CSS Custom Property Pattern
+Use `bg-[var(--token)]` for all colors. Never use Tailwind's built-in color classes (bg-blue-500, etc.).
+```
+className="bg-[var(--off-white)] dark:bg-[var(--surface-1)]"
+className="text-[var(--taupe-5)] dark:text-[var(--taupe-1)]"
+className="border-[var(--taupe-2)] dark:border-[var(--taupe-3)]"
+```
+
+### Font Family Pattern
+```
+className="font-[family-name:var(--pixel)]"   // ChicagoFLF — headings, labels
+className="font-[family-name:var(--mono)]"     // IBM Plex Mono — data, metadata
+className="font-[family-name:var(--sans)]"     // DM Sans — body text
+```
+
+### Bevel Pattern (defined in app.css @layer components)
+```
+className="bevel"         // raised 3D border
+className="bevel-inset"   // pressed/inset 3D border
+```
+
+### Dark Mode Pattern
+Always pair light and dark variants:
+```
+className="bg-[var(--off-white)] dark:bg-[var(--surface-1)] border-[var(--taupe-2)] dark:border-[var(--taupe-3)]"
+```
+
+### Alpha Color Pattern
+For transparent tints, use RGB triplet tokens:
+```
+className="bg-[rgba(var(--violet-3-rgb),0.06)]"
+className="dark:bg-[rgba(var(--violet-3-rgb),0.12)]"
+```
+
+---
+
+## Iteration Log
+
+(Entries will be appended below by each iteration)
+
+## Iteration 1 — Task CSS-01: Foundation: Bevel utilities + base custom CSS layer in app.css
+- What was done: Added @layer components block with .bevel, .bevel-inset (+ dark mode flattening), .label-mono, .overview-grid, .kv-row, .kv-key, .kv-val classes. Added scrollbar styles in @layer base with dark mode overrides. Added 11 missing keyframes: typing-bounce, wf-pulse-node, pulse-step, pulse-step-dark, youPulse, cube-wave, spin-retry, profile-slide-right, profile-slide-left, blink-cursor, reason-pulse. Each keyframe has a corresponding .animate-* utility class.
+- Files modified: app/app.css
+- CSS patterns ported: .bevel, .bevel-inset, .label-mono, .overview-grid, .overview-full, .kv-row, .kv-key, .kv-val, scrollbar styles, 11 keyframe animations
+- Key decisions: Used @layer components for utility classes (Tailwind-compatible). Added keyframes as standalone (outside layers) for broad availability. Kept blink-cursor and reason-pulse as aliases since stream-cursor-blink and reasoning-pulse already existed with same values but different names that reference CSS uses.
+- Dark mode: verified — .dark .bevel/.bevel-inset flatten to single border color, dark scrollbar thumb colors adjusted
+- Gotchas: Pre-existing TS errors in the project (react-router type generation, implicit any) — not caused by CSS changes. cube-wave differs from thinking-cube (includes rotation) so both are kept.
+
+## Iteration 2 — Task CSS-02: Foundation: Verify and fix design tokens in app.css
+- What was done: Line-by-line comparison of reference/css/tokens.css against app/app.css. All color tokens, RGB triplets, font families, border radii, dark mode overrides, surface tokens, and high contrast overrides were already present and correct. Fixed one discrepancy: @theme --font-pixel fallback was 'monospace' but reference tokens.css specifies 'sans-serif'. Fixed in both @theme blocks. Verified @font-face path is correct (/fonts/ChicagoFLF.ttf pointing to public/fonts/).
+- Files modified: app/app.css
+- CSS patterns ported: None new — all tokens were already correctly ported by the initial migration
+- Key decisions: Changed @theme --font-pixel fallback from monospace to sans-serif to match reference tokens.css exactly
+- Dark mode: verified — all dark mode token overrides present and matching reference
+- Gotchas: The app.css has TWO @theme blocks (one regular, one inline) — both needed the font-pixel fix. Pre-existing TS errors remain (react-router types, implicit any) — not related to CSS.
+
+## Iteration 3 — Task CSS-03: Sidebar: Restore retro styling to AppSidebar
+- What was done: Restored the always-dark sidebar chrome from the original design. Updated sidebar CSS variables in :root and .dark to make the sidebar dark in both themes (taupe-5 bg in light, surface-1 in dark). Added custom CSS classes for sidebar-specific elements (search input, new button, section labels, thread hover/active states). Updated app-sidebar.tsx with correct fonts (pixel for logo, mono for labels/buttons), text shadows, colors for dark background context. Updated thread-list.tsx with mono font, proper indicator badges with borders, and correct hover/active styling.
+- Files modified: app/app.css, app/components/layout/app-sidebar.tsx, app/components/chat/thread-list.tsx
+- CSS patterns ported: .sidebar-search-input (dark inset input), .sidebar-new-btn (dark bevel button), .sidebar-section-label (mono uppercase tracking), thread hover (rgba white 0.04), thread active (chinese-4 bg + bevel border), thread indicator badges (colored borders + bg)
+- Key decisions: Updated --sidebar CSS variables globally to make sidebar always dark, rather than overriding individual elements. Used custom CSS classes outside @layer for sidebar elements that need complex bevel borders (higher specificity than Tailwind utilities). Replaced shadcn Button/Input with plain HTML elements for search and new button to avoid fighting shadcn defaults. Used !important on thread hover CSS to override shadcn's cva hover styles.
+- Dark mode: verified — sidebar uses surface-1 in dark mode, text colors adjusted with dark: variants, bevel borders flatten in dark mode
+- Gotchas: The sidebar is ALWAYS dark (even in light mode) — this is the original design's "desktop app window chrome" aesthetic. The --taupe-1/--taupe-5 values flip between light/dark mode, so elements need explicit dark: overrides to stay readable. Pre-existing TS errors remain unchanged.

@@ -1,0 +1,51 @@
+/* ============================================
+   ACCESSIBILITY MODE OVERRIDES
+   ============================================
+   These CSS overrides handle a11y states that Tailwind
+   alone can't express. Data attributes are set on <html>
+   by root.tsx reading from useThemeStore.
+   ============================================ */
+
+/* ======== Dyslexia Font ======== */
+/* Lexend is a Google Font designed for readability.
+   Loaded via @import so it's available when toggled. */
+@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap");
+
+[data-a11y-font="dyslexia"] {
+  --font-sans: 'Lexend', sans-serif;
+  --font-mono: 'Lexend', sans-serif;
+  --font-pixel: 'Lexend', sans-serif;
+}
+
+/* ======== Reduced Motion ======== */
+/* Kill ALL animations and transitions when the user
+   toggles reduced motion via the profile dropdown. */
+[data-a11y-motion="reduce"] *,
+[data-a11y-motion="reduce"] *::before,
+[data-a11y-motion="reduce"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Also respect OS-level prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ======== High Contrast — Focus Rings ======== */
+/* Stronger, more visible focus rings on keyboard navigation */
+[data-a11y-contrast="high"] *:focus-visible {
+  outline: 3px solid var(--primary) !important;
+  outline-offset: 2px !important;
+}
+
+[data-a11y-contrast="high"] *:focus:not(:focus-visible) {
+  outline: none !important;
+}

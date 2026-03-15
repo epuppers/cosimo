@@ -8,6 +8,10 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { Toaster } from "sonner";
+import { useThemeStore } from "~/stores/theme-store";
+import { useTheme } from "~/hooks/use-theme";
+import { CONFIG } from "~/data/config";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -19,13 +23,29 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap",
   },
 ];
 
+/** Root layout — applies theme class, a11y data attributes, and font size from persisted store */
 export function Layout({ children }: { children: React.ReactNode }) {
+  const theme = useThemeStore((s) => s.theme);
+  const fontSizeLevel = useThemeStore((s) => s.fontSizeLevel);
+  const dyslexiaFont = useThemeStore((s) => s.dyslexiaFont);
+  const reducedMotion = useThemeStore((s) => s.reducedMotion);
+  const highContrast = useThemeStore((s) => s.highContrast);
+
+  const fontSize = CONFIG.fontZoomLevels[fontSizeLevel];
+
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={theme === "dark" ? "dark" : ""}
+      data-a11y-font={dyslexiaFont ? "dyslexia" : undefined}
+      data-a11y-motion={reducedMotion ? "reduce" : undefined}
+      data-a11y-contrast={highContrast ? "high" : undefined}
+      style={{ fontSize: fontSize !== 1 ? `${fontSize}em` : undefined }}
+    >
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -34,6 +54,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            className: "font-[var(--font-mono)] text-xs",
+          }}
+        />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -42,6 +68,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  useTheme();
   return <Outlet />;
 }
 

@@ -1,0 +1,336 @@
+/* ============================================
+   DROPDOWN MENU
+   ============================================ */
+
+.dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  min-width: 180px;
+  background: var(--white);
+  border: 2px solid;
+  border-color: var(--taupe-2) var(--taupe-4) var(--taupe-4) var(--taupe-2);
+  z-index: 50;
+  box-shadow: 3px 3px 0 rgba(var(--black-rgb),0.15);
+  border-radius: var(--r-md);
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--taupe-5);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid var(--taupe-1);
+}
+
+.dropdown-item:last-child { border-bottom: none; }
+
+.dropdown-item:hover {
+  background: var(--berry-1);
+  color: var(--berry-5);
+}
+
+.dropdown-item.violet:hover {
+  background: rgba(var(--violet-3-rgb),0.1);
+  color: var(--violet-3);
+}
+
+/* ============================================
+   OVERVIEW GRID
+   ============================================ */
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.overview-grid .detail-section {
+  margin-bottom: 0;
+}
+
+.overview-full {
+  grid-column: 1 / -1;
+}
+
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--taupe-1);
+}
+
+.kv-row:last-child { border-bottom: none; }
+
+.kv-key {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--taupe-3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.kv-val {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--taupe-5);
+}
+
+/* ============================================
+   RESIZE GRIP & LABEL
+   ============================================ */
+
+.resize-grip {
+  position: fixed;
+  bottom: 6px;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  background:
+    linear-gradient(135deg,
+      transparent 30%,
+      var(--taupe-3) 30%, var(--taupe-3) 35%,
+      transparent 35%, transparent 60%,
+      var(--taupe-3) 60%, var(--taupe-3) 65%,
+      transparent 65%, transparent 85%,
+      var(--taupe-3) 85%, var(--taupe-3) 90%,
+      transparent 90%
+    );
+  opacity: 0.5;
+}
+
+.design-label {
+  position: fixed;
+  bottom: 6px;
+  left: 12px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--taupe-3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--taupe-3);
+  border: 1px solid var(--taupe-2);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--taupe-4); }
+
+/* ============================================
+   DARK MODE OVERRIDES
+   ============================================ */
+
+[data-theme="dark"] .dropdown-menu {
+  border-color: var(--taupe-2);
+  box-shadow: 3px 3px 0 rgba(var(--black-rgb),0.3);
+}
+
+/* berry-5 stays dark for bevels — use berry-3 for hover text */
+[data-theme="dark"] .dropdown-item:hover {
+  color: var(--berry-3);
+}
+
+[data-theme="dark"] .dropdown-item.violet:hover {
+  background: rgba(var(--violet-3-rgb),0.15);
+}
+
+/* Flatten bevels in dark mode — 3D effect is subtle on dark surfaces */
+[data-theme="dark"] .bevel,
+[data-theme="dark"] .bevel-inset {
+  border-color: var(--taupe-2);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--taupe-2);
+  border-color: var(--taupe-1);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--taupe-3);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.hidden { display: none !important; }
+
+/* Beveled 3D border — raised (light top-left, dark bottom-right) */
+.bevel {
+  border-color: var(--taupe-2) var(--taupe-3) var(--taupe-3) var(--taupe-2);
+}
+
+/* Beveled 3D border — inset/pressed (dark top-left, light bottom-right) */
+.bevel-inset {
+  border-color: var(--taupe-3) var(--taupe-1) var(--taupe-1) var(--taupe-3);
+}
+
+/* Mono uppercase label pattern */
+.label-mono {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.text-green { color: var(--green); }
+.text-red { color: var(--red); }
+.cursor-default { cursor: default; }
+
+.inline-icon {
+  vertical-align: -1px;
+  margin-right: 3px;
+}
+
+.brain-empty-title-lg { font-size: 16px; }
+
+.swatch-green { background: var(--green); }
+.swatch-gold { background: var(--amber); }
+.swatch-red { background: var(--red); }
+.swatch-blue { background: var(--blue-3); }
+
+.badge-sm {
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+}
+
+.flex-fill {
+  display: flex;
+  flex: 1;
+}
+
+.wf-listing-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.wf-detail-layout {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.wf-detail-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mb-12 { margin-bottom: 12px; }
+.mb-14 { margin-bottom: 14px; }
+
+/* ======== ICON LABELS A11Y MODE ======== */
+
+/* Label spans — always hidden unless labels mode is active */
+.a11y-label {
+  display: none;
+}
+
+/* When labels mode is ON: hide icons, show label spans, resize buttons */
+[data-a11y-labels="show"] .header-btn.icon-btn [data-icon],
+[data-a11y-labels="show"] .cmd-btn [data-icon],
+[data-a11y-labels="show"] .feedback-btn [data-icon],
+[data-a11y-labels="show"] .top-icon-btn [data-icon],
+[data-a11y-labels="show"] .top-icon-btn .th-icon,
+[data-a11y-labels="show"] .panel-send-btn [data-icon],
+[data-a11y-labels="show"] .attach-option [data-icon] {
+  display: none;
+}
+
+[data-a11y-labels="show"] .a11y-label {
+  display: inline;
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+/* --- Per-button sizing when labels are visible --- */
+
+/* Header action buttons (Files, Export, Share, Edit, Cosimo, etc.) */
+[data-a11y-labels="show"] .header-btn.icon-btn {
+  padding: 4px 8px;
+}
+[data-a11y-labels="show"] .header-btn.icon-btn .a11y-label {
+  font-size: 10px;
+}
+
+/* Chat send & attach buttons */
+[data-a11y-labels="show"] .cmd-btn {
+  padding: 8px 12px;
+}
+[data-a11y-labels="show"] .cmd-btn .a11y-label {
+  font-size: 10px;
+}
+
+/* Feedback buttons — override fixed 24x24 to fit text */
+[data-a11y-labels="show"] .feedback-btn {
+  width: auto;
+  height: auto;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 4px 8px;
+}
+[data-a11y-labels="show"] .feedback-btn .a11y-label {
+  font-size: 9px;
+}
+
+/* Top header icon buttons — override fixed 28x28 to fit text */
+[data-a11y-labels="show"] .top-icon-btn {
+  width: auto;
+  height: 28px;
+  padding: 0 8px;
+}
+[data-a11y-labels="show"] .top-icon-btn .a11y-label {
+  font-size: 10px;
+}
+/* Reposition task badge inline after label text */
+[data-a11y-labels="show"] .top-icon-btn .th-badge {
+  position: static;
+  order: 2;
+  margin-left: 6px;
+}
+[data-a11y-labels="show"] .top-icon-btn .a11y-label {
+  order: 1;
+}
+
+/* Cosimo panel send button */
+[data-a11y-labels="show"] .panel-send-btn .a11y-label {
+  font-size: 10px;
+}
+
+/* Attach sub-menu buttons — override fixed 32x32 */
+[data-a11y-labels="show"] .attach-option {
+  width: auto;
+  height: auto;
+  min-height: 28px;
+  padding: 4px 10px;
+}
+[data-a11y-labels="show"] .attach-option .a11y-label {
+  font-size: 9px;
+}

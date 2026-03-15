@@ -555,6 +555,144 @@
   border-top-color: var(--surface-3);
 }
 
+/* ======== Top Tab Bar (header mode tabs) ======== */
+.top-tab-bar {
+  display: flex;
+  align-items: stretch;
+  background: var(--white);
+  border-bottom: 1px solid var(--taupe-2);
+  min-height: 38px;
+  flex-shrink: 0;
+  padding: 0 0 0 6px;
+  gap: 0;
+  position: relative;
+}
+
+.dark .top-tab-bar {
+  border-bottom-color: var(--surface-3);
+}
+
+.top-tab {
+  padding: 0 16px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--taupe-3);
+  background: var(--taupe-1);
+  border: 1px solid var(--taupe-2);
+  border-bottom: 1px solid var(--taupe-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s, background 0.15s;
+  margin-bottom: -1px;
+  margin-top: 6px;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  position: relative;
+  z-index: 1;
+  text-decoration: none;
+}
+
+.top-tab:hover {
+  color: var(--taupe-5);
+  background: var(--berry-1);
+}
+
+.top-tab.active {
+  color: var(--berry-5);
+  background: var(--off-white);
+  border-color: var(--taupe-2) var(--taupe-2) transparent var(--taupe-2);
+  z-index: 2;
+  margin-top: 4px;
+}
+
+.top-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--violet-3);
+  border-radius: var(--r-md) var(--r-md) 0 0;
+}
+
+.dark .top-tab {
+  background: rgba(var(--black-rgb), 0.25);
+  border-color: var(--surface-3);
+  color: var(--taupe-3);
+}
+
+.dark .top-tab:hover {
+  color: var(--taupe-5);
+  background: var(--berry-1);
+}
+
+.dark .top-tab.active {
+  color: var(--taupe-5);
+  background: var(--off-white);
+  border-color: var(--surface-3) var(--surface-3) transparent var(--surface-3);
+}
+
+.dark .top-tab.active::before {
+  background: var(--violet-2);
+}
+
+/* ======== Top Bar Icon Buttons ======== */
+.top-icon-btn {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: var(--r-md);
+  padding: 0;
+  color: var(--taupe-4);
+}
+
+.top-icon-btn:hover {
+  background: var(--berry-1);
+  border-color: var(--taupe-2) var(--taupe-3) var(--taupe-3) var(--taupe-2);
+}
+
+.top-icon-btn:focus-visible {
+  outline: 2px solid var(--violet-3);
+  outline-offset: 2px;
+}
+
+.dark .top-icon-btn:hover {
+  background: var(--berry-1);
+}
+
+/* ======== Top Bar Profile ======== */
+.top-profile-avatar {
+  width: 24px;
+  height: 24px;
+  background: var(--berry-3);
+  border: 1px solid var(--berry-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--white);
+  flex-shrink: 0;
+  border-radius: var(--r-md);
+}
+
+.dark .top-profile-avatar {
+  color: var(--text-light);
+}
+
 /* ======== Workflow Pulse Animation ======== */
 @keyframes wf-pulse {
   0%, 100% { opacity: 1; }

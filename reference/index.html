@@ -1,0 +1,2319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosimo — Applied Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/layout.css?v=2">
+<link rel="stylesheet" href="css/chat.css">
+<link rel="stylesheet" href="css/workflows.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/utilities.css">
+</head>
+<body>
+
+<div class="app-frame">
+
+  <!-- ======== SIDEBAR ======== -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-row">
+        <div class="logo-mark"><div class="logo-spheres"><div class="logo-sphere dark"></div><div class="logo-sphere light"></div><div class="logo-sphere dark"></div><div class="logo-sphere dark"></div><div class="logo-sphere dark"></div><div class="logo-sphere dark"></div></div></div>
+        <div class="logo-text">
+          <div class="logo-title">COSIMO</div>
+          <div class="logo-sub">MEDICI & COMPANY</div>
+        </div>
+      </div>
+
+      <button class="new-btn label-mono" id="newBtn">+ New Thread</button>
+
+      <div class="sidebar-search">
+        <input type="text" class="sidebar-search-input" placeholder="Search..." />
+        <div class="search-results hidden" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- Chat sidebar items -->
+    <div id="chatSidebar">
+      <div class="side-label">Recent</div>
+      <div class="thread-list">
+        <div class="thread-item active" data-thread-id="fund3">
+          Fund III — Allocation Drift
+          <div class="thread-meta">Today, 2:31 PM</div>
+        </div>
+        <div class="thread-item" data-thread-id="hilgard">
+          Hilgard — Fee Analysis
+          <div class="thread-meta">Feb 22, 4:15 PM</div>
+          <span class="thread-indicator label-mono ready">Ready</span>
+        </div>
+        <div class="thread-item" data-thread-id="q4lp">
+          Q4 LP Distribution Waterfall
+          <div class="thread-meta">Yesterday, 11:20 AM</div>
+        </div>
+        <div class="thread-item" data-thread-id="k1">
+          K-1 Document Extraction
+          <div class="thread-meta">Feb 20, 9:45 AM</div>
+          <span class="thread-indicator label-mono error">Error</span>
+        </div>
+        <div class="thread-item" data-thread-id="erabor">
+          Erabor Partnership Terms
+          <div class="thread-meta">Feb 18, 3:30 PM</div>
+        </div>
+        <div class="thread-item" data-thread-id="wf-run-rentroll-047">
+          <span class="thread-wf-icon" aria-label="Workflow thread">⚙</span>Rent Roll Extraction — Q4 Batch
+          <div class="thread-meta">Today, 12:15 PM</div>
+          <span class="thread-indicator label-mono ready">Ready</span>
+        </div>
+        <div class="thread-item" data-thread-id="tener-batch-12">
+          <span class="thread-wf-icon" aria-label="Workflow thread">⚙</span>Tener — Valuation Filing Batch 12
+          <div class="thread-meta">Today, 10:42 AM</div>
+          <span class="thread-indicator label-mono waiting">Waiting</span>
+        </div>
+        <div class="thread-item" data-thread-id="wf-create-dd">
+          <span class="thread-wf-icon" aria-label="Workflow thread">⚙</span>New Workflow: Due Diligence
+          <div class="thread-meta">Yesterday, 3:15 PM</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflow sidebar items -->
+    <div id="workflowSidebar" class="hidden">
+      <div class="wf-active-runs" id="wfActiveRuns"></div>
+      <div class="side-label">Templates</div>
+      <div class="workflow-sidebar-list" id="wfSidebarList"></div>
+    </div>
+
+    <!-- Brain nav — always visible at bottom of sidebar -->
+    <div class="brain-nav" id="brainNav">
+      <div class="brain-nav-header">
+        <div class="side-label">Brain</div>
+        <button class="brain-nav-toggle" id="brainNavToggle" title="Collapse Brain nav" aria-label="Collapse Brain nav">
+          <span data-icon="chevronDown"></span>
+        </button>
+      </div>
+      <div class="brain-nav-items">
+        <button class="brain-nav-btn" data-section="memory" title="Memory">
+          <span data-icon="brain"></span>
+          Memory
+        </button>
+        <button class="brain-nav-btn" data-section="lessons" title="Lessons">
+          <span data-icon="lessons"></span>
+          Lessons
+        </button>
+        <button class="brain-nav-btn" data-section="graphs" title="Data Graphs">
+          <span data-icon="graphs"></span>
+          Graphs
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+    </div>
+  </div>
+
+  <div class="resize-handle resize-handle-sidebar" id="sidebarResizeHandle"></div>
+
+  <!-- ======== MAIN ======== -->
+  <main>
+
+    <!-- ======== TOP TAB BAR ======== -->
+    <div class="top-tab-bar">
+      <button class="top-tab label-mono active" id="tabChat">
+        <span class="top-tab-icon" data-icon="chat"></span> Chat
+      </button>
+      <button class="top-tab label-mono" id="tabWorkflows">
+        <span class="top-tab-icon" data-icon="workflows"></span> Workflows
+      </button>
+      <div class="top-tab-spacer"></div>
+      <div class="top-header-right">
+        <button class="top-icon-btn" id="taskAlertBtn" title="Assigned Tasks" aria-label="Assigned Tasks" data-label="Tasks">
+          <span class="th-icon">◈</span>
+          <div class="th-badge" id="taskBadge">3</div>
+        </button>
+        <button class="top-icon-btn" id="calendarBtn" title="Calendar" aria-label="Calendar" data-label="Calendar">
+          <span class="th-icon">▦</span>
+        </button>
+        <button class="top-icon-btn" id="usageBtn" title="Usage" aria-label="Usage" data-label="Usage">
+          <span data-icon="gauge"></span>
+        </button>
+        <div class="th-divider"></div>
+        <div class="top-profile">
+          <div class="top-profile-avatar">E</div>
+          <span class="top-profile-name">Eliot Puplett</span>
+        </div>
+        <div class="th-dropdown th-dropdown-profile bevel hidden" id="profilePanel" aria-label="Profile settings">
+          <!-- Main profile menu -->
+          <div class="profile-menu-view" id="profileMainView">
+            <div class="profile-menu-user-info">
+              <div class="profile-menu-user-avatar">E</div>
+              <div class="profile-menu-user-details">
+                <div class="profile-menu-user-name">Eliot Puplett</div>
+                <div class="profile-menu-user-email">e.puplett@medici.com</div>
+              </div>
+            </div>
+            <div class="profile-menu-divider"></div>
+            <div class="profile-menu-item label-mono" data-action="appearance">
+              <span>Appearance &amp; Accessibility</span>
+              <span class="profile-menu-item-chevron" data-icon="chevronRight"></span>
+            </div>
+            <div class="profile-menu-item label-mono" data-action="account-settings">Account Settings</div>
+            <div class="profile-menu-divider"></div>
+            <div class="profile-menu-item label-mono profile-menu-signout">Sign Out</div>
+          </div>
+
+          <!-- Appearance & Accessibility sub-panel -->
+          <div class="profile-menu-view profile-menu-subpanel" id="profileAppearanceView">
+            <div class="profile-menu-subpanel-header" data-action="profile-back">
+              <span class="profile-menu-back-icon" data-icon="arrowLeft"></span>
+              <span class="profile-menu-subpanel-title">Appearance &amp; Accessibility</span>
+            </div>
+            <div class="profile-menu-divider"></div>
+            <div class="profile-menu-theme">
+              <span class="profile-menu-theme-label">Dark mode</span>
+              <div class="profile-menu-toggle" id="themeToggleSwitch" role="switch" aria-checked="false" aria-label="Dark mode">
+                <div class="profile-menu-toggle-track" id="themeToggleTrack">
+                  <div class="profile-menu-toggle-thumb" id="themeToggleThumb"></div>
+                </div>
+              </div>
+            </div>
+            <div class="profile-menu-contrast">
+              <div class="profile-menu-contrast-header">
+                <span class="profile-menu-theme-label">Purple intensity</span>
+                <span class="profile-menu-contrast-value" id="contrastValue">100%</span>
+              </div>
+              <input type="range" class="profile-menu-slider" id="purpleIntensitySlider" min="0" max="150" value="100">
+              <div class="profile-menu-slider-labels">
+                <span>Subtle</span>
+                <span>Default</span>
+                <span>Vivid</span>
+              </div>
+            </div>
+            <div class="profile-menu-divider"></div>
+            <div class="profile-menu-section-label">Accessibility</div>
+
+            <!-- Font size slider -->
+            <div class="profile-menu-contrast">
+              <div class="profile-menu-contrast-header">
+                <span class="profile-menu-theme-label">Text size</span>
+                <span class="profile-menu-contrast-value" id="fontSizeValue">100%</span>
+              </div>
+              <input type="range" class="profile-menu-slider" id="fontSizeSlider" min="0" max="4" step="1" value="0">
+              <div class="profile-menu-slider-labels">
+                <span>100%</span>
+                <span>110%</span>
+                <span>120%</span>
+              </div>
+            </div>
+
+            <!-- Dyslexia-friendly font -->
+            <div class="profile-menu-theme">
+              <span class="profile-menu-theme-label">Dyslexia-friendly font</span>
+              <div class="profile-menu-toggle" role="switch" aria-checked="false" aria-label="Dyslexia-friendly font">
+                <div class="profile-menu-toggle-track" id="dyslexiaToggleTrack">
+                  <div class="profile-menu-toggle-thumb" id="dyslexiaToggleThumb"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reduced motion -->
+            <div class="profile-menu-theme">
+              <span class="profile-menu-theme-label">Reduced motion</span>
+              <div class="profile-menu-toggle" role="switch" aria-checked="false" aria-label="Reduced motion">
+                <div class="profile-menu-toggle-track" id="motionToggleTrack">
+                  <div class="profile-menu-toggle-thumb" id="motionToggleThumb"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- High contrast + focus -->
+            <div class="profile-menu-theme">
+              <span class="profile-menu-theme-label">High contrast &amp; focus</span>
+              <div class="profile-menu-toggle" role="switch" aria-checked="false" aria-label="High contrast and focus">
+                <div class="profile-menu-toggle-track" id="contrastToggleTrack">
+                  <div class="profile-menu-toggle-thumb" id="contrastToggleThumb"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Icon labels -->
+            <div class="profile-menu-theme">
+              <span class="profile-menu-theme-label">Icon labels</span>
+              <div class="profile-menu-toggle" role="switch" aria-checked="false" aria-label="Show icon labels">
+                <div class="profile-menu-toggle-track" id="labelsToggleTrack">
+                  <div class="profile-menu-toggle-thumb" id="labelsToggleThumb"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Panel Dropdown -->
+    <!-- Task Panel (rendered from MOCK_TASKS by renderHeaderPanels()) -->
+    <div class="th-dropdown bevel hidden" id="taskPanel" aria-label="Assigned tasks"></div>
+
+    <!-- Calendar Panel (rendered from MOCK_CALENDAR by renderHeaderPanels()) -->
+    <div class="th-dropdown th-dropdown-calendar bevel hidden" id="calendarPanel" aria-label="Calendar"></div>
+
+    <!-- Usage Panel (rendered from MOCK_USAGE by renderHeaderPanels()) -->
+    <div class="th-dropdown th-dropdown-usage bevel hidden" id="usagePanel" aria-label="Usage"></div>
+
+    <!-- ======== CHAT VIEW ======== -->
+    <div class="view-container active" id="chatView">
+      <div class="chat-with-panel">
+        <div class="chat-main">
+      <div class="main-header" id="chatHeader">
+        <span class="header-title" id="chatHeaderTitle">Fund III — Allocation Drift</span>
+        <div class="header-actions">
+          <button class="header-btn bevel label-mono icon-btn disabled" id="filesBtn" disabled title="Files" aria-label="Files" data-label="Files"><span data-icon="folder"></span></button>
+          <button class="header-btn bevel label-mono icon-btn" id="exportBtn" title="Export" aria-label="Export" data-label="Export"><span data-icon="export"></span></button>
+          <button class="header-btn bevel label-mono icon-btn" id="shareBtn" title="Share" aria-label="Share" data-label="Share"><span data-icon="share"></span></button>
+        </div>
+      </div>
+
+      <!-- Fund III thread -->
+      <div class="chat-thread active" id="thread-fund3">
+      <div class="chat-scroll">
+        <div class="date-separator">
+          <div class="date-separator-line"></div>
+          <span class="date-separator-label">Today</span>
+          <div class="date-separator-line"></div>
+        </div>
+        <!-- Message 1: User -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">2:31 PM</span>
+            </div>
+            <div class="msg-body">
+              Pull the current allocation for Fund III and compare it against the IPS mandate. Flag anything drifting more than 200bps. Show me a table.
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2: AI with artifact -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">2:32 PM</span>
+              <span class="latency-chip">3.2s</span>
+              <span class="model-badge label-mono">Analyst</span>
+            </div>
+
+            <div class="artifact">
+              <div class="art-bar">
+                <div class="art-close"></div>
+                <div class="art-stripe"></div>
+                <span class="art-title">Fund III — Allocation Drift Analysis</span>
+                <div class="art-stripe"></div>
+                <span class="art-live">LIVE</span>
+              </div>
+              <div class="art-body">
+                <table class="data-tbl">
+                  <thead>
+                    <tr>
+                      <th>Sector</th>
+                      <th>Mandate</th>
+                      <th>Current</th>
+                      <th>Drift</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>US Large Cap</td>
+                      <td>35.0%</td>
+                      <td>38.2%</td>
+                      <td><span class="drift-over">+3.2%</span></td>
+                      <td><span class="action-chip">Trim $2.4M</span></td>
+                    </tr>
+                    <tr>
+                      <td>Intl Developed</td>
+                      <td>20.0%</td>
+                      <td>17.1%</td>
+                      <td><span class="drift-under">−2.9%</span></td>
+                      <td><span class="action-chip">Add $2.1M</span></td>
+                    </tr>
+                    <tr>
+                      <td>EM Equity</td>
+                      <td>10.0%</td>
+                      <td>11.4%</td>
+                      <td><span class="drift-over">+1.4%</span></td>
+                      <td><span class="action-chip">Trim $1.0M</span></td>
+                    </tr>
+                    <tr>
+                      <td>Fixed Income</td>
+                      <td>25.0%</td>
+                      <td>23.8%</td>
+                      <td><span class="drift-under">−1.2%</span></td>
+                      <td><span class="action-chip">Add $0.9M</span></td>
+                    </tr>
+                    <tr>
+                      <td>Alternatives</td>
+                      <td>10.0%</td>
+                      <td>9.5%</td>
+                      <td><span class="drift-under">−0.5%</span></td>
+                      <td><span class="action-hold">Hold</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="msg-body">
+              <p><strong>Primary issue:</strong> US Large Cap is up 3.2 points since June, driven by the tech rally. International Developed is the mirror underweight.</p>
+              <p><strong>Recommendation:</strong> Paired trade — trim the S&P 500 position and rotate into the EAFE sleeve. I've drafted the rebalancing memo for the IC. Want me to pull it up, or look at tax implications first?</p>
+            </div>
+            <div class="msg-feedback">
+              <button class="feedback-btn up" title="Good response" aria-label="Good response" data-label="Like"><span data-icon="thumbUp"></span></button>
+              <button class="feedback-btn down" title="Poor response" aria-label="Poor response" data-label="Dislike"><span data-icon="thumbDown"></span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 3: User -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">2:35 PM</span>
+            </div>
+            <div class="msg-body">
+              Let's see the tax impact first. And flag anything that would trigger a wash sale.
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 4: AI with flags -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">2:35 PM</span>
+              <span class="latency-chip">4.8s</span>
+              <span class="model-badge label-mono">Expert</span>
+            </div>
+
+            <div class="msg-body">
+              <p>Lot-level analysis against the 30-day wash sale window complete. Two positions flagged:</p>
+            </div>
+
+            <div class="flag-box safe">
+              <div class="flag-label">
+                <span class="ticker">MSFT</span>
+                <span class="status status-safe">SAFE</span>
+              </div>
+              <div class="flag-detail">
+                Loss harvested <strong>August 8</strong>. Repurchase window closes <strong>March 7</strong>. Safe to include in the rebalance.
+              </div>
+            </div>
+
+            <div class="flag-box warn">
+              <div class="flag-label">
+                <span class="ticker">AAPL</span>
+                <span class="status status-warn">CAUTION</span>
+              </div>
+              <div class="flag-detail">
+                Loss harvested <strong>September 14</strong>. Window open until <strong>October 14</strong>. Trim + index reconstitution risks wash sale on <strong>~$340K</strong> of harvested losses. Recommend excluding AAPL lots and trimming through other large-cap names.
+              </div>
+            </div>
+
+            <div class="summary-bar">
+              <div class="summary-item">
+                <span class="summary-label">ST Gains</span>
+                <span class="summary-value neg">$18.2K</span>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-item">
+                <span class="summary-label">LT Losses Avail</span>
+                <span class="summary-value pos">$42.6K</span>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-item">
+                <span class="summary-label">Net Tax Benefit</span>
+                <span class="summary-value net">~$24.4K</span>
+              </div>
+            </div>
+            <div class="msg-feedback">
+              <button class="feedback-btn up" title="Good response" aria-label="Good response" data-label="Like"><span data-icon="thumbUp"></span></button>
+              <button class="feedback-btn down" title="Poor response" aria-label="Poor response" data-label="Dislike"><span data-icon="thumbDown"></span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <!-- Message 5: User with file attachments -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">2:38 PM</span>
+            </div>
+            <div class="msg-body">
+              Here are the updated holdings and NAV for the rebalance. Can you run the allocation against these and confirm the drift numbers still hold?
+            </div>
+            <div class="msg-file-attachments">
+              <div class="file-attachment">
+                <div class="file-attachment-icon file-icon-pdf">📄</div>
+                <div class="file-attachment-info">
+                  <div class="file-attachment-name">Q1_Holdings_Report.pdf</div>
+                  <div class="file-attachment-meta">24 pages · 2.4 MB</div>
+                </div>
+                <div class="file-attachment-action">Open ↗</div>
+              </div>
+              <div class="file-attachment">
+                <div class="file-attachment-icon">▦</div>
+                <div class="file-attachment-info">
+                  <div class="file-attachment-name">Fund_III_NAV_032026.xlsx</div>
+                  <div class="file-attachment-meta">3 sheets · 840 KB</div>
+                </div>
+                <div class="file-attachment-action">Open ↗</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <div class="input-area">
+        <div class="input-file-strip">
+          <div class="input-file-chip">
+            <span class="input-file-chip-icon">📄</span>
+            <span class="input-file-chip-name">Q1_Holdings_Report.pdf</span>
+            <span class="input-file-chip-size">2.4 MB</span>
+            <button class="input-file-chip-remove" title="Remove file" aria-label="Remove Q1_Holdings_Report.pdf">×</button>
+          </div>
+          <div class="input-file-chip">
+            <span class="input-file-chip-icon">▦</span>
+            <span class="input-file-chip-name">Fund_III_NAV_032026.xlsx</span>
+            <span class="input-file-chip-size">840 KB</span>
+            <button class="input-file-chip-remove" title="Remove file" aria-label="Remove Fund_III_NAV_032026.xlsx">×</button>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="text-input bevel-inset" contenteditable="true" role="textbox" aria-label="Message input" data-placeholder="Continue this thread..."></div>
+          <div class="attach-wrapper">
+            <button class="cmd-btn label-mono" title="Attach file" data-label="Attach"><span data-icon="attach"></span></button>
+            <div class="attach-menu">
+              <button class="attach-option" title="From computer" data-label="Computer">
+                <span data-icon="computer"></span>
+              </button>
+              <button class="attach-option" title="From cloud drive" data-label="Drive">
+                <span data-icon="cloud"></span>
+              </button>
+            </div>
+          </div>
+          <button class="cmd-btn label-mono cmd-primary" title="Send" data-label="Send"><span data-icon="send"></span></button>
+        </div>
+        <div class="input-footer">
+          <div class="model-selector">
+            <button class="model-selector-btn label-mono">
+              <span class="model-selector-label">Analyst</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="model-dropdown">
+              <button class="model-option" data-model="assistant">
+                <span class="model-option-name label-mono">Assistant</span>
+                <span class="model-option-desc">Quick questions and lookups</span>
+              </button>
+              <button class="model-option selected" data-model="analyst">
+                <span class="model-option-name label-mono">Analyst</span>
+                <span class="model-option-desc">Drafts, summaries, and document review</span>
+              </button>
+              <button class="model-option" data-model="expert">
+                <span class="model-option-name label-mono">Expert</span>
+                <span class="model-option-desc">Complex analysis and long-form deliverables</span>
+              </button>
+            </div>
+          </div>
+          <span>⌘B bold · ⌘I italic · ⌘U underline · **markdown**</span>
+        </div>
+      </div>
+      </div><!-- /thread-fund3 -->
+
+      <!-- Hilgard thread -->
+      <div class="chat-thread" id="thread-hilgard">
+      <div class="chat-scroll">
+        <!-- Message 1: User -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">4:15 PM</span>
+            </div>
+            <div class="msg-body">
+              Build me a management fee analysis for Hilgard Properties — Fund II. Use the committed capital basis of $86M at 1.75% annual, with a step-down to 1.25% after Year 4. Include quarterly breakdowns for 2025 and 2026, and flag where the offset provisions from portfolio company fees should apply. Output as xlsx.
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2: Cosimo response with file -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">4:16 PM</span>
+              <span class="latency-chip">4.1s</span>
+              <span class="model-badge label-mono">Analyst</span>
+            </div>
+
+            <div class="msg-body">
+              <p>Fee analysis complete. Key findings:</p>
+              <p><strong>Pre-step-down (Q1 2025 – Q4 2025):</strong> Quarterly fee of $376,250 on $86M committed at 1.75%. Annual total: $1,505,000.</p>
+              <p><strong>Post-step-down (Q1 2026 onward):</strong> Rate drops to 1.25%, reducing quarterly fee to $268,750. Annual total: $1,075,000 — a $430K annual saving for LPs.</p>
+              <p><strong>Offset provisions:</strong> Q2 and Q3 2025 have portfolio company monitoring fees of $42,000 and $18,500 respectively that should offset against the management fee per the LPA. Net fees adjusted in the output.</p>
+            </div>
+
+            <div class="file-attachment">
+              <div class="file-attachment-icon">▦</div>
+              <div class="file-attachment-info">
+                <div class="file-attachment-name">Hilgard_Fund_II_Fee_Analysis.xlsx</div>
+                <div class="file-attachment-meta">8 columns · 12 rows · Generated Feb 22</div>
+              </div>
+              <div class="file-attachment-action">Open ↗</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 3: User follow-up -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">4:18 PM</span>
+            </div>
+            <div class="msg-body">
+              Looks good. Can you double-check the offset amounts against the monitoring fee schedule we uploaded last week?
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 4: Cosimo confirmation -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">4:19 PM</span>
+              <span class="latency-chip">2.8s</span>
+              <span class="model-badge label-mono">Analyst</span>
+            </div>
+            <div class="msg-body">
+              <p>Cross-referenced against <strong>Hilgard_Monitoring_Fees_2025.pdf</strong> from your Feb 15 upload. Both offset amounts match — $42,000 (Q2, Brightfield advisory) and $18,500 (Q3, Crestline consulting). The xlsx is accurate. No discrepancies found.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-row">
+          <div class="text-input bevel-inset" contenteditable="true" role="textbox" aria-label="Message input" data-placeholder="Continue this thread..."></div>
+          <div class="attach-wrapper">
+            <button class="cmd-btn label-mono" title="Attach file" data-label="Attach"><span data-icon="attach"></span></button>
+            <div class="attach-menu">
+              <button class="attach-option" title="From computer" data-label="Computer">
+                <span data-icon="computer"></span>
+              </button>
+              <button class="attach-option" title="From cloud drive" data-label="Drive">
+                <span data-icon="cloud"></span>
+              </button>
+            </div>
+          </div>
+          <button class="cmd-btn label-mono cmd-primary" title="Send" data-label="Send"><span data-icon="send"></span></button>
+        </div>
+        <div class="input-footer">
+          <div class="model-selector">
+            <button class="model-selector-btn label-mono">
+              <span class="model-selector-label">Analyst</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="model-dropdown">
+              <button class="model-option" data-model="assistant">
+                <span class="model-option-name label-mono">Assistant</span>
+                <span class="model-option-desc">Quick questions and lookups</span>
+              </button>
+              <button class="model-option selected" data-model="analyst">
+                <span class="model-option-name label-mono">Analyst</span>
+                <span class="model-option-desc">Drafts, summaries, and document review</span>
+              </button>
+              <button class="model-option" data-model="expert">
+                <span class="model-option-name label-mono">Expert</span>
+                <span class="model-option-desc">Complex analysis and long-form deliverables</span>
+              </button>
+            </div>
+          </div>
+          <span>⌘B bold · ⌘I italic · ⌘U underline · **markdown**</span>
+        </div>
+      </div>
+      </div><!-- /thread-hilgard -->
+
+      <!-- Q4 LP Distribution Waterfall thread -->
+      <div class="chat-thread" id="thread-q4lp">
+      <div class="chat-scroll">
+        <!-- Message 1: User -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">11:20 AM</span>
+            </div>
+            <div class="msg-body">
+              Run the Q4 distribution waterfall for Fund III. Use the standard 8% pref, 50/50 catch-up, and 20% carried interest structure. I need the LP-level breakdown across all three tiers — show me who gets what.
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2: Cosimo thinking -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">11:20 AM</span>
+              <span class="model-badge label-mono">Assistant</span>
+            </div>
+            <div class="msg-body">
+              <div class="cosimo-thinking">
+                <div class="thinking-cube"></div>
+                <div class="thinking-cube"></div>
+                <div class="thinking-cube"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-row">
+          <div class="text-input bevel-inset" contenteditable="true" role="textbox" aria-label="Message input" data-placeholder="Continue this thread..."></div>
+          <div class="attach-wrapper">
+            <button class="cmd-btn label-mono" title="Attach file" data-label="Attach"><span data-icon="attach"></span></button>
+            <div class="attach-menu">
+              <button class="attach-option" title="From computer" data-label="Computer">
+                <span data-icon="computer"></span>
+              </button>
+              <button class="attach-option" title="From cloud drive" data-label="Drive">
+                <span data-icon="cloud"></span>
+              </button>
+            </div>
+          </div>
+          <button class="cmd-btn label-mono cmd-primary" title="Send" data-label="Send"><span data-icon="send"></span></button>
+        </div>
+        <div class="input-footer">
+          <div class="model-selector">
+            <button class="model-selector-btn label-mono">
+              <span class="model-selector-label">Analyst</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="model-dropdown">
+              <button class="model-option" data-model="assistant">
+                <span class="model-option-name label-mono">Assistant</span>
+                <span class="model-option-desc">Quick questions and lookups</span>
+              </button>
+              <button class="model-option selected" data-model="analyst">
+                <span class="model-option-name label-mono">Analyst</span>
+                <span class="model-option-desc">Drafts, summaries, and document review</span>
+              </button>
+              <button class="model-option" data-model="expert">
+                <span class="model-option-name label-mono">Expert</span>
+                <span class="model-option-desc">Complex analysis and long-form deliverables</span>
+              </button>
+            </div>
+          </div>
+          <span>⌘B bold · ⌘I italic · ⌘U underline · **markdown**</span>
+        </div>
+      </div>
+      </div><!-- /thread-q4lp -->
+
+      <!-- Erabor Partnership Terms thread -->
+      <div class="chat-thread" id="thread-new">
+      <div class="chat-scroll flex-fill">
+        <div class="empty-thread">
+          <div class="empty-thread-icon">◆</div>
+          <div class="empty-thread-title">What can Cosimo help with?</div>
+          <div class="empty-thread-sub">Ask about fund performance, document analysis, compliance checks, or anything across your portfolio.</div>
+          <div class="empty-thread-suggestions">
+            <button class="empty-thread-chip bevel" data-suggestion="Compare Q3 and Q4 distributions across all active funds">Distribution comparison</button>
+            <button class="empty-thread-chip bevel" data-suggestion="Pull the latest NAV report for Fund IV and flag any valuation changes above 10%">NAV review</button>
+            <button class="empty-thread-chip bevel" data-suggestion="Summarize all outstanding covenant violations across the loan book">Covenant check</button>
+            <button class="empty-thread-chip bevel" data-suggestion="Generate a capital call notice for the next tranche">Capital call</button>
+          </div>
+        </div>
+      </div>
+      <div class="input-area">
+        <div class="input-row">
+          <div class="text-input bevel-inset" id="new-thread-input" contenteditable="true" role="textbox" aria-label="Ask Cosimo anything" data-placeholder="Ask Cosimo anything..."></div>
+          <div class="attach-wrapper">
+            <button class="cmd-btn label-mono" title="Attach file" data-label="Attach"><span data-icon="attach"></span></button>
+            <div class="attach-menu">
+              <button class="attach-option" title="From computer" data-label="Computer">
+                <span data-icon="computer"></span>
+              </button>
+              <button class="attach-option" title="From cloud drive" data-label="Drive">
+                <span data-icon="cloud"></span>
+              </button>
+            </div>
+          </div>
+          <button class="cmd-btn label-mono cmd-primary" title="Send" data-label="Send"><span data-icon="send"></span></button>
+        </div>
+        <div class="input-footer">
+          <div class="model-selector">
+            <button class="model-selector-btn label-mono">
+              <span class="model-selector-label">Analyst</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="model-dropdown">
+              <button class="model-option" data-model="assistant">
+                <span class="model-option-name label-mono">Assistant</span>
+                <span class="model-option-desc">Quick questions and lookups</span>
+              </button>
+              <button class="model-option selected" data-model="analyst">
+                <span class="model-option-name label-mono">Analyst</span>
+                <span class="model-option-desc">Drafts, summaries, and document review</span>
+              </button>
+              <button class="model-option" data-model="expert">
+                <span class="model-option-name label-mono">Expert</span>
+                <span class="model-option-desc">Complex analysis and long-form deliverables</span>
+              </button>
+            </div>
+          </div>
+          <span>⌘B bold · ⌘I italic · ⌘U underline · **markdown**</span>
+        </div>
+      </div>
+      </div><!-- /thread-new -->
+
+      <div class="chat-thread" id="thread-k1">
+      <div class="chat-scroll">
+        <!-- User message -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">9:45 AM</span>
+            </div>
+            <div class="msg-body">
+              Pull the 2024 K-1s for the Ridgeline Capital fund and extract all partner allocations — ordinary income, capital gains, Section 199A, and any guaranteed payments. Map each against our internal capital account balances and flag any discrepancies above $5,000.
+            </div>
+          </div>
+        </div>
+
+        <!-- Cosimo error state -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">9:45 AM</span>
+              <span class="model-badge label-mono">Expert</span>
+            </div>
+            <div class="msg-body">
+              <div class="cosimo-error">
+                <div class="cosimo-error-icon">!</div>
+                <div class="cosimo-error-content">
+                  <div class="cosimo-error-title label-mono">Unable to complete request</div>
+                  <div class="cosimo-error-detail">Connection to Ridgeline Capital document vault timed out after 30s. The K-1 extraction pipeline could not retrieve the source documents. This may be due to an expired API token or a temporary outage on the custodian's end.</div>
+                  <div class="cosimo-error-meta">Error 504 · Gateway Timeout · Vault Integration · Feb 20, 9:46 AM</div>
+                </div>
+                <button class="cosimo-error-retry label-mono" id="k1RetryBtn">
+                  <span data-icon="retry"></span>
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-row">
+          <div class="text-input bevel-inset" contenteditable="true" role="textbox" aria-label="Message input" data-placeholder="Continue this thread..."></div>
+          <div class="attach-wrapper">
+            <button class="cmd-btn label-mono" title="Attach file" data-label="Attach"><span data-icon="attach"></span></button>
+            <div class="attach-menu">
+              <button class="attach-option" title="From computer" data-label="Computer">
+                <span data-icon="computer"></span>
+              </button>
+              <button class="attach-option" title="From cloud drive" data-label="Drive">
+                <span data-icon="cloud"></span>
+              </button>
+            </div>
+          </div>
+          <button class="cmd-btn label-mono cmd-primary" title="Send" data-label="Send"><span data-icon="send"></span></button>
+        </div>
+        <div class="input-footer">
+          <div class="model-selector">
+            <button class="model-selector-btn label-mono">
+              <span class="model-selector-label">Analyst</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="model-dropdown">
+              <button class="model-option" data-model="assistant">
+                <span class="model-option-name label-mono">Assistant</span>
+                <span class="model-option-desc">Quick questions and lookups</span>
+              </button>
+              <button class="model-option selected" data-model="analyst">
+                <span class="model-option-name label-mono">Analyst</span>
+                <span class="model-option-desc">Drafts, summaries, and document review</span>
+              </button>
+              <button class="model-option" data-model="expert">
+                <span class="model-option-name label-mono">Expert</span>
+                <span class="model-option-desc">Complex analysis and long-form deliverables</span>
+              </button>
+            </div>
+          </div>
+          <span>⌘B bold · ⌘I italic · ⌘U underline · **markdown**</span>
+        </div>
+      </div>
+      </div><!-- /thread-k1 -->
+
+      <div class="chat-thread" id="thread-erabor">
+      <div class="chat-scroll" id="erabor-scroll">
+        <!-- Message 1: User -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">3:30 PM</span>
+            </div>
+            <div class="msg-body">
+              Pull the Erabor partnership agreement and summarize the key economic terms. I need to understand the GP commit, fee structure, clawback provisions, and any side letter concessions before the Thursday call with Marcus. Cross-reference against our standard Fund III terms and flag anything non-standard.
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2: Cosimo response (animated sequence) -->
+        <div class="msg-block" id="erabor-response">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">3:30 PM</span>
+              <span class="latency-chip hidden" id="erabor-latency">4.2s</span>
+              <span class="model-badge label-mono">Expert</span>
+            </div>
+
+            <!-- State 1: Thinking cubes -->
+            <div class="msg-body" id="erabor-thinking">
+              <div class="cosimo-thinking">
+                <div class="thinking-cube"></div>
+                <div class="thinking-cube"></div>
+                <div class="thinking-cube"></div>
+              </div>
+            </div>
+
+            <!-- State 2: Train of thought -->
+            <div class="cosimo-reasoning hidden" id="erabor-reasoning">
+              <div class="reasoning-header">
+                <div class="reasoning-header-icon">◆</div>
+                <span class="reasoning-header-label">Cosimo is thinking...</span>
+                <div class="reasoning-pulse"></div>
+              </div>
+              <div class="reasoning-steps" id="erabor-steps">
+                <div class="reasoning-step-item" data-step="0">Locating Erabor Partners LP Agreement (executed Dec 2024)...</div>
+                <div class="reasoning-step-item" data-step="1">Extracting Section 4 — Management Fee &amp; Carry provisions</div>
+                <div class="reasoning-step-item" data-step="2">GP commitment: 3.5% of total commitments ($7.0M on $200M fund) — <span class="reasoning-flag">above our standard 2.5%</span></div>
+                <div class="reasoning-step-item" data-step="3">Fee structure: 2.0% on committed during investment period, step-down to 1.5% on invested capital post-Year 5</div>
+                <div class="reasoning-step-item" data-step="4">Scanning for side letter provisions...</div>
+                <div class="reasoning-step-item" data-step="5">Found 3 side letters — Northgate Capital, Westbridge RE, and one redacted entity</div>
+                <div class="reasoning-step-item" data-step="6">Northgate side letter grants MFN on fees + co-invest priority — <span class="reasoning-flag">non-standard</span></div>
+                <div class="reasoning-step-item" data-step="7">Cross-referencing clawback language against Fund III template...</div>
+                <div class="reasoning-step-item" data-step="8">Clawback: interim clawback with annual true-up, 100% GP obligation — matches standard</div>
+                <div class="reasoning-step-item" data-step="9">Key person clause names Marcus Tilden + one other — <span class="reasoning-flag">single-trigger suspension</span>, not our standard dual-trigger</div>
+                <div class="reasoning-step-item" data-step="10">Compiling summary with flagged deviations...</div>
+              </div>
+            </div>
+
+            <!-- State 3: Full response (streamed in) -->
+            <div class="msg-body hidden" id="erabor-reply">
+              <div class="erabor-stream-block" data-stream="0">
+                <p>I've pulled the executed Erabor Partners LP Agreement dated December 14, 2024 and cross-referenced all economic terms against our Fund III standard template. The agreement covers a $200M closed-end vehicle with a 7-year investment period and two 1-year extensions at GP discretion, subject to advisory committee consent.</p>
+              </div>
+
+              <div class="erabor-stream-block" data-stream="1">
+                <p>Overall, the structure is largely in line with institutional norms for a fund of this size and strategy. However, I've identified three provisions that deviate from our standard terms in ways that could create friction or optionality issues down the road. I've detailed each section below with flagged items highlighted.</p>
+              </div>
+
+              <div class="erabor-stream-block" data-stream="2">
+                <div class="erabor-section">
+                  <div class="erabor-section-title">GP Commitment</div>
+                  <div class="erabor-section-body">
+                    <div class="erabor-kv"><span class="erabor-k">Amount</span><span class="erabor-v">$7.0M (3.5% of $200M)</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Fund III Standard</span><span class="erabor-v">2.5% ($5.0M equivalent)</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Funding Schedule</span><span class="erabor-v">Pro rata with LP capital calls</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Source</span><span class="erabor-v">Cash only — no management fee waiver notes permitted</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Status</span><span class="erabor-v erabor-flag">Above standard — favorable to LPs, signals strong GP alignment</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="erabor-stream-block" data-stream="3">
+                <div class="erabor-section">
+                  <div class="erabor-section-title">Fee Structure</div>
+                  <div class="erabor-section-body">
+                    <div class="erabor-kv"><span class="erabor-k">Investment Period</span><span class="erabor-v">2.0% on committed capital</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Post-Year 5</span><span class="erabor-v">1.5% on invested capital (step-down)</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Organizational Exp</span><span class="erabor-v">Capped at $1.5M, borne by fund</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Offset Provisions</span><span class="erabor-v">100% of transaction, monitoring, and break-up fees offset against management fee</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Fee Commencement</span><span class="erabor-v">First close date (not final close)</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Status</span><span class="erabor-v">Standard — matches Fund III template</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="erabor-stream-block" data-stream="4">
+                <div class="erabor-section">
+                  <div class="erabor-section-title">Carried Interest &amp; Waterfall</div>
+                  <div class="erabor-section-body">
+                    <div class="erabor-kv"><span class="erabor-k">Carry Rate</span><span class="erabor-v">20% above 8% preferred return</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Preferred Return</span><span class="erabor-v">8% compounded annually, net of fees and expenses</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Catch-up</span><span class="erabor-v">50/50 GP/LP split until 20% GP share achieved</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Waterfall Type</span><span class="erabor-v">European (whole-fund) — carry calculated on aggregate, not deal-by-deal</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Crystallization</span><span class="erabor-v">Upon each distribution event, subject to clawback</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Status</span><span class="erabor-v">Standard</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="erabor-stream-block" data-stream="5">
+                <div class="erabor-section">
+                  <div class="erabor-section-title">Clawback Provisions</div>
+                  <div class="erabor-section-body">
+                    <div class="erabor-kv"><span class="erabor-k">Type</span><span class="erabor-v">Interim clawback with annual true-up</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">GP Obligation</span><span class="erabor-v">100% of excess carry distributions</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Escrow</span><span class="erabor-v">30% of carried interest held for 24 months post-final distribution</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">GP Guarantee</span><span class="erabor-v">Joint and several personal guarantee from named GPs</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Tax Adjustment</span><span class="erabor-v">Net of taxes actually paid — GP provides annual tax cert</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Status</span><span class="erabor-v">Standard — matches Fund III</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="erabor-stream-block" data-stream="6">
+                <div class="erabor-section">
+                  <div class="erabor-section-title">Side Letter Concessions</div>
+                  <div class="erabor-section-body">
+                    <div class="erabor-kv"><span class="erabor-k">Northgate Capital</span><span class="erabor-v erabor-flag">MFN on fees + co-invest priority on deals &gt;$50M</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Westbridge RE</span><span class="erabor-v">Enhanced quarterly reporting + advisory committee seat</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Redacted Entity</span><span class="erabor-v erabor-flag">Fee waiver on first $10M committed — unusual, requires follow-up with counsel</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">MFN Sunset</span><span class="erabor-v">Northgate MFN applies only to LPs committing &gt;$25M at first close</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Disclosure</span><span class="erabor-v erabor-flag">Redacted entity side letter not disclosed to advisory committee — potential compliance issue</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="erabor-stream-block" data-stream="7">
+                <div class="erabor-section">
+                  <div class="erabor-section-title">Key Person Clause</div>
+                  <div class="erabor-section-body">
+                    <div class="erabor-kv"><span class="erabor-k">Named Persons</span><span class="erabor-v">Marcus Tilden (Managing Partner), David Chen (CIO)</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Trigger</span><span class="erabor-v erabor-flag">Single-trigger suspension — if either departs, investment period suspends automatically</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Fund III Standard</span><span class="erabor-v">Dual-trigger (both must depart)</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Cure Period</span><span class="erabor-v">90 days to appoint replacement approved by advisory committee</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Devotion Clause</span><span class="erabor-v">Each key person must devote "substantially all" business time — no defined threshold</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">LP Vote to Resume</span><span class="erabor-v">66.7% in interest required to lift suspension</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="erabor-stream-block" data-stream="8">
+                <div class="erabor-section">
+                  <div class="erabor-section-title">Reporting &amp; Governance</div>
+                  <div class="erabor-section-body">
+                    <div class="erabor-kv"><span class="erabor-k">Auditor</span><span class="erabor-v">Ernst &amp; Young LLP</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Reporting Frequency</span><span class="erabor-v">Quarterly NAV + annual audited financials within 120 days of fiscal year-end</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">Advisory Committee</span><span class="erabor-v">5 members, LP-appointed, conflict approval + valuation oversight</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">LP Transfer Rights</span><span class="erabor-v">Subject to GP consent (not to be unreasonably withheld), minimum $5M transfer</span></div>
+                    <div class="erabor-kv"><span class="erabor-k">LPAC Meeting Freq</span><span class="erabor-v">Semi-annual in-person, quarterly written updates</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="erabor-stream-block" data-stream="9">
+                <p><strong>Summary for Thursday's call:</strong> Three items to raise with Marcus.</p>
+                <p>First, the single-trigger key person clause is materially more aggressive than our standard dual-trigger structure. This gives LPs significant optionality — if David Chen were to leave, LPs could effectively put the fund into suspension regardless of Marcus's continued involvement. This is worth discussing whether it was an intentional concession to anchor LPs or an oversight from prior fund documents that carried forward.</p>
+                <p>Second, the Northgate MFN plus co-invest priority side letter could create allocation tension on larger deals. If Northgate has priority on anything above $50M and their MFN triggers fee parity with smaller commitments, it narrows the GP's flexibility on deal allocation and economics. Worth understanding if this was a condition of their anchor commitment.</p>
+                <p>Third, the redacted entity fee waiver needs immediate disclosure and counsel review. An undisclosed side letter with a fee waiver is a compliance risk under the fund's own governance framework — the advisory committee should have been notified. I'd recommend raising this directly with Marcus and getting confirmation that outside counsel has signed off.</p>
+                <p>Everything else — carry structure, clawback, fee step-down, reporting cadence — is clean and within Fund III norms. The GP commitment at 3.5% is actually above standard, which is a positive signal for LP alignment.</p>
+                <p>Want me to draft talking points for the call, or generate a redline comparison against the Fund III template?</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-row">
+          <div class="text-input bevel-inset" contenteditable="true" role="textbox" aria-label="Message input" data-placeholder="Continue this thread..."></div>
+          <div class="attach-wrapper">
+            <button class="cmd-btn label-mono" title="Attach file" data-label="Attach"><span data-icon="attach"></span></button>
+            <div class="attach-menu">
+              <button class="attach-option" title="From computer" data-label="Computer">
+                <span data-icon="computer"></span>
+              </button>
+              <button class="attach-option" title="From cloud drive" data-label="Drive">
+                <span data-icon="cloud"></span>
+              </button>
+            </div>
+          </div>
+          <button class="cmd-btn label-mono cmd-primary" title="Send" data-label="Send"><span data-icon="send"></span></button>
+        </div>
+        <div class="input-footer">
+          <div class="model-selector">
+            <button class="model-selector-btn label-mono">
+              <span class="model-selector-label">Analyst</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="model-dropdown">
+              <button class="model-option" data-model="assistant">
+                <span class="model-option-name label-mono">Assistant</span>
+                <span class="model-option-desc">Quick questions and lookups</span>
+              </button>
+              <button class="model-option selected" data-model="analyst">
+                <span class="model-option-name label-mono">Analyst</span>
+                <span class="model-option-desc">Drafts, summaries, and document review</span>
+              </button>
+              <button class="model-option" data-model="expert">
+                <span class="model-option-name label-mono">Expert</span>
+                <span class="model-option-desc">Complex analysis and long-form deliverables</span>
+              </button>
+            </div>
+          </div>
+          <span>⌘B bold · ⌘I italic · ⌘U underline · **markdown**</span>
+        </div>
+      </div>
+      </div><!-- /thread-erabor -->
+
+      <div class="chat-thread" id="thread-wf-run-rentroll-047">
+      <div class="chat-scroll">
+        <div class="date-separator">
+          <div class="date-separator-line"></div>
+          <span class="date-separator-label">Today</span>
+          <div class="date-separator-line"></div>
+        </div>
+
+        <!-- Message 1: User with /rent-roll command + file attachments -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">12:15 PM</span>
+            </div>
+            <div class="msg-body">
+              <span class="wf-command-chip">/rent-roll</span>
+            </div>
+            <div class="wf-file-attachments">
+              <div class="wf-file-chip"><span class="wf-file-chip-icon">📄</span> 245-Park-Ave-RentRoll.pdf</div>
+              <div class="wf-file-chip"><span class="wf-file-chip-icon">📄</span> Marina-Heights-Q4.pdf</div>
+              <div class="wf-file-chip"><span class="wf-file-chip-icon">📄</span> Berkshire-Units-Dec.pdf</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2: Cosimo — run started with artifact -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">12:15 PM</span>
+              <span class="latency-chip">1.2s</span>
+              <span class="model-badge label-mono">Workflow</span>
+            </div>
+
+            <div class="msg-body">
+              <p>Starting Rent Roll Extraction on 3 files. I'll extract unit-level data and standardize to your output schema.</p>
+            </div>
+
+            <div class="artifact">
+              <div class="art-bar">
+                <div class="art-close"></div>
+                <div class="art-stripe"></div>
+                <span class="art-title">Workflow Run — Rent Roll Extraction</span>
+                <div class="art-stripe"></div>
+                <span class="art-live">LIVE</span>
+              </div>
+              <div class="art-body">
+                <div class="wf-run-summary">
+                  <div class="wf-run-summary-row"><span class="wf-run-summary-label">Template</span><span class="wf-run-summary-value">Rent Roll Extraction</span></div>
+                  <div class="wf-run-summary-row"><span class="wf-run-summary-label">Input</span><span class="wf-run-summary-value">3 PDF files</span></div>
+                  <div class="wf-run-summary-row"><span class="wf-run-summary-label">Output</span><span class="wf-run-summary-value">xlsx → /Finance/CRE/Processed/</span></div>
+                  <div class="wf-run-summary-row"><span class="wf-run-summary-label">Status</span><span class="wf-run-summary-value wf-status-running">Running</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 3: Cosimo — extraction results -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">12:16 PM</span>
+              <span class="latency-chip">8.4s</span>
+              <span class="model-badge label-mono">Workflow</span>
+            </div>
+            <div class="msg-body">
+              <p>Extracted 142 units across 3 properties. All fields mapped successfully. Two units at Marina Heights had ambiguous floor data — I inferred Floor 2 from unit numbers 201–208. Confidence: 94%.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 4: Cosimo — output ready with spreadsheet artifact -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">12:16 PM</span>
+              <span class="latency-chip">2.1s</span>
+              <span class="model-badge label-mono">Workflow</span>
+            </div>
+
+            <div class="msg-body">
+              <p>Output ready: <strong>Q4-2025-RentRoll-Standardized.xlsx</strong> saved to /Finance/CRE/Processed/Rent Rolls/. Here's a preview:</p>
+            </div>
+
+            <div class="artifact">
+              <div class="art-bar">
+                <div class="art-close"></div>
+                <div class="art-stripe"></div>
+                <span class="art-title">Q4-2025-RentRoll-Standardized.xlsx</span>
+                <div class="art-stripe"></div>
+              </div>
+              <div class="art-body">
+                <table class="data-tbl">
+                  <thead>
+                    <tr>
+                      <th>Unit</th>
+                      <th>Floor</th>
+                      <th>Tenant</th>
+                      <th>Lease Start</th>
+                      <th>Lease End</th>
+                      <th>Monthly Rent</th>
+                      <th>Sq Ft</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>101</td>
+                      <td>1</td>
+                      <td>Meridian Capital LLC</td>
+                      <td>Jan 2024</td>
+                      <td>Dec 2028</td>
+                      <td>$14,200</td>
+                      <td>2,400</td>
+                      <td><span class="wf-status-chip occupied">Occupied</span></td>
+                    </tr>
+                    <tr>
+                      <td>205</td>
+                      <td>2</td>
+                      <td>Apex Realty Group</td>
+                      <td>Mar 2023</td>
+                      <td>Feb 2026</td>
+                      <td>$11,800</td>
+                      <td>1,850</td>
+                      <td><span class="wf-status-chip occupied">Occupied</span></td>
+                    </tr>
+                    <tr>
+                      <td>312</td>
+                      <td>3</td>
+                      <td>—</td>
+                      <td>—</td>
+                      <td>—</td>
+                      <td>—</td>
+                      <td>1,200</td>
+                      <td><span class="wf-status-chip vacant">Vacant</span></td>
+                    </tr>
+                    <tr>
+                      <td>418</td>
+                      <td>4</td>
+                      <td>Crossharbor Partners</td>
+                      <td>Jun 2025</td>
+                      <td>May 2030</td>
+                      <td>$18,500</td>
+                      <td>3,100</td>
+                      <td><span class="wf-status-chip occupied">Occupied</span></td>
+                    </tr>
+                    <tr>
+                      <td>507</td>
+                      <td>5</td>
+                      <td>BGC Partners Inc.</td>
+                      <td>Sep 2024</td>
+                      <td>Aug 2027</td>
+                      <td>$9,750</td>
+                      <td>1,600</td>
+                      <td><span class="wf-status-chip notice">Notice</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="msg-feedback">
+              <button class="feedback-btn up" title="Good response" aria-label="Good response" data-label="Like"><span data-icon="thumbUp"></span></button>
+              <button class="feedback-btn down" title="Poor response" aria-label="Poor response" data-label="Dislike"><span data-icon="thumbDown"></span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 5: User — confirmation -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">12:18 PM</span>
+            </div>
+            <div class="msg-body">
+              Looks good, thanks
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="input-area">
+        <div class="input-row">
+          <div class="text-input bevel-inset" contenteditable="true" role="textbox" aria-label="Message input" data-placeholder="Continue this thread..."></div>
+          <div class="attach-wrapper">
+            <button class="cmd-btn label-mono" title="Attach file" data-label="Attach"><span data-icon="attach"></span></button>
+            <div class="attach-menu">
+              <button class="attach-option" title="From computer" data-label="Computer">
+                <span data-icon="computer"></span>
+              </button>
+              <button class="attach-option" title="From cloud drive" data-label="Drive">
+                <span data-icon="cloud"></span>
+              </button>
+            </div>
+          </div>
+          <button class="cmd-btn label-mono cmd-primary" title="Send" data-label="Send"><span data-icon="send"></span></button>
+        </div>
+        <div class="input-footer">
+          <div class="model-selector">
+            <button class="model-selector-btn label-mono">
+              <span class="model-selector-label">Analyst</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="model-dropdown">
+              <button class="model-option" data-model="assistant">
+                <span class="model-option-name label-mono">Assistant</span>
+                <span class="model-option-desc">Quick questions and lookups</span>
+              </button>
+              <button class="model-option selected" data-model="analyst">
+                <span class="model-option-name label-mono">Analyst</span>
+                <span class="model-option-desc">Drafts, summaries, and document review</span>
+              </button>
+              <button class="model-option" data-model="expert">
+                <span class="model-option-name label-mono">Expert</span>
+                <span class="model-option-desc">Complex analysis and long-form deliverables</span>
+              </button>
+            </div>
+          </div>
+          <span>⌘B bold · ⌘I italic · ⌘U underline · **markdown**</span>
+        </div>
+      </div>
+      </div><!-- /thread-wf-run-rentroll-047 -->
+
+      <div class="chat-thread" id="thread-tener-batch-12">
+      <div class="chat-scroll">
+        <div class="date-separator">
+          <div class="date-separator-line"></div>
+          <span class="date-separator-label">Today</span>
+          <div class="date-separator-line"></div>
+        </div>
+
+        <!-- Message 1: User with /valuation command + folder attachment -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">9:42 AM</span>
+            </div>
+            <div class="msg-body">
+              <span class="wf-command-chip">/valuation</span>
+            </div>
+            <div class="wf-file-attachments">
+              <div class="wf-file-chip"><span class="wf-file-chip-icon">📁</span> Batch-12-Parcels/ — 47 files</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2: Cosimo — run started with artifact -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">9:42 AM</span>
+              <span class="latency-chip">1.8s</span>
+              <span class="model-badge label-mono">Workflow</span>
+            </div>
+
+            <div class="msg-body">
+              <p>Starting Valuation Filing workflow on Batch 12 — 47 property files. I'll extract parcel IDs, assessed values, and filing deadlines.</p>
+            </div>
+
+            <div class="artifact">
+              <div class="art-bar">
+                <div class="art-close"></div>
+                <div class="art-stripe"></div>
+                <span class="art-title">Workflow Run — Valuation Filing</span>
+                <div class="art-stripe"></div>
+                <span class="art-live">LIVE</span>
+              </div>
+              <div class="art-body">
+                <div class="wf-run-summary">
+                  <div class="wf-run-summary-row"><span class="wf-run-summary-label">Template</span><span class="wf-run-summary-value">Tener Valuation Filing</span></div>
+                  <div class="wf-run-summary-row"><span class="wf-run-summary-label">Run</span><span class="wf-run-summary-value">#012</span></div>
+                  <div class="wf-run-summary-row"><span class="wf-run-summary-label">Input</span><span class="wf-run-summary-value">47 files (Batch-12-Parcels/)</span></div>
+                  <div class="wf-run-summary-row"><span class="wf-run-summary-label">Output</span><span class="wf-run-summary-value">Filing package → /Tener/Filings/</span></div>
+                  <div class="wf-run-summary-row"><span class="wf-run-summary-label">Status</span><span class="wf-run-summary-value wf-status-running">Running</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 3: Cosimo — gate message with exception table -->
+        <div class="msg-block">
+          <div class="ai-block msg-gate">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">9:48 AM</span>
+              <span class="latency-chip">5m 42s</span>
+              <span class="model-badge label-mono">Workflow</span>
+              <span class="msg-gate-chip">⏸ Awaiting Review</span>
+            </div>
+
+            <div class="msg-body">
+              <p>Processed 44 of 47 files successfully. 3 files need your attention:</p>
+            </div>
+
+            <div class="artifact">
+              <div class="art-bar">
+                <div class="art-close"></div>
+                <div class="art-stripe"></div>
+                <span class="art-title">Exceptions — Batch 12</span>
+                <div class="art-stripe"></div>
+              </div>
+              <div class="art-body">
+                <table class="data-tbl">
+                  <thead>
+                    <tr>
+                      <th>File</th>
+                      <th>Issue</th>
+                      <th>Suggestion</th>
+                      <th>Confidence</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Parcel-2847-Assessment.pdf</td>
+                      <td>Conflicting assessed values (p.3: $4.2M, p.7: $4.8M)</td>
+                      <td>Use page 7 (amended)</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Parcel-3102-Notice.pdf</td>
+                      <td>Poor OCR quality — 3 fields uncertain</td>
+                      <td>Manual review needed</td>
+                      <td>67%</td>
+                    </tr>
+                    <tr>
+                      <td>Parcel-4411-Filing.tiff</td>
+                      <td>Unexpected format (TIFF scan, not PDF)</td>
+                      <td>Convert and retry</td>
+                      <td>—</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 4: Cosimo — gate follow-up question -->
+        <div class="msg-block">
+          <div class="ai-block msg-gate">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">9:48 AM</span>
+              <span class="model-badge label-mono">Workflow</span>
+              <span class="msg-gate-chip">⏸ Awaiting Review</span>
+            </div>
+
+            <div class="msg-body">
+              <p>Specifically: <strong>Parcel-2847-Assessment.pdf</strong> has two conflicting assessed values on pages 3 and 7 ($4.2M vs $4.8M). Which should I use, or should I flag both in the output?</p>
+            </div>
+
+            <div class="msg-feedback">
+              <button class="feedback-btn up" title="Good response" aria-label="Good response" data-label="Like"><span data-icon="thumbUp"></span></button>
+              <button class="feedback-btn down" title="Poor response" aria-label="Poor response" data-label="Dislike"><span data-icon="thumbDown"></span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 5: User — response to gate -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">9:55 AM</span>
+            </div>
+            <div class="msg-body">
+              Use the page 7 value, that's the amended assessment
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 6: Cosimo — acknowledgment -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">9:55 AM</span>
+              <span class="latency-chip">0.8s</span>
+              <span class="model-badge label-mono">Workflow</span>
+            </div>
+            <div class="msg-body">
+              <p>Got it — using $4.8M for Parcel 2847. Resuming processing on remaining exceptions...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 7: Cosimo — completion -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">9:58 AM</span>
+              <span class="latency-chip">2m 34s</span>
+              <span class="model-badge label-mono">Workflow</span>
+            </div>
+            <div class="msg-body">
+              <p>All 47 files processed. Output saved to <strong>/Tener/Filings/Batch-12/</strong>. 3 parcels were flagged for manual values — I've noted your corrections in the audit trail.</p>
+            </div>
+
+            <div class="msg-feedback">
+              <button class="feedback-btn up" title="Good response" aria-label="Good response" data-label="Like"><span data-icon="thumbUp"></span></button>
+              <button class="feedback-btn down" title="Poor response" aria-label="Poor response" data-label="Dislike"><span data-icon="thumbDown"></span></button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="input-area">
+        <div class="input-row">
+          <div class="text-input bevel-inset" contenteditable="true" role="textbox" aria-label="Message input" data-placeholder="Continue this thread..."></div>
+          <div class="attach-wrapper">
+            <button class="cmd-btn label-mono" title="Attach file" data-label="Attach"><span data-icon="attach"></span></button>
+            <div class="attach-menu">
+              <button class="attach-option" title="From computer" data-label="Computer">
+                <span data-icon="computer"></span>
+              </button>
+              <button class="attach-option" title="From cloud drive" data-label="Drive">
+                <span data-icon="cloud"></span>
+              </button>
+            </div>
+          </div>
+          <button class="cmd-btn label-mono cmd-primary" title="Send" data-label="Send"><span data-icon="send"></span></button>
+        </div>
+        <div class="input-footer">
+          <div class="model-selector">
+            <button class="model-selector-btn label-mono">
+              <span class="model-selector-label">Analyst</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="model-dropdown">
+              <button class="model-option" data-model="assistant">
+                <span class="model-option-name label-mono">Assistant</span>
+                <span class="model-option-desc">Quick questions and lookups</span>
+              </button>
+              <button class="model-option selected" data-model="analyst">
+                <span class="model-option-name label-mono">Analyst</span>
+                <span class="model-option-desc">Drafts, summaries, and document review</span>
+              </button>
+              <button class="model-option" data-model="expert">
+                <span class="model-option-name label-mono">Expert</span>
+                <span class="model-option-desc">Complex analysis and long-form deliverables</span>
+              </button>
+            </div>
+          </div>
+          <span>⌘B bold · ⌘I italic · ⌘U underline · **markdown**</span>
+        </div>
+      </div>
+      </div><!-- /thread-tener-batch-12 -->
+
+      <div class="chat-thread" id="thread-wf-create-dd">
+      <div class="chat-scroll">
+        <div class="date-separator">
+          <div class="date-separator-line"></div>
+          <span class="date-separator-label">Yesterday</span>
+          <div class="date-separator-line"></div>
+        </div>
+
+        <!-- Message 1: User — wants to create DD workflow -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">3:42 PM</span>
+            </div>
+            <div class="msg-body">
+              <p>I want to create a workflow for due diligence on new investments</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2: Cosimo — asks clarifying questions -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">3:42 PM</span>
+              <span class="latency-chip">0.8s</span>
+              <span class="model-badge label-mono">Cosimo</span>
+            </div>
+            <div class="msg-body">
+              <p>Great — let's set up a DD workflow. A few questions to get the shape right. What kind of documents will typically be involved? And is this for a specific asset class or general?</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 3: User — describes requirements -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">3:44 PM</span>
+            </div>
+            <div class="msg-body">
+              <p>Real estate acquisitions. We usually get a data room with financials, rent rolls, environmental reports, title docs, and zoning info. I want Cosimo to pull key metrics from each doc type and flag any red flags.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 4: Cosimo — proposed flow graph -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">3:45 PM</span>
+              <span class="latency-chip">2.1s</span>
+              <span class="model-badge label-mono">Cosimo</span>
+            </div>
+            <div class="msg-body">
+              <p>Here's what I'm thinking for the flow:</p>
+            </div>
+            <div class="artifact">
+              <div class="art-bar">
+                <div class="art-close"></div>
+                <div class="art-stripe"></div>
+                <span class="art-title">Proposed Workflow — Due Diligence</span>
+                <div class="art-stripe"></div>
+              </div>
+              <div class="art-body">
+                <div id="ddFlowGraphInitial" class="wf-artifact-graph"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 5: User — asks for cross-reference step -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">3:47 PM</span>
+            </div>
+            <div class="msg-body">
+              <p>Add a step that cross-references the rent roll numbers against the financials to check for consistency</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 6: Cosimo — updated flow graph -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">3:48 PM</span>
+              <span class="latency-chip">1.8s</span>
+              <span class="model-badge label-mono">Cosimo</span>
+            </div>
+            <div class="msg-body">
+              <p>Added a cross-reference validation step after the extraction branches merge. Here's the updated flow:</p>
+            </div>
+            <div class="artifact">
+              <div class="art-bar">
+                <div class="art-close"></div>
+                <div class="art-stripe"></div>
+                <span class="art-title">Updated Workflow — Due Diligence</span>
+                <div class="art-stripe"></div>
+              </div>
+              <div class="art-body">
+                <div id="ddFlowGraphUpdated" class="wf-artifact-graph"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 7: Cosimo — suggests trigger -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">3:48 PM</span>
+              <span class="latency-chip">0.6s</span>
+              <span class="model-badge label-mono">Cosimo</span>
+            </div>
+            <div class="msg-body">
+              <p>What should trigger this? I'd suggest a chat command — you'd type <code class="wf-command-inline">/due-diligence [company name]</code> to kick it off and point it at the target's data room.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 8: User — names the command -->
+        <div class="msg-block">
+          <div class="user-card">
+            <div class="msg-header">
+              <div class="badge badge-human">E</div>
+              <span class="sender">Eliot Puplett</span>
+              <span class="timestamp">3:49 PM</span>
+            </div>
+            <div class="msg-body">
+              <p>Perfect. Let's call it /dd for short</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 9: Cosimo — confirms setup -->
+        <div class="msg-block">
+          <div class="ai-block">
+            <div class="msg-header">
+              <div class="badge badge-ai">◆</div>
+              <span class="sender">Cosimo</span>
+              <span class="timestamp">3:49 PM</span>
+              <span class="latency-chip">0.9s</span>
+              <span class="model-badge label-mono">Cosimo</span>
+            </div>
+            <div class="msg-body">
+              <p>Done. Your DD workflow is set up with the command <span class="wf-command-chip">/dd</span>. You can run it now or find it in the Workflows library.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="input-area">
+        <div class="input-row">
+          <div class="text-input bevel-inset" contenteditable="true" role="textbox" aria-label="Message input" data-placeholder="Continue this thread..."></div>
+          <div class="attach-wrapper">
+            <button class="cmd-btn label-mono" title="Attach file" data-label="Attach"><span data-icon="attach"></span></button>
+            <div class="attach-menu">
+              <button class="attach-option" title="From computer" data-label="Computer">
+                <span data-icon="computer"></span>
+              </button>
+              <button class="attach-option" title="From cloud drive" data-label="Drive">
+                <span data-icon="cloud"></span>
+              </button>
+            </div>
+          </div>
+          <button class="cmd-btn label-mono cmd-primary" title="Send" data-label="Send"><span data-icon="send"></span></button>
+        </div>
+        <div class="input-footer">
+          <div class="model-selector">
+            <button class="model-selector-btn label-mono">
+              <span class="model-selector-label">Analyst</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="model-dropdown">
+              <button class="model-option" data-model="assistant">
+                <span class="model-option-name label-mono">Assistant</span>
+                <span class="model-option-desc">Quick questions and lookups</span>
+              </button>
+              <button class="model-option selected" data-model="analyst">
+                <span class="model-option-name label-mono">Analyst</span>
+                <span class="model-option-desc">Drafts, summaries, and document review</span>
+              </button>
+              <button class="model-option" data-model="expert">
+                <span class="model-option-name label-mono">Expert</span>
+                <span class="model-option-desc">Complex analysis and long-form deliverables</span>
+              </button>
+            </div>
+          </div>
+          <span>⌘B bold · ⌘I italic · ⌘U underline · **markdown**</span>
+        </div>
+      </div>
+      </div><!-- /thread-wf-create-dd -->
+
+      </div><!-- /chat-main -->
+
+      <!-- ======== RIGHT PANEL (file viewer / folder) ======== -->
+      <div class="resize-handle resize-handle-filepanel" id="filePanelResizeHandle"></div>
+      <div class="file-panel" id="filePanel" aria-label="File panel">
+        <div class="file-panel-header">
+          <div class="file-panel-tabs">
+            <button class="file-panel-tab label-mono active" id="fpTabViewer">Viewer</button>
+            <button class="file-panel-tab label-mono" id="fpTabFolder">Files</button>
+          </div>
+          <button class="file-panel-close" id="fpCloseBtn">✕</button>
+        </div>
+
+        <!-- File Viewer -->
+        <div class="file-panel-view active" id="fpViewer">
+          <div class="fp-file-bar">
+            <span class="fp-file-icon">▦</span>
+            <span class="fp-file-name">Hilgard_Fund_II_Fee_Analysis.xlsx</span>
+          </div>
+          <div class="fp-formula-bar">
+            <span class="fp-cell-ref bevel-inset" id="fpCellRef">A1</span>
+            <span class="fp-formula" id="fpFormula">Period</span>
+          </div>
+          <div class="fp-sheet-wrap">
+            <table class="fp-sheet" id="fpSheet">
+              <thead>
+                <tr>
+                  <th class="fp-row-header"></th>
+                  <th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th>
+                </tr>
+              </thead>
+              <tbody id="fpSheetBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Folder View -->
+        <div class="file-panel-view" id="fpFolder">
+          <div class="fp-folder-header">
+            <span class="fp-folder-title">Thread Files</span>
+            <span class="fp-folder-count">1 file</span>
+          </div>
+          <div class="fp-file-list">
+            <div class="fp-file-item active">
+              <div class="fp-file-item-icon">▦</div>
+              <div class="fp-file-item-info">
+                <div class="fp-file-item-name">Hilgard_Fund_II_Fee_Analysis.xlsx</div>
+                <div class="fp-file-item-meta">Generated by Cosimo · Feb 22, 4:16 PM · 12 rows</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /file-panel -->
+
+      <!-- ======== RIGHT PANEL (workflow context) ======== -->
+      <div class="resize-handle resize-handle-wfpanel" id="wfPanelResizeHandle"></div>
+      <div class="workflow-panel" id="workflowPanel" aria-label="Workflow context panel">
+        <div class="workflow-panel-header">
+          <div class="workflow-panel-title-row">
+            <span class="workflow-panel-name" id="wfPanelName"></span>
+            <span class="workflow-panel-run-id" id="wfPanelRunId"></span>
+          </div>
+          <div class="workflow-panel-header-right">
+            <span class="workflow-panel-status" id="wfPanelStatus"></span>
+            <button class="workflow-panel-close" id="wfPanelCloseBtn" aria-label="Close workflow panel">✕</button>
+          </div>
+        </div>
+        <div class="workflow-panel-graph" id="wfPanelGraph"></div>
+        <div class="workflow-panel-details" id="wfPanelDetails">
+          <div class="workflow-panel-section" id="wfPanelInput">
+            <div class="workflow-panel-section-label label-mono">Input</div>
+            <div class="workflow-panel-section-body" id="wfPanelInputBody"></div>
+          </div>
+          <div class="workflow-panel-section" id="wfPanelExceptions">
+            <div class="workflow-panel-section-label label-mono">Exceptions</div>
+            <div class="workflow-panel-section-body" id="wfPanelExceptionsBody"></div>
+          </div>
+          <div class="workflow-panel-section" id="wfPanelOutput">
+            <div class="workflow-panel-section-label label-mono">Output</div>
+            <div class="workflow-panel-section-body" id="wfPanelOutputBody"></div>
+          </div>
+        </div>
+      </div><!-- /workflow-panel -->
+
+      </div><!-- /chat-with-panel -->
+    </div>
+
+    <!-- ======== WORKFLOWS VIEW ======== -->
+    <div class="view-container" id="workflowsView">
+
+      <!-- Workflow Listing -->
+      <div id="wfListing" class="wf-listing-layout">
+        <div class="main-header">
+          <span class="header-title">Workflows</span>
+          <div class="header-actions">
+            <button class="header-btn bevel label-mono primary" id="newWorkflowBtn">+ New Workflow</button>
+          </div>
+        </div>
+
+        <div class="wf-listing">
+          <!-- Stats (populated by Workflows.renderLibrary) -->
+          <div class="wf-stats-section bevel" id="wfStatsSection">
+            <div class="wf-stats-section-bar">
+              <div class="art-stripe"></div>
+              <span class="detail-section-title">Overview</span>
+              <div class="art-stripe"></div>
+            </div>
+            <div class="wf-stats-body" id="wfStatsBody"></div>
+          </div>
+
+          <!-- Cards (populated by Workflows.renderLibrary) -->
+          <div id="wfCardContainer"></div>
+
+          <!-- Empty state (shown when no cards) -->
+          <div class="wf-no-results hidden" id="wfNoResults">
+            <div class="brain-empty-icon">
+              <span data-icon="workflows" data-icon-w="32" data-icon-h="32"></span>
+            </div>
+            <div class="brain-empty-title brain-empty-title-lg">No workflows yet</div>
+            <div class="brain-empty-desc">Create a new workflow to get started.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workflow Detail -->
+      <div id="wfDetail" class="hidden wf-detail-layout">
+        <div class="main-header">
+          <div class="wf-detail-header-row">
+            <button class="back-btn" id="wfBackBtn">← Back</button>
+            <span class="header-title" id="wfDetailTitle">Rent Roll Extraction</span>
+          </div>
+          <div class="header-actions">
+            <div class="dropdown-wrapper">
+              <button class="header-btn bevel label-mono" id="wfActionsBtn">Actions ▾</button>
+              <div class="dropdown-menu" id="actionDropdown">
+                <button class="dropdown-item" data-action="duplicate">⧉ Duplicate</button>
+                <button class="dropdown-item violet" data-action="edit-cosimo">◆ Edit with Cosimo</button>
+                <button class="dropdown-item text-red" data-action="delete">✕ Delete Workflow</button>
+              </div>
+            </div>
+            <button class="header-btn bevel label-mono primary" id="wfRunBtn">▶ Run</button>
+          </div>
+        </div>
+
+        <div class="wf-detail">
+          <div class="wf-detail-columns">
+            <!-- Left: Flow Graph (60%) -->
+            <div class="wf-detail-graph-col">
+              <div class="flow-graph-container bevel" id="flowGraphContainer" aria-label="Workflow flow graph">
+                <!-- Flow graph SVG rendered by Workflows.renderFlowGraph() -->
+                <div class="flow-graph-placeholder">
+                  <span class="flow-graph-placeholder-text">Flow graph</span>
+                </div>
+              </div>
+            </div>
+            <!-- Right: Info Column (40%) -->
+            <div class="wf-detail-info-col">
+              <div class="wf-detail-desc" id="wfDetailDesc"></div>
+              <div class="wf-detail-meta" id="wfDetailMeta"></div>
+
+              <div class="tab-bar">
+                <button class="tab-btn active" data-tab="overview">Overview</button>
+                <button class="tab-btn" data-tab="schema">Schema</button>
+                <button class="tab-btn" data-tab="triggers">Triggers</button>
+                <button class="tab-btn" data-tab="runs">Runs</button>
+                <button class="tab-btn" data-tab="lessons">Lessons</button>
+              </div>
+
+              <div class="tab-content">
+                <!-- OVERVIEW TAB -->
+                <div class="tab-panel active" id="tab-overview">
+                  <div id="wfDetailOverview"></div>
+                </div>
+                <!-- SCHEMA TAB (Task 4.1) -->
+                <div class="tab-panel" id="tab-schema"></div>
+                <!-- TRIGGERS TAB (Task 4.2) -->
+                <div class="tab-panel" id="tab-triggers"></div>
+                <!-- RUNS TAB (Task 4.3) -->
+                <div class="tab-panel" id="tab-runs"></div>
+                <!-- LESSONS TAB (Task 4.4) -->
+                <div class="tab-panel" id="tab-lessons"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== BRAIN VIEW ======== -->
+    <div class="view-container" id="brainView">
+
+
+          <!-- Memory Section -->
+          <div class="brain-section active" id="brain-memory">
+            <div class="main-header">
+              <span class="header-title">Memory</span>
+              <div class="header-actions">
+                <button class="header-btn bevel label-mono primary" id="addMemoryBtn">+ Add Memory</button>
+              </div>
+            </div>
+            <div class="brain-scroll" id="memoryScroll">
+
+              <!-- Section 1: Role Profile -->
+              <div class="mem-section">
+                <div class="mem-section-label">What Describes Your Work</div>
+                <div class="mem-role-card">
+                  <div class="mem-role-text" contenteditable="true" id="roleField" role="textbox" aria-label="Role description" data-placeholder="Describe what you do, your role, your firm..."></div>
+                </div>
+              </div>
+
+              <!-- Section 2: Personality Traits -->
+              <div class="mem-section">
+                <div class="mem-section-label">What Traits Should Cosimo Have?</div>
+                <div class="mem-personality">
+                  <div class="mem-trait-selected" id="traitSelected"></div>
+                  <div class="mem-trait-presets" id="traitPresets"></div>
+                  <div class="mem-trait-custom">
+                    <input type="text" class="mem-trait-input bevel-inset" id="traitInput" placeholder="Add a custom trait..." />
+                    <button class="mem-trait-add-btn label-mono" id="traitAddBtn">Add</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 3: Core Memories -->
+              <div class="mem-section">
+                <div class="mem-section-label">Core Memories</div>
+                <div class="mem-facts-toolbar">
+                  <div class="mem-search-wrap">
+                    <span class="mem-search-icon" data-icon="search"></span>
+                    <input type="text" class="mem-search-input" id="memSearchInput" placeholder="Search memories..." />
+                  </div>
+                  <div class="mem-category-filters" id="memCategoryFilters">
+                    <button class="mem-cat-pill active">All</button>
+                    <button class="mem-cat-pill">Preferences</button>
+                    <button class="mem-cat-pill">Workflows</button>
+                    <button class="mem-cat-pill">Contacts</button>
+                    <button class="mem-cat-pill">Funds</button>
+                    <button class="mem-cat-pill">Style</button>
+                  </div>
+                </div>
+
+                <!-- Add Memory Inline Form (hidden by default) -->
+                <div class="mem-add-form hidden" id="memAddForm">
+                  <div class="mem-add-form-inner">
+                    <input type="text" class="mem-add-input bevel-inset" id="memAddInput" placeholder="Type a fact Cosimo should remember..." />
+                    <div class="mem-add-form-row">
+                      <select class="mem-add-category" id="memAddCategory">
+                        <option value="preference">Preference</option>
+                        <option value="workflow">Workflow</option>
+                        <option value="contact">Contact</option>
+                        <option value="fund">Fund</option>
+                        <option value="style">Style</option>
+                        <option value="context">Context</option>
+                      </select>
+                      <div class="mem-add-actions">
+                        <button class="header-btn bevel label-mono" id="memCancelBtn">Cancel</button>
+                        <button class="header-btn bevel label-mono primary" id="memSaveBtn">Save</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fact Cards (rendered from MOCK_MEMORY by renderMemoryFromData()) -->
+                <div class="mem-fact-list" id="memFactList"></div>
+
+                <!-- No results state -->
+                <div class="mem-no-results hidden" id="memNoResults">
+                  <div class="brain-empty-icon">
+                    <span data-icon="search" data-icon-w="32" data-icon-h="32"></span>
+                  </div>
+                  <div class="brain-empty-title brain-empty-title-lg">No memories found</div>
+                  <div class="brain-empty-desc">Try a different search or category filter.</div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Lessons Section -->
+          <div class="brain-section" id="brain-lessons">
+
+            <!-- Lessons List View -->
+            <div id="lessonsListView" class="brain-subview">
+              <div class="main-header">
+                <span class="header-title">Lessons</span>
+                <div class="header-actions">
+                  <button class="header-btn bevel label-mono primary" id="newLessonBtn">+ New Lesson</button>
+                </div>
+              </div>
+              <div class="brain-scroll">
+
+                <!-- Search -->
+                <div class="mem-search-wrap mb-12">
+                  <span class="mem-search-icon" data-icon="search"></span>
+                  <input type="text" class="mem-search-input" id="lessonSearchInput" placeholder="Search lessons..." />
+                </div>
+
+                <!-- Scope Filter -->
+                <div class="mem-category-filters mb-14" id="lessonScopeFilters">
+                  <button class="mem-cat-pill active">All</button>
+                  <button class="mem-cat-pill">
+                    <span data-icon="person"></span>Personal
+                  </button>
+                  <button class="mem-cat-pill">
+                    <span data-icon="building"></span>Company
+                  </button>
+                </div>
+
+                <!-- Lesson Cards (rendered from MOCK_LESSONS by renderLessonList()) -->
+                <div class="lesson-list" id="lessonList"></div>
+
+                <!-- No results -->
+                <div class="lesson-no-results hidden" id="lessonNoResults">
+                  <div class="brain-empty-icon">
+                    <span data-icon="search" data-icon-w="32" data-icon-h="32"></span>
+                  </div>
+                  <div class="brain-empty-title brain-empty-title-lg">No lessons found</div>
+                  <div class="brain-empty-desc">Try a different search term or filter.</div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Lesson Detail View (hidden by default) -->
+            <div id="lessonDetailView" class="brain-subview hidden">
+              <div class="main-header">
+                <span class="header-title">
+                  <button class="lesson-back-btn" id="lessonBackBtn">&larr;</button>
+                  <span id="lessonDetailTitle">Lesson Title</span>
+                </span>
+                <div class="header-actions">
+                  <button class="header-btn bevel label-mono icon-btn" id="lessonEditBtn" title="Edit Directly" aria-label="Edit Directly" data-label="Edit"><span data-icon="edit"></span></button>
+                  <button class="header-btn bevel label-mono icon-btn" id="lessonCosimoBtn" title="Edit with Cosimo" aria-label="Edit with Cosimo" data-label="Cosimo"><span data-icon="cosimo"></span></button>
+                  <button class="header-btn bevel label-mono icon-btn" id="lessonDeleteBtn" title="Delete Lesson" aria-label="Delete Lesson" data-label="Delete"><span data-icon="trashRed"></span></button>
+                </div>
+              </div>
+
+              <div class="brain-scroll" id="lessonDetailScroll">
+
+                <!-- Lesson meta bar -->
+                <div class="lesson-detail-meta">
+                  <span class="lesson-scope-badge scope-company" id="lessonDetailScope">Company</span>
+                  <span class="lesson-detail-stat">Referenced 23 times</span>
+                  <span class="lesson-detail-stat">Last used 2d ago</span>
+                  <span class="lesson-detail-stat">Updated Feb 28 by Sarah Chen</span>
+                  <button class="header-btn bevel label-mono lesson-scope-btn" id="lessonScopeToggle">
+                    <span data-icon="arrowRight"></span>
+                    <span id="lessonScopeToggleText">Change to Personal</span>
+                  </button>
+                </div>
+
+                <!-- Lesson content body -->
+                <div class="lesson-detail-body" id="lessonDetailBody">
+
+                  <!-- Text section -->
+                  <div class="lesson-block lesson-block-text">
+                    <h3>Overview</h3>
+                    <p>All rent rolls processed by Cosimo must follow the firm's standardized format. This ensures consistency across properties, funds, and reporting periods. Deviations should be flagged for manual review.</p>
+                  </div>
+
+                  <!-- Table/Spreadsheet section -->
+                  <div class="lesson-block lesson-block-table">
+                    <h3>Required Column Layout</h3>
+                    <table class="lesson-table">
+                      <thead>
+                        <tr><th>Column</th><th>Header Name</th><th>Format</th><th>Required</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr><td>A</td><td>Unit Number</td><td>Text (e.g., "101A")</td><td>Yes</td></tr>
+                        <tr><td>B</td><td>Tenant Name</td><td>Text, Title Case</td><td>Yes</td></tr>
+                        <tr><td>C</td><td>Lease Start</td><td>YYYY-MM-DD</td><td>Yes</td></tr>
+                        <tr><td>D</td><td>Lease End</td><td>YYYY-MM-DD</td><td>Yes</td></tr>
+                        <tr><td>E</td><td>Monthly Rent</td><td>USD, no decimals</td><td>Yes</td></tr>
+                        <tr><td>F</td><td>Security Deposit</td><td>USD, no decimals</td><td>No</td></tr>
+                        <tr><td>G</td><td>Status</td><td>Current / Vacant / Notice</td><td>Yes</td></tr>
+                        <tr><td>H</td><td>Sq Footage</td><td>Integer</td><td>No</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Color guide section -->
+                  <div class="lesson-block lesson-block-colors">
+                    <h3>Status Color Coding</h3>
+                    <div class="lesson-color-grid">
+                      <div class="lesson-color-swatch">
+                        <div class="swatch-box swatch-green"></div>
+                        <div class="swatch-label">Current</div>
+                        <div class="swatch-value">#3D8B40</div>
+                      </div>
+                      <div class="lesson-color-swatch">
+                        <div class="swatch-box swatch-gold"></div>
+                        <div class="swatch-label">Notice</div>
+                        <div class="swatch-value">#B8862B</div>
+                      </div>
+                      <div class="lesson-color-swatch">
+                        <div class="swatch-box swatch-red"></div>
+                        <div class="swatch-label">Vacant</div>
+                        <div class="swatch-value">#C04848</div>
+                      </div>
+                      <div class="lesson-color-swatch">
+                        <div class="swatch-box swatch-blue"></div>
+                        <div class="swatch-label">Renewal Pending</div>
+                        <div class="swatch-value">#749CB5</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Rules/list section -->
+                  <div class="lesson-block lesson-block-text">
+                    <h3>Validation Rules</h3>
+                    <ol>
+                      <li>No blank rows between data entries</li>
+                      <li>Lease End must be after Lease Start</li>
+                      <li>Monthly Rent must be &gt; 0 for Current status</li>
+                      <li>Vacant units should have Tenant Name set to "VACANT"</li>
+                      <li>Unit Numbers must be unique within a property</li>
+                      <li>Dates older than 10 years should be flagged for review</li>
+                    </ol>
+                  </div>
+
+                  <!-- Font/style section -->
+                  <div class="lesson-block lesson-block-text">
+                    <h3>Formatting Notes</h3>
+                    <p>When generating rent roll reports:</p>
+                    <ul>
+                      <li>Header row: <strong>IBM Plex Mono 11px Bold</strong>, background <code>#E8E6EC</code></li>
+                      <li>Data rows: <strong>IBM Plex Mono 11px Regular</strong>, alternating <code>#FFFFFF</code> / <code>#F8F6FA</code></li>
+                      <li>Totals row: <strong>Bold</strong>, top border <code>2px solid #2D2D2E</code></li>
+                      <li>Currency: Right-aligned, USD format with commas, no decimals</li>
+                    </ul>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Data Graphs Section -->
+          <div class="brain-section" id="brain-graphs">
+            <div class="main-header">
+              <span class="header-title">Data Graphs</span>
+              <div class="header-actions">
+                <div class="graph-breadcrumb" id="graphBreadcrumb">
+                  <button class="graph-crumb active" id="graphRootCrumb">You</button>
+                </div>
+              </div>
+            </div>
+            <div class="graph-container" id="graphContainer">
+              <!-- SVG graph renders here -->
+              <svg id="graphSvg" class="graph-svg"></svg>
+
+              <!-- Node tooltip -->
+              <div class="graph-tooltip" id="graphTooltip"></div>
+
+              <!-- Detail pane (slides up from bottom) -->
+              <div class="graph-detail-pane" id="graphDetailPane">
+                <div class="graph-detail-resize" id="graphDetailResize"></div>
+                <div class="graph-detail-header">
+                  <div class="graph-detail-title-row">
+                    <div class="graph-detail-icon" id="graphDetailIcon"></div>
+                    <div>
+                      <div class="graph-detail-name" id="graphDetailName">Entity</div>
+                      <div class="graph-detail-type label-mono" id="graphDetailType">Type</div>
+                    </div>
+                  </div>
+                  <div class="graph-detail-actions">
+                    <button class="header-btn bevel label-mono icon-btn" id="graphEditBtn" title="Edit" aria-label="Edit" data-label="Edit"><span data-icon="edit"></span></button>
+                    <button class="header-btn bevel label-mono icon-btn" id="graphCosimoBtn" title="Edit with Cosimo" aria-label="Edit with Cosimo" data-label="Cosimo"><span data-icon="cosimo"></span></button>
+                    <button class="header-btn bevel label-mono icon-btn" id="graphCloseBtn" title="Close" aria-label="Close" data-label="Close"><span data-icon="close"></span></button>
+                  </div>
+                </div>
+                <div class="graph-detail-body" id="graphDetailBody">
+                  <div class="graph-detail-facts" id="graphDetailFacts"></div>
+                  <div class="graph-detail-related-label">Related</div>
+                  <div class="graph-detail-related" id="graphDetailRelated"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+    </div>
+
+  </main>
+</div>
+
+<!-- Cosimo Panel Overlay -->
+<div class="panel-overlay" id="panelOverlay" aria-hidden="true"></div>
+
+<!-- Cosimo Chat Panel -->
+<div class="cosimo-panel" id="cosimoPanel" aria-label="Cosimo assistant panel">
+  <div class="cosimo-panel-header">
+    <div class="cosimo-panel-title">
+      <span class="cosimo-panel-name">Edit with Cosimo</span>
+    </div>
+    <button class="panel-close-btn" id="cosimoPanelClose">✕</button>
+  </div>
+
+  <div class="cosimo-panel-chat" id="panelChat">
+    <div class="panel-msg panel-msg-ai">
+      <div class="panel-msg-header">
+        <div class="badge badge-ai badge-sm">◆</div>
+        <span class="panel-msg-sender">Cosimo</span>
+      </div>
+      I can help you modify this workflow. Try things like:
+      <br><br>
+      <strong>"Add a step to check for duplicate units"</strong><br>
+      <strong>"Change the output format to CSV"</strong><br>
+      <strong>"Add a new source folder for Q1 2026 files"</strong><br>
+      <strong>"Make step 3 also normalize tenant names"</strong>
+    </div>
+  </div>
+
+  <div class="cosimo-panel-input">
+    <div class="panel-input-row">
+      <div class="panel-text-input bevel-inset" id="panelInput" contenteditable="true" role="textbox" aria-label="Cosimo message input" data-placeholder="Describe a change..."></div>
+      <button class="cmd-btn cmd-primary label-mono" id="cosimoPanelSend" title="Send" data-label="Send"><span data-icon="send"></span></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<div class="resize-grip"></div>
+<div class="design-label">Cosimo v2.1</div>
+
+<script src="js/icons.js"></script>
+<script src="js/mock-data.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+/* ============================================
+   FONTS
+   ============================================ */
+
+@font-face {
+  font-family: 'ChicagoFLF';
+  src: url('../fonts/ChicagoFLF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ============================================
+   DESIGN TOKENS & RESET
+   ============================================ */
+
+:root {
+  --taupe-1: #E8E6EC;
+  --taupe-2: #B4B2B9;
+  --taupe-3: #87868B;
+  --taupe-4: #5A595C;
+  --taupe-5: #2D2D2E;
+
+  --berry-1: #E0D0E1;
+  --berry-2: #C4A6C5;
+  --berry-3: #8B4F8D;
+  --berry-4: #5D355E;
+  --berry-5: #2E1A2F;
+
+  --blue-1: #CCE7F8;
+  --blue-2: #9BD0F2;
+  --blue-3: #749CB5;
+
+  --violet-1: #D8C8E2;
+  --violet-2: #A383B4;
+  --violet-3: #74418F;
+  --violet-4: #4D2B5F;
+  --violet-5: #271630;
+
+  --chinese-1: #D8CAD9;
+  --chinese-2: #A891AD;
+  --chinese-3: #7F6485;
+  --chinese-4: #4A2E50;
+  --chinese-5: #2A182E;
+
+  /* RGB triplets for alpha usage — updated by purple intensity slider */
+  --violet-3-rgb: 116,65,143;
+  --berry-3-rgb: 139,79,141;
+  --green-rgb: 61,139,64;
+  --red-rgb: 192,72,72;
+  --amber-rgb: 184,134,43;
+  --blue-3-rgb: 116,156,181;
+  --taupe-3-rgb: 135,134,139;
+  --black-rgb: 0,0,0;
+  --white-pure-rgb: 255,255,255;
+  --surface-tooltip-rgb: 45,45,46;
+  --cosimo-error-rgb: 194,59,34;
+
+  --white: #FFFFFF;
+  --off-white: #F8F6FA;
+  --green: #3D8B40;
+  --red: #C04848;
+  --amber: #B8862B;
+
+  /* Bevel highlight/shadow pairs for semantic colors */
+  --green-hi: #5aad5c;
+  --green-lo: #2a6b2c;
+  --red-hi: #e06060;
+  --red-lo: #802020;
+
+  /* Dark surface depth scale (used in dark mode overrides) */
+  --surface-0: #0e0e10;
+  --surface-1: #1a1a1d;
+  --surface-2: #28282d;
+  --surface-3: #2a2a2f;
+  --surface-graph: #0a0a0e;
+  --surface-graph-bg: #0e0d12;
+
+  /* Light text for dark backgrounds */
+  --text-light: #f0eef4;
+
+  /* Red hover/pressed shade */
+  --red-dark: #b84040;
+
+  --pixel: 'ChicagoFLF', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+
+  /* Border radii */
+  --r-xs: 2px;
+  --r-sm: 3px;
+  --r-md: 4px;
+  --r-lg: 6px;
+  --r-pill: 9px;
+}
+
+/* ============================================
+   DARK MODE OVERRIDES
+   ============================================ */
+
+[data-theme="dark"] {
+  /* Gray scale — flipped for dark surfaces & light text */
+  --taupe-1: #28282d;
+  --taupe-2: #36363c;
+  --taupe-3: #76757c;
+  --taupe-4: #adacb2;
+  --taupe-5: #e0dee5;
+
+  /* Surfaces */
+  --white: #1f1f23;
+  --off-white: #18181b;
+
+  /* Berry — dark tints, vibrant accent, dark ends preserved for bevels */
+  --berry-1: #2e1f2f;
+  --berry-2: #5a3a5c;
+  --berry-3: #a860aa;
+  --berry-4: #5D355E;
+  --berry-5: #2E1A2F;
+
+  /* Blue */
+  --blue-1: #1a2d3c;
+  --blue-2: #406e8c;
+  --blue-3: #8cb8d4;
+
+  /* Violet — dark tints, brighter accent, dark ends preserved */
+  --violet-1: #241a2f;
+  --violet-2: #6a4a80;
+  --violet-3: #8855a8;
+  --violet-4: #4D2B5F;
+  --violet-5: #271630;
+
+  /* Chinese — dark tints, preserved for bevel integrity */
+  --chinese-1: #261a28;
+  --chinese-2: #4e3854;
+  --chinese-3: #8a6c92;
+  --chinese-4: #4A2E50;
+  --chinese-5: #2A182E;
+
+  /* RGB triplets for alpha usage */
+  --violet-3-rgb: 136,85,168;
+  --berry-3-rgb: 168,96,170;
+  --green-rgb: 76,175,80;
+  --red-rgb: 224,85,85;
+  --amber-rgb: 212,160,48;
+  --blue-3-rgb: 140,184,212;
+  --taupe-3-rgb: 118,117,124;
+
+  /* Semantic — brightened for dark-bg legibility */
+  --green: #4caf50;
+  --red: #e05555;
+  --amber: #d4a030;
+
+  /* Bevel pairs — brightened for dark mode */
+  --green-hi: #5cb85e;
+  --green-lo: #2d7a2f;
+  --red-hi: #e06868;
+  --red-lo: #901818;
+
+  /* Dark surface depth — same values, tokens just resolve to themselves */
+  --surface-0: #0e0e10;
+  --surface-1: #1a1a1d;
+  --surface-2: #28282d;
+  --surface-3: #2a2a2f;
+  --surface-graph: #0a0a0e;
+  --surface-graph-bg: #0e0d12;
+
+  /* Light text */
+  --text-light: #f0eef4;
+
+  /* Red hover/pressed shade */
+  --red-dark: #a03838;
+}
+
+/* ============================================
+   HIGH CONTRAST TOKEN OVERRIDES
+   ============================================ */
+
+[data-a11y-contrast="high"] {
+  --taupe-1: #CCC9D0;
+  --taupe-2: #908E96;
+  --taupe-3: #5A595E;
+  --taupe-4: #3A3A3C;
+}
+
+[data-theme="dark"][data-a11y-contrast="high"] {
+  --taupe-1: #3a3a42;
+  --taupe-2: #55555e;
+  --taupe-3: #9b9aa2;
+  --taupe-4: #c8c6ce;
+  --taupe-5: #f0eef5;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--sans);
+  background: var(--taupe-4);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  color: var(--taupe-5);
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  -webkit-font-smoothing: auto;
+}

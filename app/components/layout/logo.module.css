@@ -1,0 +1,108 @@
+/* ======== Logo Sphere Components ======== */
+
+/* Small sidebar logo mark */
+.logoMark {
+  width: 31px;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logoSpheres {
+  position: relative;
+  width: 31px;
+  height: 29px;
+}
+
+.sphere {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.sphereDark {
+  background: radial-gradient(circle at 35% 30%, var(--violet-3), var(--violet-4));
+  box-shadow: inset 0 -1px 2px rgba(var(--black-rgb), 0.25), inset 0 1px 1px rgba(var(--white-pure-rgb), 0.08);
+}
+
+.sphereLight {
+  background: radial-gradient(circle at 35% 30%, var(--berry-1), var(--berry-2));
+  box-shadow: inset 0 -1px 2px rgba(var(--black-rgb), 0.08), inset 0 1px 1px rgba(var(--white-pure-rgb), 0.15);
+}
+
+/* Row 1 — top */
+.sphere:nth-child(1) { top: 0; left: 0; }
+.sphere:nth-child(2) { top: 0; left: 11.4px; }
+.sphere:nth-child(3) { top: 0; left: 22.8px; }
+/* Row 2 — middle */
+.sphere:nth-child(4) { top: 10.2px; left: 5.7px; }
+.sphere:nth-child(5) { top: 10.2px; left: 17.1px; }
+/* Row 3 — bottom */
+.sphere:nth-child(6) { top: 20.4px; left: 11.4px; }
+
+/* ======== Large Login Page Logo ======== */
+
+.heroLogoMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: logoGlow 4s ease-in-out infinite;
+}
+
+@keyframes logoGlow {
+  0%, 100% { filter: drop-shadow(0 0 30px rgba(116,65,143,0.4)) drop-shadow(0 0 60px rgba(116,65,143,0.15)); }
+  50% { filter: drop-shadow(0 0 50px rgba(116,65,143,0.6)) drop-shadow(0 0 100px rgba(116,65,143,0.25)); }
+}
+
+.heroSpheres {
+  position: relative;
+  width: 115px;
+  height: 106px;
+}
+
+.heroSphere {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.heroSphereDark {
+  background: radial-gradient(circle at 35% 30%, var(--violet-3), var(--violet-4));
+  box-shadow:
+    inset 0 -3px 6px rgba(0,0,0,0.3),
+    inset 0 1px 3px rgba(255,255,255,0.12),
+    0 0 15px rgba(116,65,143,0.35);
+}
+
+.heroSphereLight {
+  background: radial-gradient(circle at 35% 30%, var(--berry-1), var(--berry-2));
+  box-shadow:
+    inset 0 -3px 6px rgba(0,0,0,0.08),
+    inset 0 1px 3px rgba(255,255,255,0.25),
+    0 0 20px rgba(224,208,225,0.4);
+}
+
+/* Row 1 — top: 3 spheres */
+.heroSphere:nth-child(1) { top: 0; left: 0; }
+.heroSphere:nth-child(2) { top: 0; left: 39.6px; }
+.heroSphere:nth-child(3) { top: 0; left: 79.2px; }
+/* Row 2 — middle: 2 spheres */
+.heroSphere:nth-child(4) { top: 34.8px; left: 19.8px; }
+.heroSphere:nth-child(5) { top: 34.8px; left: 59.4px; }
+/* Row 3 — bottom: 1 sphere */
+.heroSphere:nth-child(6) { top: 69.6px; left: 39.6px; }
+
+/* Reduced motion: disable glow animation */
+@media (prefers-reduced-motion: reduce) {
+  .heroLogoMark {
+    animation: none;
+  }
+}
+
+:global([data-a11y-motion="reduce"]) .heroLogoMark {
+  animation: none;
+}

@@ -1,0 +1,581 @@
+// ============================================
+// MOCK DATA — WORKFLOW TEMPLATES, RUNS, COMMANDS
+// ============================================
+// Ported from js/mock-data.js. This is the single source
+// of truth for workflow data in the React app.
+// Components access this data via the service layer only.
+
+import type {
+  WorkflowTemplate,
+  WorkflowRun,
+  WorkflowCommand,
+} from '~/services/types';
+
+// ============================================
+// WORKFLOW TEMPLATES (7 total)
+// ============================================
+
+export const MOCK_WORKFLOW_TEMPLATES: Record<string, WorkflowTemplate> = {
+  'rent-roll': {
+    id: 'rent-roll',
+    title: 'Rent Roll Extraction',
+    description: 'Extracts and standardizes rent roll data from uploaded PDFs into clean xlsx format with unit-level detail, floor mapping, and lease terms.',
+    status: 'active',
+    version: 3,
+    createdBy: 'E. Puckett',
+    createdDate: 'Jan 14, 2026',
+    triggerType: 'folder-watch',
+    triggerConfig: {
+      watchPath: '/Finance/CRE/Incoming/Rent Rolls/',
+      chatCommand: '/rent-roll',
+    },
+    linkedLessons: ['rent-roll-format'],
+    linkedEntities: ['prop-berkshire', 'prop-marina', 'prop-hilgard-apt'],
+    inputSchema: {
+      description: 'PDF rent roll documents from property managers. Each file should contain unit-level lease data for a single property.',
+      fields: [
+        { name: 'Unit ID', type: 'string', required: true, description: 'Unique identifier for the rental unit' },
+        { name: 'Tenant Name', type: 'string', required: true, description: 'Current tenant or lessee name' },
+        { name: 'Lease Start', type: 'date', required: true, description: 'Lease commencement date' },
+        { name: 'Lease End', type: 'date', required: true, description: 'Lease expiration date' },
+        { name: 'Monthly Rent', type: 'currency', required: true, description: 'Current monthly rent amount' },
+        { name: 'Sq Ft', type: 'number', required: false, description: 'Unit square footage' },
+        { name: 'Floor', type: 'number', required: false, description: 'Floor number within building' },
+        { name: 'Status', type: 'enum', required: true, description: 'Current occupancy status', options: ['Occupied', 'Vacant', 'Notice'] },
+      ],
+    },
+    outputSchema: {
+      format: 'xlsx',
+      destination: '/Finance/CRE/Processed/Rent Rolls/',
+      columns: ['Unit ID', 'Tenant Name', 'Lease Start', 'Lease End', 'Monthly Rent', 'Sq Ft', 'Floor', 'Status'],
+    },
+    nodes: [
+      { id: 'n1', type: 'input', title: 'Ingest Files', description: 'Receive PDF rent roll documents', lesson: null, x: 0, y: 0 },
+      { id: 'n2', type: 'action', title: 'Extract & Parse', description: 'OCR and extract tabular data from PDFs', lesson: 'rent-roll-format', x: 0, y: 1 },
+      { id: 'n3', type: 'branch', title: 'Confidence Check', description: 'Evaluate extraction confidence scores', lesson: null, x: 0, y: 2, conditions: [{ label: 'High Confidence', target: 'n5' }, { label: 'Low Confidence', target: 'n4' }] },
+      { id: 'n4', type: 'gate', title: 'Manual Review', description: 'Human reviews low-confidence extractions', lesson: null, x: -1, y: 3 },
+      { id: 'n5', type: 'action', title: 'Standardize & Enrich', description: 'Map fields to output schema, enrich with metadata', lesson: 'rent-roll-format', x: 0, y: 4 },
+      { id: 'n6', type: 'action', title: 'Quality Check', description: 'Validate data completeness and consistency', lesson: null, x: 0, y: 5 },
+      { id: 'n7', type: 'output', title: 'Export to xlsx', description: 'Save standardized rent roll to output folder', lesson: null, x: 0, y: 6 },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n2', to: 'n3' },
+      { from: 'n3', to: 'n4', label: 'Low Confidence' },
+      { from: 'n3', to: 'n5', label: 'High Confidence' },
+      { from: 'n4', to: 'n5' },
+      { from: 'n5', to: 'n6' },
+      { from: 'n6', to: 'n7' },
+    ],
+    runs: {
+      total: 47,
+      successRate: 95.7,
+      avgDuration: '12.4s',
+      filesProcessed: 183,
+    },
+    recentRuns: [
+      { id: '#047', status: 'success', trigger: 'Manual — 3 files', time: 'Today, 12:15 PM', duration: '11.2s', threadId: 'wf-run-rentroll-047' },
+      { id: '#046', status: 'success', trigger: 'Folder watch — 1 file', time: 'Yesterday, 6:00 AM', duration: '8.7s', threadId: null },
+      { id: '#045', status: 'failed', trigger: 'Manual — 5 files', time: 'Mar 10, 3:22 PM', duration: '4.1s', threadId: null },
+      { id: '#044', status: 'success', trigger: 'Folder watch — 2 files', time: 'Mar 9, 6:00 AM', duration: '14.3s', threadId: null },
+      { id: '#043', status: 'success', trigger: 'Chat command', time: 'Mar 8, 11:45 AM', duration: '9.8s', threadId: null },
+    ],
+  },
+
+  'k1-extract': {
+    id: 'k1-extract',
+    title: 'K-1 Document Processing',
+    description: 'Parses K-1 tax documents, extracts allocations, and maps to fund accounting structure. Flags discrepancies against capital accounts.',
+    status: 'active',
+    version: 2,
+    createdBy: 'E. Puckett',
+    createdDate: 'Feb 3, 2026',
+    triggerType: 'manual',
+    triggerConfig: {
+      chatCommand: '/k1',
+    },
+    linkedLessons: ['k1-extraction'],
+    linkedEntities: ['fund-iii', 'k1-docs'],
+    inputSchema: {
+      description: 'K-1 tax documents (PDF). Supports multi-page and multi-partner documents.',
+      fields: [
+        { name: 'Partner Name', type: 'string', required: true, description: 'Limited partner name as shown on K-1' },
+        { name: 'TIN', type: 'string', required: true, description: 'Taxpayer identification number (last 4 digits)' },
+        { name: 'Ordinary Income', type: 'currency', required: true, description: 'Box 1 — Ordinary business income' },
+        { name: 'Rental Income', type: 'currency', required: false, description: 'Box 2 — Net rental real estate income' },
+        { name: 'Guaranteed Payments', type: 'currency', required: false, description: 'Box 4c — Guaranteed payments' },
+        { name: 'Capital Account', type: 'currency', required: true, description: 'Ending capital account balance' },
+      ],
+    },
+    outputSchema: {
+      format: 'xlsx',
+      destination: '/Tax/K-1/Processed/',
+      columns: ['Partner Name', 'TIN (last 4)', 'Box 1', 'Box 2', 'Box 4c', 'Capital Account', 'State'],
+    },
+    nodes: [
+      { id: 'n1', type: 'input', title: 'Receive K-1 Documents', description: 'Upload or ingest K-1 PDF files', lesson: null, x: 0, y: 0 },
+      { id: 'n2', type: 'action', title: 'Parse K-1 Forms', description: 'OCR and identify K-1 form structure', lesson: 'k1-extraction', x: 0, y: 1 },
+      { id: 'n3', type: 'action', title: 'Extract Allocations', description: 'Pull partner allocations from each K-1', lesson: 'k1-extraction', x: 0, y: 2 },
+      { id: 'n4', type: 'branch', title: 'Multi-State Check', description: 'Check if partner has multi-state filing requirements', lesson: null, x: 0, y: 3, conditions: [{ label: 'Multi-State', target: 'n5' }, { label: 'Single State', target: 'n6' }] },
+      { id: 'n5', type: 'action', title: 'State Apportionment', description: 'Calculate state-level income apportionment', lesson: null, x: 1, y: 4 },
+      { id: 'n6', type: 'action', title: 'Map to Fund Structure', description: 'Map extracted data to fund accounting structure', lesson: null, x: 0, y: 5 },
+      { id: 'n7', type: 'gate', title: 'Discrepancy Review', description: 'Human reviews flagged discrepancies against capital accounts', lesson: null, x: 0, y: 6 },
+      { id: 'n8', type: 'output', title: 'Export Results', description: 'Save processed K-1 data to output folder', lesson: null, x: 0, y: 7 },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n2', to: 'n3' },
+      { from: 'n3', to: 'n4' },
+      { from: 'n4', to: 'n5', label: 'Multi-State' },
+      { from: 'n4', to: 'n6', label: 'Single State' },
+      { from: 'n5', to: 'n6' },
+      { from: 'n6', to: 'n7' },
+      { from: 'n7', to: 'n8' },
+    ],
+    runs: {
+      total: 23,
+      successRate: 91.3,
+      avgDuration: '18.6s',
+      filesProcessed: 96,
+    },
+    recentRuns: [
+      { id: '#023', status: 'success', trigger: 'Chat command', time: 'Today, 9:30 AM', duration: '16.4s', threadId: null },
+      { id: '#022', status: 'success', trigger: 'Manual — 8 files', time: 'Mar 11, 2:15 PM', duration: '22.1s', threadId: null },
+      { id: '#021', status: 'failed', trigger: 'Manual — 2 files', time: 'Mar 8, 10:00 AM', duration: '5.3s', threadId: null },
+    ],
+  },
+
+  'lp-waterfall': {
+    id: 'lp-waterfall',
+    title: 'LP Distribution Waterfall',
+    description: 'Calculates LP/GP distribution splits across preferred return, catch-up, and carried interest tiers. Generates allocation schedules.',
+    status: 'draft',
+    version: 1,
+    createdBy: 'E. Puckett',
+    createdDate: 'Feb 20, 2026',
+    triggerType: 'manual',
+    triggerConfig: {},
+    linkedLessons: ['waterfall-calc'],
+    linkedEntities: ['fund-iii', 'fee-structure'],
+    inputSchema: {
+      description: 'Fund distribution data including committed capital, contributions, and distributable proceeds.',
+      fields: [
+        { name: 'Fund Name', type: 'string', required: true, description: 'Fund entity name' },
+        { name: 'Vintage Year', type: 'string', required: true, description: 'Fund vintage year' },
+        { name: 'Total Committed', type: 'currency', required: true, description: 'Total committed capital' },
+        { name: 'Total Contributed', type: 'currency', required: true, description: 'Total capital contributed to date' },
+        { name: 'Distributable Amount', type: 'currency', required: true, description: 'Amount available for distribution' },
+        { name: 'Preferred Return Rate', type: 'number', required: true, description: 'Preferred return hurdle rate (%)' },
+      ],
+    },
+    outputSchema: {
+      format: 'xlsx',
+      destination: '/Finance/Distributions/',
+      columns: ['LP Name', 'Committed', 'Contributed', 'Return of Capital', 'Preferred Return', 'Catch-Up', 'Carry Split', 'Total Distribution'],
+    },
+    nodes: [
+      { id: 'n1', type: 'input', title: 'Load Distribution Data', description: 'Ingest fund and LP commitment data', lesson: null, x: 0, y: 0 },
+      { id: 'n2', type: 'action', title: 'Load LPA Terms', description: 'Pull waterfall terms from partnership agreement', lesson: 'waterfall-calc', x: 0, y: 1 },
+      { id: 'n3', type: 'action', title: 'Calculate Preferred Return', description: 'Compute 8% preferred return per LP', lesson: 'waterfall-calc', x: 0, y: 2 },
+      { id: 'n4', type: 'action', title: 'Calculate Catch-Up', description: 'Compute GP catch-up tranche', lesson: null, x: 0, y: 3 },
+      { id: 'n5', type: 'action', title: 'Calculate Carry Split', description: 'Compute carried interest 80/20 split', lesson: null, x: 0, y: 4 },
+      { id: 'n6', type: 'gate', title: 'GP Review', description: 'GP reviews and approves distribution schedule', lesson: null, x: 0, y: 5 },
+      { id: 'n7', type: 'action', title: 'Generate Schedule', description: 'Build final LP-by-LP allocation schedule', lesson: null, x: 0, y: 6 },
+      { id: 'n8', type: 'output', title: 'Export Schedule', description: 'Save distribution schedule to output folder', lesson: null, x: 0, y: 7 },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n2', to: 'n3' },
+      { from: 'n3', to: 'n4' },
+      { from: 'n4', to: 'n5' },
+      { from: 'n5', to: 'n6' },
+      { from: 'n6', to: 'n7' },
+      { from: 'n7', to: 'n8' },
+    ],
+    runs: {
+      total: 0,
+      successRate: 0,
+      avgDuration: '—',
+      filesProcessed: 0,
+    },
+    recentRuns: [],
+  },
+
+  'fee-calc': {
+    id: 'fee-calc',
+    title: 'Management Fee Calculator',
+    description: 'Computes management fees across fund vehicles using committed/invested capital basis, step-downs, and offset provisions.',
+    status: 'active',
+    version: 4,
+    createdBy: 'E. Puckett',
+    createdDate: 'Dec 5, 2025',
+    triggerType: 'schedule',
+    triggerConfig: {
+      schedule: 'Monthly, 1st at 9 AM',
+      chatCommand: '/fees',
+    },
+    linkedLessons: ['fee-calc-rules'],
+    linkedEntities: ['fund-iii', 'hilgard', 'erabor', 'fee-structure'],
+    inputSchema: {
+      description: 'Fund commitment and investment period data. Pulls from fund accounting system.',
+      fields: [
+        { name: 'Fund Name', type: 'string', required: true, description: 'Fund entity name' },
+        { name: 'Committed Capital', type: 'currency', required: true, description: 'Total LP committed capital' },
+        { name: 'Invested Capital', type: 'currency', required: true, description: 'Capital deployed to date' },
+        { name: 'Fee Rate', type: 'number', required: true, description: 'Annual management fee rate (%)' },
+        { name: 'Period', type: 'enum', required: true, description: 'Current fee period', options: ['Investment', 'Post-Investment'] },
+        { name: 'Offset Amount', type: 'currency', required: false, description: 'Fee offset from portfolio company fees' },
+      ],
+    },
+    outputSchema: {
+      format: 'xlsx',
+      destination: '/Finance/Fees/',
+      columns: ['Fund', 'Quarter', 'Basis', 'Rate', 'Gross Fee', 'Offset', 'Net Fee'],
+    },
+    nodes: [
+      { id: 'n1', type: 'input', title: 'Load Fund Data', description: 'Pull commitment and investment data', lesson: null, x: 0, y: 0 },
+      { id: 'n2', type: 'action', title: 'Load Commitments', description: 'Calculate fee basis per fund', lesson: 'fee-calc-rules', x: 0, y: 1 },
+      { id: 'n3', type: 'action', title: 'Apply Fee Rates', description: 'Apply rate schedule with step-downs', lesson: 'fee-calc-rules', x: 0, y: 2 },
+      { id: 'n4', type: 'action', title: 'Calculate Offsets', description: 'Apply portfolio company fee offsets', lesson: null, x: 0, y: 3 },
+      { id: 'n5', type: 'output', title: 'Export Fee Schedule', description: 'Save fee calculations to output folder', lesson: null, x: 0, y: 4 },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n2', to: 'n3' },
+      { from: 'n3', to: 'n4' },
+      { from: 'n4', to: 'n5' },
+    ],
+    runs: {
+      total: 31,
+      successRate: 100,
+      avgDuration: '6.2s',
+      filesProcessed: 31,
+    },
+    recentRuns: [
+      { id: '#031', status: 'success', trigger: 'Schedule — monthly', time: 'Mar 1, 9:00 AM', duration: '5.8s', threadId: null },
+      { id: '#030', status: 'success', trigger: 'Schedule — monthly', time: 'Feb 1, 9:00 AM', duration: '6.1s', threadId: null },
+      { id: '#029', status: 'success', trigger: 'Chat command', time: 'Jan 28, 3:15 PM', duration: '6.5s', threadId: null },
+    ],
+  },
+
+  'covenant': {
+    id: 'covenant',
+    title: 'Loan Covenant Monitor',
+    description: 'Monitors DSCR, LTV, and debt yield covenants across the loan book. Alerts when metrics approach or breach thresholds.',
+    status: 'paused',
+    version: 2,
+    createdBy: 'E. Puckett',
+    createdDate: 'Jan 20, 2026',
+    triggerType: 'schedule',
+    triggerConfig: {
+      schedule: 'Daily at 7 AM',
+    },
+    linkedLessons: [],
+    linkedEntities: ['credit-ii'],
+    inputSchema: {
+      description: 'Loan portfolio data including outstanding balances, NOI, and property valuations.',
+      fields: [
+        { name: 'Loan ID', type: 'string', required: true, description: 'Unique loan identifier' },
+        { name: 'Outstanding Balance', type: 'currency', required: true, description: 'Current loan balance' },
+        { name: 'Property Value', type: 'currency', required: true, description: 'Current appraised value' },
+        { name: 'NOI', type: 'currency', required: true, description: 'Net operating income (trailing 12 months)' },
+        { name: 'Debt Service', type: 'currency', required: true, description: 'Annual debt service payments' },
+        { name: 'Covenant DSCR', type: 'number', required: true, description: 'Minimum DSCR covenant threshold' },
+        { name: 'Covenant LTV', type: 'number', required: true, description: 'Maximum LTV covenant threshold (%)' },
+      ],
+    },
+    outputSchema: {
+      format: 'pdf',
+      destination: '/Finance/Covenants/Reports/',
+      columns: ['Loan ID', 'DSCR', 'LTV', 'Debt Yield', 'Status', 'Action Required'],
+    },
+    nodes: [
+      { id: 'n1', type: 'input', title: 'Pull Loan Data', description: 'Ingest loan portfolio from banking system', lesson: null, x: 0, y: 0 },
+      { id: 'n2', type: 'action', title: 'Pull Loan Data', description: 'Retrieve current balances and terms', lesson: null, x: 0, y: 1 },
+      { id: 'n3', type: 'action', title: 'Calculate Ratios', description: 'Compute DSCR, LTV, and debt yield', lesson: null, x: 0, y: 2 },
+      { id: 'n4', type: 'branch', title: 'Threshold Check', description: 'Evaluate metrics against covenant thresholds', lesson: null, x: 0, y: 3, conditions: [{ label: 'Breach', target: 'n5' }, { label: 'Warning', target: 'n6' }, { label: 'Clear', target: 'n7' }] },
+      { id: 'n5', type: 'gate', title: 'Breach Alert', description: 'Immediate review — covenant breached', lesson: null, x: -1, y: 4 },
+      { id: 'n6', type: 'gate', title: 'Warning Alert', description: 'Metrics approaching covenant limits', lesson: null, x: 0, y: 4 },
+      { id: 'n7', type: 'action', title: 'Log Only', description: 'All covenants clear — log and continue', lesson: null, x: 1, y: 4 },
+      { id: 'n8', type: 'output', title: 'Output Report', description: 'Generate covenant monitoring report', lesson: null, x: 0, y: 5 },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n2', to: 'n3' },
+      { from: 'n3', to: 'n4' },
+      { from: 'n4', to: 'n5', label: 'Breach' },
+      { from: 'n4', to: 'n6', label: 'Warning' },
+      { from: 'n4', to: 'n7', label: 'Clear' },
+      { from: 'n5', to: 'n8' },
+      { from: 'n6', to: 'n8' },
+      { from: 'n7', to: 'n8' },
+    ],
+    runs: {
+      total: 18,
+      successRate: 88.9,
+      avgDuration: '9.1s',
+      filesProcessed: 18,
+    },
+    recentRuns: [
+      { id: '#018', status: 'success', trigger: 'Schedule — daily', time: 'Feb 15, 7:00 AM', duration: '8.4s', threadId: null },
+      { id: '#017', status: 'success', trigger: 'Schedule — daily', time: 'Feb 14, 7:00 AM', duration: '9.2s', threadId: null },
+      { id: '#016', status: 'failed', trigger: 'Schedule — daily', time: 'Feb 13, 7:00 AM', duration: '3.1s', threadId: null },
+    ],
+  },
+
+  'tener-valuation': {
+    id: 'tener-valuation',
+    title: 'Tener Valuation Filing',
+    description: 'Extracts parcel data from property assessment documents, validates against tax records, and generates filing packages.',
+    status: 'active',
+    version: 2,
+    createdBy: 'E. Puckett',
+    createdDate: 'Jan 28, 2026',
+    triggerType: 'chat-command',
+    triggerConfig: {
+      chatCommand: '/valuation',
+    },
+    linkedLessons: [],
+    linkedEntities: ['valuation-reports'],
+    inputSchema: {
+      description: 'Property assessment documents (PDF or image scans). Each file should contain parcel identification and valuation data.',
+      fields: [
+        { name: 'Parcel ID', type: 'string', required: true, description: 'County parcel identification number' },
+        { name: 'Assessed Value', type: 'currency', required: true, description: 'Current assessed property value' },
+        { name: 'Tax Year', type: 'string', required: true, description: 'Tax assessment year' },
+        { name: 'Filing Deadline', type: 'date', required: true, description: 'Assessment appeal filing deadline' },
+        { name: 'Property Address', type: 'string', required: true, description: 'Physical property address' },
+        { name: 'Owner', type: 'string', required: false, description: 'Property owner or entity name' },
+        { name: 'Tax Class', type: 'enum', required: false, description: 'Property tax classification', options: ['Residential', 'Commercial', 'Industrial', 'Mixed-Use', 'Vacant Land'] },
+      ],
+    },
+    outputSchema: {
+      format: 'pdf',
+      destination: '/Tener/Filings/',
+      columns: ['Parcel ID', 'Address', 'Assessed Value', 'Tax Year', 'Filing Deadline', 'Tax Class', 'Status'],
+    },
+    nodes: [
+      { id: 'n1', type: 'input', title: 'Receive Documents', description: 'Ingest assessment documents for processing', lesson: null, x: 0, y: 0 },
+      { id: 'n2', type: 'action', title: 'OCR & Extract', description: 'Optical character recognition and data extraction', lesson: null, x: 0, y: 1 },
+      { id: 'n3', type: 'action', title: 'Identify Parcel Data', description: 'Locate and parse parcel identification fields', lesson: null, x: 0, y: 2 },
+      { id: 'n4', type: 'branch', title: 'Data Quality Check', description: 'Evaluate extraction quality and completeness', lesson: null, x: 0, y: 3, conditions: [{ label: 'Clean', target: 'n5' }, { label: 'Issues Found', target: 'n6' }] },
+      { id: 'n5', type: 'action', title: 'Map to Schema', description: 'Map clean data directly to output schema', lesson: null, x: -1, y: 4 },
+      { id: 'n6', type: 'gate', title: 'Gate for Review', description: 'Human reviews data quality issues', lesson: null, x: 1, y: 4 },
+      { id: 'n7', type: 'action', title: 'Validate Against Tax Records', description: 'Cross-reference with county tax database', lesson: null, x: 0, y: 5 },
+      { id: 'n8', type: 'action', title: 'Generate Filing Package', description: 'Compile assessment appeal filing documents', lesson: null, x: 0, y: 6 },
+      { id: 'n9', type: 'output', title: 'Export Filing', description: 'Save filing package to output destination', lesson: null, x: 0, y: 7 },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n2', to: 'n3' },
+      { from: 'n3', to: 'n4' },
+      { from: 'n4', to: 'n5', label: 'Clean' },
+      { from: 'n4', to: 'n6', label: 'Issues Found' },
+      { from: 'n5', to: 'n7' },
+      { from: 'n6', to: 'n7' },
+      { from: 'n7', to: 'n8' },
+      { from: 'n8', to: 'n9' },
+    ],
+    runs: {
+      total: 34,
+      successRate: 94.1,
+      avgDuration: '24.7s',
+      filesProcessed: 412,
+    },
+    recentRuns: [
+      { id: '#034', status: 'success', trigger: 'Chat command — 12 files', time: 'Today, 10:45 AM', duration: '28.3s', threadId: null },
+      { id: '#033', status: 'success', trigger: 'Chat command — 47 files', time: 'Yesterday, 2:00 PM', duration: '42.1s', threadId: 'tener-batch-12' },
+      { id: '#032', status: 'success', trigger: 'Chat command — 8 files', time: 'Mar 10, 9:15 AM', duration: '18.6s', threadId: null },
+    ],
+  },
+
+  'due-diligence': {
+    id: 'due-diligence',
+    title: 'Due Diligence Review',
+    description: 'Analyzes data room documents for real estate acquisitions. Extracts key metrics by document type and flags red flags across financials, rent rolls, environmental, title, and zoning.',
+    status: 'draft',
+    version: 1,
+    createdBy: 'E. Puckett',
+    createdDate: 'Mar 5, 2026',
+    triggerType: 'chat-command',
+    triggerConfig: {
+      chatCommand: '/dd [company]',
+    },
+    linkedLessons: [],
+    linkedEntities: ['due-diligence'],
+    inputSchema: {
+      description: 'Data room contents for a target acquisition. Documents should be organized by type: financials, rent rolls, environmental, title, and zoning.',
+      fields: [
+        { name: 'Target Name', type: 'string', required: true, description: 'Name of acquisition target' },
+        { name: 'Property Type', type: 'enum', required: true, description: 'Asset class of the target', options: ['Multifamily', 'Office', 'Industrial', 'Retail', 'Mixed-Use'] },
+        { name: 'Acquisition Price', type: 'currency', required: false, description: 'Proposed acquisition price' },
+        { name: 'Data Room Path', type: 'string', required: true, description: 'Path to data room folder' },
+      ],
+    },
+    outputSchema: {
+      format: 'pdf',
+      destination: '/Acquisitions/DD Reports/',
+      columns: ['Category', 'Document', 'Key Findings', 'Red Flags', 'Confidence'],
+    },
+    nodes: [
+      { id: 'n1', type: 'input', title: 'Ingest Data Room', description: 'Load all documents from target data room', lesson: null, x: 0, y: 0 },
+      { id: 'n2', type: 'branch', title: 'Sort by Doc Type', description: 'Classify and route documents by category', lesson: null, x: 0, y: 1, conditions: [{ label: 'Financials', target: 'n3' }, { label: 'Rent Rolls', target: 'n4' }, { label: 'Environmental', target: 'n5' }, { label: 'Title', target: 'n6' }, { label: 'Zoning', target: 'n7' }] },
+      { id: 'n3', type: 'action', title: 'Analyze Financials', description: 'Extract revenue, expenses, NOI, cap rate', lesson: null, x: -2, y: 2 },
+      { id: 'n4', type: 'action', title: 'Process Rent Rolls', description: 'Extract unit mix, occupancy, lease terms', lesson: 'rent-roll-format', x: -1, y: 2 },
+      { id: 'n5', type: 'action', title: 'Review Environmental', description: 'Identify Phase I/II findings and risks', lesson: null, x: 0, y: 2 },
+      { id: 'n6', type: 'action', title: 'Examine Title Docs', description: 'Review title commitments and exceptions', lesson: null, x: 1, y: 2 },
+      { id: 'n7', type: 'action', title: 'Check Zoning', description: 'Verify zoning compliance and entitlements', lesson: null, x: 2, y: 2 },
+      { id: 'n8', type: 'action', title: 'Cross-Reference Validation', description: 'Cross-reference rent roll numbers against financials', lesson: null, x: 0, y: 3 },
+      { id: 'n9', type: 'gate', title: 'Red Flag Review', description: 'Human reviews all flagged issues before final report', lesson: null, x: 0, y: 4 },
+      { id: 'n10', type: 'action', title: 'Generate DD Summary', description: 'Compile executive summary with findings', lesson: null, x: 0, y: 5 },
+      { id: 'n11', type: 'output', title: 'Export DD Report', description: 'Save due diligence report to output folder', lesson: null, x: 0, y: 6 },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n2', to: 'n3', label: 'Financials' },
+      { from: 'n2', to: 'n4', label: 'Rent Rolls' },
+      { from: 'n2', to: 'n5', label: 'Environmental' },
+      { from: 'n2', to: 'n6', label: 'Title' },
+      { from: 'n2', to: 'n7', label: 'Zoning' },
+      { from: 'n3', to: 'n8' },
+      { from: 'n4', to: 'n8' },
+      { from: 'n5', to: 'n8' },
+      { from: 'n6', to: 'n8' },
+      { from: 'n7', to: 'n8' },
+      { from: 'n8', to: 'n9' },
+      { from: 'n9', to: 'n10' },
+      { from: 'n10', to: 'n11' },
+    ],
+    runs: {
+      total: 0,
+      successRate: 0,
+      avgDuration: '—',
+      filesProcessed: 0,
+    },
+    recentRuns: [],
+  },
+};
+
+// ============================================
+// WORKFLOW RUNS (2 total)
+// ============================================
+
+export const MOCK_WORKFLOW_RUNS: Record<string, WorkflowRun> = {
+  'wf-run-rentroll-047': {
+    templateId: 'rent-roll',
+    runId: '#047',
+    status: 'completed',
+    triggerType: 'manual',
+    triggeredBy: 'E. Puckett',
+    startTime: 'Today, 12:15 PM',
+    threadId: 'wf-run-rentroll-047',
+    inputManifest: [
+      { name: '245-Park-Ave-RentRoll.pdf', type: 'pdf', size: '2.1 MB' },
+      { name: 'Marina-Heights-Q4.pdf', type: 'pdf', size: '1.8 MB' },
+      { name: 'Berkshire-Units-Dec.pdf', type: 'pdf', size: '3.4 MB' },
+    ],
+    nodeStatuses: {
+      'n1': 'completed',
+      'n2': 'completed',
+      'n3': 'completed',
+      'n4': 'skipped',
+      'n5': 'completed',
+      'n6': 'completed',
+      'n7': 'completed',
+    },
+    exceptions: [
+      {
+        nodeId: 'n5',
+        type: 'inference',
+        description: 'Inferred Floor 2 for units 201–208 at Marina Heights based on unit numbering convention.',
+        confidence: 94,
+      },
+    ],
+    outputManifest: [
+      { name: 'Q4-2025-RentRoll-Standardized.xlsx', path: '/Finance/CRE/Processed/Rent Rolls/', size: '84 KB' },
+    ],
+  },
+
+  'wf-run-tener-12': {
+    templateId: 'tener-valuation',
+    runId: '#012',
+    status: 'waiting',
+    triggerType: 'chat-command',
+    triggeredBy: 'E. Puckett',
+    startTime: 'Yesterday, 2:00 PM',
+    threadId: 'tener-batch-12',
+    inputManifest: [
+      { name: 'Batch-12-Parcels/', type: 'folder', fileCount: 47 },
+    ],
+    nodeStatuses: {
+      'n1': 'completed',
+      'n2': 'completed',
+      'n3': 'completed',
+      'n4': 'completed',
+      'n5': 'completed',
+      'n6': 'waiting',
+      'n7': 'pending',
+      'n8': 'pending',
+      'n9': 'pending',
+    },
+    exceptions: [
+      {
+        nodeId: 'n6',
+        type: 'conflicting-value',
+        description: 'Parcel-2847-Assessment.pdf has conflicting assessed values — page 3 shows $4.2M, page 7 shows $4.8M (amended).',
+        confidence: null,
+      },
+      {
+        nodeId: 'n6',
+        type: 'low-confidence',
+        description: 'Parcel-3102-Notice.pdf — poor OCR quality, 3 fields uncertain.',
+        confidence: 67,
+      },
+      {
+        nodeId: 'n6',
+        type: 'format-unknown',
+        description: 'Parcel-4411-Filing.tiff — unexpected format (TIFF scan, not PDF). Needs conversion.',
+        confidence: null,
+      },
+    ],
+    outputManifest: [],
+  },
+};
+
+// ============================================
+// WORKFLOW COMMANDS (5 total)
+// ============================================
+
+export const MOCK_WORKFLOW_COMMANDS: WorkflowCommand[] = [
+  {
+    command: '/rent-roll',
+    label: 'Rent Roll Extraction',
+    description: 'Extract and standardize rent roll data from PDFs',
+    templateId: 'rent-roll',
+  },
+  {
+    command: '/k1',
+    label: 'K-1 Document Extraction',
+    description: 'Parse K-1 forms and extract partner allocations',
+    templateId: 'k1-extract',
+  },
+  {
+    command: '/fees',
+    label: 'Fee Calculation',
+    description: 'Calculate management fees with commitment offsets',
+    templateId: 'fee-calc',
+  },
+  {
+    command: '/valuation',
+    label: 'Valuation Filing',
+    description: 'Extract parcel data and generate tax filing packages',
+    templateId: 'tener-valuation',
+  },
+  {
+    command: '/dd',
+    label: 'Due Diligence',
+    description: 'Run due diligence analysis on a target company',
+    templateId: 'due-diligence',
+    argPlaceholder: '[company name]',
+  },
+];

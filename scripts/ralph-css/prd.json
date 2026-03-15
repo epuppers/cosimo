@@ -1,0 +1,233 @@
+{
+  "branchName": "css-restoration",
+  "userStories": [
+    {
+      "id": "CSS-01",
+      "title": "Foundation: Bevel utilities + base custom CSS layer in app.css",
+      "description": "Read reference/css/utilities.css and reference/css/tokens.css. IMPORTANT: First read app/app.css to see what already exists — do NOT duplicate existing keyframes or classes. In app/app.css, add a @layer components {} block (after the existing @layer base block) containing: (1) .bevel class — border-style:solid; border-width:1px; border-color: var(--taupe-2) var(--taupe-3) var(--taupe-3) var(--taupe-2). (2) .bevel-inset — border-color: var(--taupe-3) var(--taupe-1) var(--taupe-1) var(--taupe-3). (3) Dark mode variants: .dark .bevel and .dark .bevel-inset with softened border colors from the reference. (4) .label-mono — font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.05em; color:var(--taupe-3). (5) Scrollbar styles from utilities.css — webkit-scrollbar 6px, track transparent, thumb var(--taupe-2) with radius, dark mode overrides. (6) .overview-grid, .kv-row, .kv-key, .kv-val classes from utilities.css. (7) Check which @keyframes are missing from app.css — it already has wf-pulse, thinking-cube, reasoning-pulse, and stream-cursor-blink. Add ONLY missing ones: typing-bounce (three-dot bounce for thinking indicator) and any others from utilities.css/components.css that aren't already present. Do NOT duplicate existing keyframes. Verify all new CSS is valid and doesn't break the build.",
+      "passes": true
+    },
+    {
+      "id": "CSS-02",
+      "title": "Foundation: Verify and fix design tokens in app.css",
+      "description": "Read reference/css/tokens.css line by line. Compare every CSS custom property defined there against what exists in app/app.css. Verify: (1) All color tokens present: --taupe-1 through --taupe-5, --violet-1 through --violet-4, --blue-1/2/3, --berry-1/2/3, --green, --red, --amber, --chinese-1/2, --off-white, --white. (2) All RGB triplets present: --violet-3-rgb, --green-rgb, --red-rgb, --amber-rgb, --blue-3-rgb, --taupe-3-rgb, --berry-3-rgb. (3) Font family tokens: --pixel (ChicagoFLF, monospace), --mono (IBM Plex Mono, monospace), --sans (DM Sans, sans-serif). (4) Border radius tokens: --r-xs (2px), --r-sm (3px), --r-md (4px), --r-lg (6px), --r-pill (9px). (5) ALL dark mode overrides from [data-theme='dark'] are ported to .dark {} or :root.dark {}. (6) Dark surface tokens: --surface-0 through --surface-3. (7) High contrast overrides from [data-a11y-contrast='high']. Fix any missing or incorrect values. Also verify the @font-face for ChicagoFLF points to the correct path (should be /fonts/ChicagoFLF.ttf since it's in public/fonts/).",
+      "passes": true
+    },
+    {
+      "id": "CSS-03",
+      "title": "Sidebar: Restore retro styling to AppSidebar",
+      "description": "Read reference/css/layout.css SIDEBAR section (~lines 50-250). Read app/components/layout/app-sidebar.tsx. Restore: (1) Sidebar background: var(--off-white), dark: var(--surface-1). (2) Right border: bevel pattern (light side on right edge). (3) Logo row at top: .logo-mark styling with the small sphere cluster. (4) Thread list items: font-family var(--mono) for titles, var(--sans) for previews, 11px/10px font sizes. (5) Thread hover state: background rgba(var(--violet-3-rgb), 0.06). (6) Active thread: left 3px border var(--violet-3), background rgba(var(--violet-3-rgb), 0.08). (7) Thread indicators: colored dots for ready (green), waiting (amber), running (violet+pulse), error (red). (8) Timestamp styling: var(--mono), 9px, var(--taupe-3). (9) Workflow thread icon: small gear character. (10) Section headers in sidebar: font-family var(--pixel), text-transform uppercase, letter-spacing, var(--taupe-3) color. (11) Dark mode for all of the above. (12) Brain nav buttons at bottom with icon + label pattern.",
+      "passes": true
+    },
+    {
+      "id": "CSS-04",
+      "title": "Header: Restore retro styling to AppHeader",
+      "description": "Read reference/css/layout.css MAIN HEADER and HEADER ACTIONS sections. Read app/components/layout/app-header.tsx. Restore: (1) Header bar: background var(--off-white), bottom border bevel pattern, height ~44px. (2) Header title: font-family var(--pixel), font-size 12px. (3) Header action buttons (.header-btn pattern): 28x28px, rounded var(--r-md), border 1px solid var(--taupe-2), bevel on hover, icon 16px. (4) Search input: var(--mono) font, bevel-inset border, 10px font size. (5) Logo mark in header: small sphere arrangement. (6) Dark mode: surface-1 background, adjusted borders. (7) Mode tabs (Chat/Workflows/Brain): var(--pixel) font, active state with violet bottom border or background tint.",
+      "passes": false
+    },
+    {
+      "id": "CSS-05",
+      "title": "Header Panels: Task, Calendar, Usage dropdowns",
+      "description": "Read reference/css/layout.css TASK PANEL, CALENDAR PANEL, and USAGE PANEL sections. Read app/components/layout/app-header.tsx (the panel rendering sections). Restore: (1) Task panel: bevel border, var(--mono) font for task items, priority badges (urgent=red, high=amber), checkbox styling. (2) Calendar panel: mini calendar grid with var(--pixel) day headers, event list with colored left borders, month/year header. (3) Usage panel: progress bar with var(--violet-3) fill, stats in var(--mono), credit counts. (4) All panels: consistent max-width, max-height with scroll, bevel border, subtle shadow, arrow/caret pointing to trigger button. (5) Dark mode for all panels.",
+      "passes": false
+    },
+    {
+      "id": "CSS-06",
+      "title": "Profile Menu: Theme, purple slider, accessibility toggles",
+      "description": "Read reference/css/layout.css PROFILE MENU and PROFILE MENU SECTIONS. Read app/components/layout/app-header.tsx (profile menu section). Restore: (1) Profile menu container: bevel border, fixed width ~260px. (2) Menu items: var(--mono) font, 11px, hover background. (3) Theme toggle row: Sun/Moon icons, active state highlight. (4) Purple intensity slider: custom track color var(--violet-3), proper thumb styling. (5) Font size section: 5 size buttons (A, A+, A++, etc.) with active state. (6) Accessibility toggles: switch styling, descriptive labels in var(--sans). (7) Subpanel slide animation (profile-slide-right/left keyframes). (8) Dark mode for entire menu. (9) Divider lines between sections.",
+      "passes": false
+    },
+    {
+      "id": "CSS-07",
+      "title": "Chat Messages: msg-block, user-card, ai-block styling",
+      "description": "Read reference/css/chat.css CHAT VIEW section and MESSAGE HOVER ACTIONS. Read app/components/chat/message-block.tsx. Restore: (1) Message container (.msg-block): padding, margin, border-bottom 1px var(--taupe-1). (2) User messages (.user-card): right-aligned or left with user avatar, name in var(--mono) 10px bold, timestamp in var(--mono) 9px var(--taupe-3). (3) AI messages (.ai-block): left-aligned, model badge (Assistant/Analyst/Expert/Cosimo) with var(--mono), colored dot per model type. (4) Message content: var(--sans) 13px, line-height 1.6, paragraph spacing. (5) Hover actions row: copy, retry, feedback buttons, appear on hover, 24x24 icon buttons. (6) File attachments inline: icon + filename in var(--mono), file type chip (pdf=blue, xlsx=green). (7) Date separators between message groups. (8) Dark mode for all message elements.",
+      "passes": false
+    },
+    {
+      "id": "CSS-08",
+      "title": "Chat Artifacts: beveled containers with dark header bars",
+      "description": "Read reference/css/chat.css sections on artifacts and data tables. Read app/components/chat/artifact.tsx and app/components/chat/data-table.tsx. Restore: (1) Artifact container: bevel border, rounded var(--r-lg), overflow hidden. (2) Artifact header bar (.art-bar): background var(--taupe-5) (very dark), text var(--off-white), padding 6px 10px, var(--mono) 10px font. (3) Artifact title (.art-title): var(--mono) 10px bold, white text. (4) LIVE badge: small green dot + 'LIVE' text in var(--mono) 8px. (5) Artifact body (.art-body): padding 12px, white background, scrollable. (6) Decorative dashed stripe below header (1px dashed var(--taupe-3) with spacing). (7) Data tables (.data-tbl): var(--mono) 10px, header row background var(--taupe-1), borders 1px var(--taupe-2), cell padding 4px 8px, alternating row tint optional. (8) Metadata artifacts: key-value grid with .kv-row pattern. (9) Dark mode: art-bar stays dark (surface-3), body becomes surface-1, table borders adjust.",
+      "passes": false
+    },
+    {
+      "id": "CSS-09",
+      "title": "Chat Workflow Elements: command chips, gate messages, status badges",
+      "description": "Read reference/css/chat.css WORKFLOW CHAT STYLING section. Read app/components/chat/message-block.tsx for where these render. Restore or create: (1) .wf-command-chip: display inline-block, background var(--violet-3), color white, font-family var(--mono), font-size 11px, padding 2px 8px, border-radius var(--r-sm), font-weight 600. (2) .msg-gate: 3px left border var(--amber), background rgba(var(--amber-rgb), 0.05), padding-left extra. (3) Gate status chip: 'Awaiting Review' in amber, same size as model badge, font var(--mono). (4) .wf-run-summary artifact: metadata card showing template name, input count, output path, status. (5) File chips for attachments: type-specific colors (pdf=blue, xlsx=green, folder=taupe). (6) Workflow status chips: running=violet+pulse, completed=green, waiting=amber, failed=red. (7) Dark mode: command chip slightly adjusted alpha, gate background increased to 0.08.",
+      "passes": false
+    },
+    {
+      "id": "CSS-10",
+      "title": "Chat Input: rich input area, model selector, attach menu, autocomplete",
+      "description": "Read reference/css/chat.css sections: MODEL SELECTOR, ATTACH FILE DROPDOWN, WORKFLOW COMMAND AUTOCOMPLETE, FILE UPLOAD PREVIEW STRIP. Read app/components/chat/chat-input.tsx. Restore: (1) Input container: bevel-inset border, rounded var(--r-lg), background var(--white), focus ring var(--violet-3). (2) Textarea: var(--sans) 13px, placeholder in var(--taupe-3). (3) Model selector dropdown: var(--mono) font, current model badge, dropdown with model descriptions, active checkmark. (4) Attach button + dropdown: bevel border, 'Computer' and 'Drive' options with icons. (5) Send button: circular, var(--violet-3) background when active, disabled state muted. (6) File preview strip: horizontal scroll, file chips with X remove button, icon per type. (7) Command autocomplete dropdown: positioned above input, max 5 items visible, 240px max-height, var(--mono) font, active item highlight var(--violet-1). (8) Disabled state during streaming: reduced opacity, cursor not-allowed. (9) Dark mode for all input elements.",
+      "passes": false
+    },
+    {
+      "id": "CSS-11",
+      "title": "File Panel: spreadsheet view and folder view",
+      "description": "Read reference/css/chat.css RIGHT FILE PANEL and FOLDER VIEW sections. Read app/components/chat/file-panel.tsx. Restore: (1) Panel container: right-side, bevel left border, background var(--off-white). (2) Panel header: var(--pixel) font title, close X button, tab bar (Spreadsheet/Folder). (3) Tab buttons: var(--mono) 10px, active state underline or background. (4) Spreadsheet view: formula bar with var(--mono) input, grid with var(--mono) 10px cells, column headers (A,B,C...) with var(--taupe-1) background, row numbers, selected cell highlight var(--violet-1). (5) Folder view: file tree with indent levels, folder/file icons, file type badges, size in var(--mono) 9px. (6) Resize handle: left edge, cursor col-resize, subtle dashed indicator. (7) Dark mode: surface-1 background, adjusted grid colors.",
+      "passes": false
+    },
+    {
+      "id": "CSS-12",
+      "title": "Workflow Context Panel: run status with compact flow graph",
+      "description": "Read reference/css/chat.css WORKFLOW CONTEXT PANEL section. Read app/components/chat/workflow-panel.tsx. Restore: (1) Panel container: right-side (like file panel), bevel left border. (2) Panel header: template name in var(--pixel), run ID badge, close button. (3) Compact flow graph: smaller nodes (100x36px), same color scheme as full graph but scaled down. (4) Node status overlays: colored circles per status (completed=green, running=violet+pulse, waiting=amber, pending=muted, failed=red, skipped=strikethrough). (5) Step list below graph: node names with status dots, exception indicators. (6) Exception section: amber-tinted cards with description text. (7) Output section: file name, path, size in var(--mono). (8) Dark mode.",
+      "passes": false
+    },
+    {
+      "id": "CSS-13",
+      "title": "Erabor Streaming: thinking animation, reasoning blocks, streaming text",
+      "description": "Read reference/css/chat.css COSIMO THINKING ANIMATION, ERABOR RESPONSE SECTIONS, and STREAMING TEXT EFFECT sections. Read reference/css/components.css COSIMO THINKING / REASONING sections. Read app/components/chat/message-stream.tsx. Restore: (1) Thinking animation: three dots bouncing (typing-bounce keyframe), var(--violet-3) colored dots. (2) Reasoning train of thought: collapsible block with var(--taupe-1) background, left border var(--violet-2), var(--mono) 10px content, fade-in animation. (3) Erabor sections: bordered blocks with section headers in var(--pixel), key-value rows in var(--mono). (4) Flagged items: amber left border, amber tint background. (5) Streaming text effect: typewriter cursor (blink-cursor keyframe), text appearing progressively. (6) Stop button during streaming. (7) Gate accessibility: [data-a11y-motion='reduce'] disables all animations. (8) Dark mode for thinking dots, reasoning blocks, sections.",
+      "passes": false
+    },
+    {
+      "id": "CSS-14",
+      "title": "Verification Checkpoint: Chat view visual audit",
+      "description": "This is a CODE AUDIT task. Read reference/css/chat.css and reference/css/layout.css. Read ALL chat components (message-block.tsx, artifact.tsx, data-table.tsx, chat-input.tsx, file-panel.tsx, workflow-panel.tsx, message-stream.tsx) and layout components (app-sidebar.tsx, app-header.tsx). For each component, compare its className strings against the reference CSS. Check: (1) Bevel borders: search for 'bevel' class on artifacts, panels, input containers. (2) Font tokens: search for var(--pixel), var(--mono), var(--sans) — ensure headings use pixel, data uses mono, body uses sans. (3) Color tokens: grep for any raw hex colors or Tailwind color classes (bg-blue-500, text-green-600 etc.) — replace with var(--token) pattern. (4) Dark mode: every bg-[var(--X)] should have a corresponding dark:bg-[var(--Y)]. (5) Hover/focus states on buttons and interactive elements. (6) Gate message: check for amber left border + tinted background. (7) Command chip: check for violet background. Fix ALL issues found. Document every fix in progress.txt.",
+      "passes": false
+    },
+    {
+      "id": "CSS-15",
+      "title": "Workflow Library: card grid with retro styling",
+      "description": "Read reference/css/workflows.css WORKFLOWS VIEW section. Read app/components/workflows/workflow-card.tsx and app/components/workflows/workflow-stats.tsx. Restore: (1) Library header: var(--pixel) title, stats bar below. (2) Stats bar: template count, active count, total runs — var(--mono) 10px. (3) Card grid: responsive columns, gap spacing. (4) Workflow cards: bevel border, rounded var(--r-lg), hover shadow lift. (5) Card header: status badge (active=green, draft=amber, paused=taupe, archived=muted), title in var(--pixel) 13px. (6) Card body: description in var(--sans) 11px, trigger chip (icon + type), lesson chip. (7) Card footer: run count, success rate, 'Run' button with bevel. (8) Run dots: colored status indicators in footer. (9) Dark mode: surface-1 card background, adjusted borders.",
+      "passes": false
+    },
+    {
+      "id": "CSS-16",
+      "title": "Workflow Template Detail: two-column layout with tabs",
+      "description": "Read reference/css/workflows.css WORKFLOW DETAIL VIEW section. Read app/components/workflows/template-detail.tsx. Restore: (1) Two-column layout: left = flow graph (60%), right = info tabs (40%). (2) Graph column: var(--off-white) background, bevel border, overflow hidden. (3) Info column: tab bar at top with var(--pixel) tab labels. (4) Tab bar: bottom border, active tab has var(--violet-3) bottom border 2px, inactive var(--taupe-3). (5) Tab panel content area: scrollable, padded. (6) Detail metadata row above tabs: template name var(--pixel), status badge, version badge, trigger chip, created-by in var(--mono). (7) Action buttons: 'Edit with Cosimo' button, 'Run' button — bevel borders. (8) Dark mode.",
+      "passes": false
+    },
+    {
+      "id": "CSS-17",
+      "title": "Workflow Detail Tabs: Overview, Schema, Triggers, Runs, Lessons",
+      "description": "Read reference/css/workflows.css tab sections and reference/css/components.css SCHEMA TAB, TRIGGERS TAB, LESSONS TAB sections. Read all tab components: overview-tab.tsx, schema-tab.tsx, triggers-tab.tsx, runs-tab.tsx, lessons-tab.tsx. Restore: (1) Overview tab: .overview-grid with key-value rows, section headers in var(--pixel), values in var(--mono). (2) Schema tab: input/output schema display, field list with type badges (string=taupe, number=blue, date=berry, currency=green, enum=violet, boolean=amber), required indicator. (3) Triggers tab: trigger type display with icon, config values in var(--mono), folder path in code style. (4) Runs tab: table of recent runs, status dot + label, duration in var(--mono), 'View Thread' link in var(--violet-3). (5) Lessons tab: linked lesson cards with scope badge (team=violet, personal=blue), link to full lesson. (6) Dark mode for all tabs.",
+      "passes": false
+    },
+    {
+      "id": "CSS-18",
+      "title": "Flow Graph SVG: nodes, edges, and interaction states",
+      "description": "Read reference/css/components.css FLOW GRAPH SVG section (~250 lines). Read app/components/workflows/flow-graph.tsx, flow-node.tsx, flow-edge.tsx. This is CRITICAL — the flow graph currently hard-codes colors as hex in JavaScript. Fix: (1) Move ALL node colors to CSS classes or CSS custom properties. Create classes: .flow-node-input, .flow-node-action, .flow-node-gate, .flow-node-branch, .flow-node-output — each with correct stroke and fill from the color table in CLAUDE.md. (2) Node rect: rounded corners (rx=6 matching var(--r-lg)), 160x60 full / 100x36 compact. (3) Node title: var(--mono) 11px font-weight 600. (4) Node description: var(--sans) 10px var(--taupe-3). (5) Gate nodes: dashed stroke (stroke-dasharray='6 3'). (6) Edges: 1.5px stroke var(--taupe-3), small arrowhead marker. (7) Edge labels on branches: var(--mono) 9px, background pill. (8) Selected node: 2px stroke, slight glow/shadow. (9) Lesson indicator dot on nodes: small violet circle. (10) Run status overlays for compact graph: colored status circles. (11) Pulse animation for running nodes (wf-pulse-node keyframe). (12) Dark mode for all graph elements. (13) Remove ALL hard-coded hex colors from flow-node.tsx and flow-edge.tsx.",
+      "passes": false
+    },
+    {
+      "id": "CSS-19",
+      "title": "Node Popover: detail panel on node click",
+      "description": "Read reference/css/components.css NODE POPOVER section. Read app/components/workflows/node-popover.tsx. Restore: (1) Popover container: bevel border, background var(--white), shadow, rounded var(--r-lg), max-width 280px. (2) Node type badge: colored per type (same scheme as nodes), var(--mono) 9px uppercase. (3) Title: var(--pixel) 12px. (4) Description: var(--sans) 11px. (5) Linked lesson row: lesson icon + title, clickable link in var(--violet-3). (6) 'Edit with Cosimo' button: var(--violet-3) background, white text, bevel, full width. (7) Close button: top-right, subtle. (8) Dark mode: surface-2 background.",
+      "passes": false
+    },
+    {
+      "id": "CSS-20",
+      "title": "Verification Checkpoint: Workflows view visual audit",
+      "description": "CODE AUDIT task. Read reference/css/workflows.css and reference/css/components.css flow graph sections. Read ALL workflow components: workflow-card.tsx, workflow-stats.tsx, template-detail.tsx, flow-graph.tsx, flow-node.tsx, flow-edge.tsx, node-popover.tsx, overview-tab.tsx, schema-tab.tsx, triggers-tab.tsx, runs-tab.tsx, lessons-tab.tsx. For each, compare className strings against reference CSS. Check: (1) 'bevel' class on cards, popover, graph container. (2) Font tokens: pixel for titles/tab labels, mono for metadata/values. (3) No raw hex or Tailwind color classes — all var(--token). (4) Status badges: active=green, draft=amber, paused=taupe. (5) Flow node colors defined via CSS classes or vars, NOT hard-coded hex in JS. (6) Gate nodes: dashed stroke attribute present. (7) dark: variants on all styled elements. Fix ALL issues found. Document every fix in progress.txt.",
+      "passes": false
+    },
+    {
+      "id": "CSS-21",
+      "title": "Cosimo Panel: slide-in assistant with retro chat styling",
+      "description": "Read reference/css/components.css COSIMO CHAT PANEL section (~170 lines). Read app/components/layout/cosimo-panel.tsx. Restore: (1) Panel: slides in from right, fixed position, width ~380px, full height, background var(--off-white), bevel left border, shadow. (2) Header: var(--pixel) title 'Cosimo', context subtitle (template/node/lesson name), close X button, bottom border. (3) Chat area: scrollable, padded. (4) Cosimo messages: left-aligned, var(--sans) 12px, light background. (5) User messages: right-aligned, var(--violet-1) background tint. (6) Input area: bottom-fixed, bevel-inset border, var(--sans) placeholder, send button. (7) Thinking state: typing-bounce animation dots. (8) Panel enter/exit animation (slide from right). (9) Backdrop/overlay behind panel (subtle dark tint). (10) Dark mode: surface-1 background. (11) Gate by [data-a11y-motion='reduce'] for slide animation.",
+      "passes": false
+    },
+    {
+      "id": "CSS-22",
+      "title": "Brain Memory: fact list, trait badges, add/edit UI",
+      "description": "Read reference/css/components.css BRAIN — MEMORY SECTION. Read app/components/brain/memory-list.tsx, memory-fact.tsx, trait-badges.tsx. Restore: (1) Memory section header: var(--pixel) title, role profile text in var(--sans) italic. (2) Trait badges: pill-shaped, var(--mono) 10px, active=var(--violet-1) background + var(--violet-3) border, inactive=var(--taupe-1) border dashed. (3) Filter bar: search input bevel-inset, category filter chips. (4) Category chips: active has colored left border per category type. (5) Fact entries: left border 3px colored by category (preference=violet, workflow=blue, contact=berry, fund=green, style=amber, context=taupe), var(--sans) 12px content. (6) Fact hover: show edit/delete action buttons. (7) Linked entities on facts: small pill badges with entity type icon. (8) Add fact form: expandable, bevel border, input fields. (9) Edit mode: inline editing with save/cancel. (10) Dark mode.",
+      "passes": false
+    },
+    {
+      "id": "CSS-23",
+      "title": "Brain Lessons: card list, detail view, edit mode",
+      "description": "Read reference/css/components.css BRAIN — LESSONS SECTION. Read app/components/brain/lesson-card.tsx, lesson-detail.tsx. Restore: (1) Lesson list: filter bar with search + scope toggle (All/Team/Personal). (2) Lesson cards: bevel border, hover lift, title in var(--pixel) 12px, scope badge (team=violet pill, personal=blue pill) in var(--mono) 9px. (3) Card meta: last updated date in var(--mono) 9px var(--taupe-3), linked workflow count. (4) Lesson detail: slide-in or expanded view, title var(--pixel), scope badge, content rendered as rich text in var(--sans). (5) Edit mode: toggle button, textarea for content editing, save/cancel buttons with bevel. (6) 'Edit with Cosimo' link in var(--violet-3). (7) Delete button: var(--red) text, confirmation dialog. (8) Dark mode.",
+      "passes": false
+    },
+    {
+      "id": "CSS-24",
+      "title": "Brain Knowledge Graph: entity nodes, edges, detail panel",
+      "description": "Read reference/css/components.css BRAIN — DATA GRAPHS section. Read app/components/brain/entity-graph.tsx, entity-detail.tsx. Restore: (1) Graph container: bevel border, background var(--off-white), cursor grab/grabbing. (2) Entity nodes: circles or rounded rects, colored by category (funds=violet, contacts=berry, documents=blue, workflows=green, systems=amber, entities=taupe). (3) Node labels: var(--mono) 10px, centered below node. (4) Edges: 1px stroke var(--taupe-2), slightly curved. (5) Edge labels: var(--mono) 8px, background pill. (6) Selected entity: enlarged, glow ring. (7) Hover tooltip: entity name + type. (8) Breadcrumb trail: shows navigation path, clickable. (9) Entity detail card: bevel border, name var(--pixel), type badge, relationships list, linked workflows. (10) Zoom controls: +/- buttons with bevel. (11) Dark mode: surface-1 background, node colors slightly more vivid.",
+      "passes": false
+    },
+    {
+      "id": "CSS-25",
+      "title": "Brain Nav: sidebar section with retro buttons",
+      "description": "Read reference/css/components.css BRAIN NAV and BRAIN VIEW sections. Read app/components/layout/app-sidebar.tsx (brain nav section) and app/routes/_app.brain.tsx. Restore: (1) Brain nav in sidebar bottom: three buttons (Memory, Lessons, Graphs) with icons. (2) Button style: var(--mono) 10px, icon 16px, vertical stack or horizontal, bevel border on hover. (3) Active button: var(--violet-1) background, var(--violet-3) left border or bottom border. (4) Brain view header: tab bar matching sidebar selection, var(--pixel) labels. (5) Brain section transitions: smooth content swap. (6) Dark mode.",
+      "passes": false
+    },
+    {
+      "id": "CSS-26",
+      "title": "Verification Checkpoint: Brain view visual audit",
+      "description": "CODE AUDIT task. Read reference/css/components.css brain sections. Read ALL brain components: memory-list.tsx, memory-fact.tsx, trait-badges.tsx, lesson-card.tsx, lesson-detail.tsx, entity-graph.tsx, entity-detail.tsx. For each, compare className strings against reference CSS. Check: (1) Memory facts: left border 3px with category-specific color var. (2) Trait badges: pill shape, mono font, active/inactive styling. (3) Lesson cards: bevel class, pixel font title, scope badge colors. (4) Graph nodes: category colors via CSS vars not hex. (5) Entity detail: bevel border, pixel font name. (6) dark: variants on all styled elements. (7) No raw hex or Tailwind color classes. Fix ALL issues found. Document every fix in progress.txt.",
+      "passes": false
+    },
+    {
+      "id": "CSS-27",
+      "title": "Login Page: SSO page with 6-sphere logo",
+      "description": "Read reference/login.html for structure. Read reference/css/layout.css and reference/css/tokens.css for any login-specific styles. Read app/routes/login.tsx and app/routes/login.module.css. Verify: (1) The 6-sphere inverted triangle logo (.hero-spheres) renders correctly with dark and light spheres. (2) Background is correct (var(--off-white) or gradient). (3) SSO button has retro bevel styling. (4) Typography is correct (var(--pixel) for heading, var(--sans) for subtitle). (5) Dark mode works for the entire login page. (6) Sphere animation (if any) respects reduced motion. Fix any discrepancies with the original login.html.",
+      "passes": false
+    },
+    {
+      "id": "CSS-28",
+      "title": "Accessibility: icon labels mode, contrast, motion, dyslexia",
+      "description": "Read reference/css/utilities.css ICON LABELS A11Y MODE section. Read reference/css/tokens.css HIGH CONTRAST OVERRIDES. Read app/a11y.css and relevant components. Restore: (1) Icon labels mode ([data-a11y-labels='show']): all icon-only buttons show a text label adjacent to the icon. Add .a11y-label class that is hidden by default, shown when attribute is active. Apply to all header buttons, sidebar actions, panel close buttons. (2) High contrast mode: verify all [data-a11y-contrast='high'] overrides from tokens.css are ported. (3) Reduced motion: verify ALL keyframe animations are gated with [data-a11y-motion='reduce'] or @media (prefers-reduced-motion). (4) Dyslexia font: verify font swap works (OpenDyslexic or similar). (5) Font size cycling: verify the 5 zoom levels apply correctly via CSS custom property or body font-size. (6) Verify the theme store correctly sets all data attributes on the html element.",
+      "passes": false
+    },
+    {
+      "id": "CSS-29",
+      "title": "Toast Notifications: success, error, info styling",
+      "description": "Read reference/css/chat.css TOAST NOTIFICATIONS section. The app uses sonner for toasts. Restore retro styling: (1) Toast container positioning: bottom-right, stacked. (2) Toast base: bevel border, rounded var(--r-lg), var(--mono) 11px font, padding. (3) Success toast: left border 3px var(--green), green icon. (4) Error toast: left border 3px var(--red), red icon. (5) Info toast: left border 3px var(--blue-3), blue icon. (6) Toast animation: slide in from right, fade out. Gate with reduced motion. (7) Dark mode: surface-2 background. Apply custom styling to sonner's Toaster component via className props or CSS overrides targeting sonner's class names.",
+      "passes": false
+    },
+    {
+      "id": "CSS-30",
+      "title": "Dropdown Menus: retro-styled select/context menus",
+      "description": "Read reference/css/utilities.css DROPDOWN MENU section. The app uses shadcn DropdownMenu. Apply retro styling globally: (1) Dropdown content: bevel border, background var(--white), rounded var(--r-md), shadow, var(--mono) 10px font. (2) Dropdown items: padding 6px 10px, hover background var(--violet-1). (3) Dropdown separators: 1px var(--taupe-1). (4) Active/selected item: var(--violet-3) text or left dot. (5) Dropdown icons: 14px, var(--taupe-3). (6) Apply to ALL shadcn DropdownMenu instances via CSS targeting [data-radix-dropdown-menu-content] or similar. (7) Also apply to PopoverContent with same pattern. (8) Dark mode: surface-2 background, adjusted borders.",
+      "passes": false
+    },
+    {
+      "id": "CSS-31",
+      "title": "Sidebar Collapse States: narrow, collapsed, toggle button",
+      "description": "Read reference/css/layout.css SIDEBAR section, specifically the .sidebar.collapsed and .sidebar.narrow rules (~lines 77-157, 161-204). Read app/components/layout/app-sidebar.tsx. Restore: (1) Sidebar width transition: smooth animation from 264px to 48px (collapsed) with CSS transition on width. (2) Collapsed state: hide text labels, show only icons centered, hide brain nav text, hide thread previews/timestamps — only show thread title truncated or icons. (3) Narrow state (between collapsed and full): intermediate width ~110px, show abbreviated content. (4) Sidebar toggle button: 22x22px, bevel border on hover, violet-3 hover background, positioned at top-right of sidebar. (5) Brain nav collapse: hide labels when sidebar collapsed, show only icons. (6) Logo collapse: show only small mark when collapsed, full logo when expanded. (7) Transitions gated by [data-a11y-motion='reduce']. (8) Dark mode for all states.",
+      "passes": false
+    },
+    {
+      "id": "CSS-32",
+      "title": "Resize Handles: sidebar, file panel, workflow panel",
+      "description": "Read reference/css/layout.css RESIZE HANDLES section. Read app/hooks/use-resize-panel.ts and components that use it (app-sidebar.tsx, file-panel.tsx, workflow-panel.tsx). Restore: (1) Sidebar resize handle: right edge, 4px wide, cursor col-resize, subtle dashed center indicator (3 short dashes stacked vertically), hover highlights with var(--taupe-2) background. (2) File panel resize handle: left edge, same pattern. (3) Workflow panel resize handle: left edge, same pattern. (4) Active/dragging state: var(--violet-3) indicator color. (5) Handle visual indicator: small grip dots or dashes centered vertically. (6) Dark mode: adjusted handle colors.",
+      "passes": false
+    },
+    {
+      "id": "CSS-33",
+      "title": "Empty Thread State and Drop Zone",
+      "description": "Read reference/css/chat.css EMPTY THREAD section (~lines 181-237) and DROP ZONE section (~lines 311-330). Read app/components/chat/ for empty state and drop zone rendering. Restore: (1) Empty thread: centered content, large icon (var(--taupe-2)), title in var(--pixel), subtitle in var(--sans) var(--taupe-3), suggestion chips below. (2) Suggestion chips: bevel border, var(--mono) 10px, hover state with violet-1 background. (3) Drop zone active state (.input-area.drop-active): dashed 2px violet-3 border, semi-transparent violet background rgba(var(--violet-3-rgb), 0.05), centered 'Drop files here' text overlay via ::after pseudo-element. (4) Dark mode for both.",
+      "passes": false
+    },
+    {
+      "id": "CSS-34",
+      "title": "Code Blocks, Flag Boxes, Summary Bars in Chat",
+      "description": "Read reference/css/chat.css CODE BLOCK WITH COPY section (~lines 269-286), and the flag-box/summary-bar sections (~lines 522-601). Read app/components/chat/message-block.tsx and artifact.tsx. Restore: (1) Code blocks: dark background var(--taupe-5), mono font, rounded var(--r-md), header bar with language label and COPY button, copy button hover state. (2) Flag boxes (.flag-box): left border 3px, .safe=green border + green tint, .warn=amber border + amber tint. (3) Flag labels and details: mono font for labels, sans for details. (4) Summary bars: horizontal row of stat items with vertical taupe-2 dividers, label in mono 9px uppercase, value in mono 12px bold. (5) Status chips (.status-safe, .status-warn): colored pill badges. (6) Dark mode for all.",
+      "passes": false
+    },
+    {
+      "id": "CSS-35",
+      "title": "Cosimo Error State and Reasoning/Thinking Display",
+      "description": "Read reference/css/components.css COSIMO ERROR STATE section (~lines 2192-2296) and COSIMO REASONING section (~lines 2055-2183). Read app/components/chat/message-stream.tsx and any error display components. Restore: (1) Error card (.cosimo-error): red-tinted background rgba(var(--cosimo-error-rgb), 0.06), bevel border, rounded var(--r-lg). (2) Error icon: red circle with exclamation. (3) Error title: var(--pixel) 12px, var(--red). (4) Error detail: var(--sans) 11px. (5) Retry button: bevel, var(--mono), spin animation on .retrying state (spin-retry keyframe). (6) Reasoning section (.cosimo-reasoning): collapsible, var(--taupe-1) background, left border 2px var(--violet-2). (7) Thinking cube wave: 3 cubes with staggered cube-wave keyframe animation. (8) Reasoning steps: list with visibility/opacity transitions. (9) You pulse animation (youPulse keyframe) on user indicator. (10) All animations gated by [data-a11y-motion='reduce']. (11) Dark mode.",
+      "passes": false
+    },
+    {
+      "id": "CSS-36",
+      "title": "Panel Overlay Backdrop and Input Area Gradient Border",
+      "description": "Read reference/css/components.css PANEL OVERLAY section (~lines 2601-2617). Read reference/css/chat.css input-area gradient (~lines 1625-1632). Restore: (1) Panel overlay (.panel-overlay): fixed position, full screen, background rgba(0,0,0,0.2), z-index above main content but below panel, opacity 0 by default, .show state opacity 1 with transition. (2) Apply overlay behind Cosimo panel when open. (3) Input area top border: border-image with linear-gradient across var(--violet-3), var(--berry-2), var(--taupe-2) — creates a subtle decorative gradient line above the chat input. (4) Dark mode: overlay slightly more opaque (0.3), gradient colors adjusted for dark mode. (5) Overlay transition gated by [data-a11y-motion='reduce'].",
+      "passes": false
+    },
+    {
+      "id": "CSS-37",
+      "title": "Missing Keyframes Audit: add all remaining animations to app.css",
+      "description": "Read ALL reference CSS files and catalog every @keyframes animation. Read app/app.css and check which are already present. The following should already exist: wf-pulse, thinking-cube, reasoning-pulse, stream-cursor-blink. Add ALL that are missing. The full list from the original: (1) blink-cursor — chat.css (2) wf-pulse-node — components.css (3) pulse-step — components.css (4) typing-bounce — components.css (5) youPulse — components.css (6) cube-wave — components.css (7) reason-pulse — components.css (8) spin-retry — components.css (9) pulse-step-dark — components.css (10) profile-slide-right — layout.css (11) profile-slide-left — layout.css. For each missing one, copy the keyframe definition from the reference CSS, add a corresponding .animate-X utility class, and ensure [data-a11y-motion='reduce'] disables it in a11y.css. Do NOT duplicate any that already exist.",
+      "passes": false
+    },
+    {
+      "id": "CSS-38",
+      "title": "Final Code Audit: full app walkthrough",
+      "description": "Final CODE AUDIT pass. Read ALL reference CSS files. Read EVERY component TSX file in app/components/ and app/routes/. For each one, systematically check: (1) grep for raw hex colors (#xxx) in className — replace all with var(--token). (2) grep for Tailwind color classes (bg-blue, text-green, border-gray etc.) — replace with var(--token) pattern. (3) Verify 'bevel' or 'bevel-inset' class on cards, panels, containers, buttons, inputs, dropdowns, artifacts. (4) Verify font tokens: headings/labels use var(--pixel), data/metadata use var(--mono), body text uses var(--sans). (5) Verify every bg-[var(--X)] has a dark: variant. (6) Check app.css has all needed custom classes and keyframes — compare against reference CSS @keyframes count. (7) Check a11y.css gates ALL animations with [data-a11y-motion='reduce']. (8) Verify :focus-visible styles on all interactive elements (buttons, links, inputs). Fix ANY remaining issues. Run npx tsc --noEmit to confirm no type errors. This story should only be marked as passed when all code checks are clean.",
+      "passes": false
+    }
+  ]
+}
