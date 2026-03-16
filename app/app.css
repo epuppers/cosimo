@@ -7236,13 +7236,49 @@
   animation: none;
 }
 
-/* Sheet overlay — retro tint */
-.cosimo-panel-sheet ~ [data-slot="sheet-overlay"],
-[data-slot="sheet-content"].cosimo-panel-sheet + [data-slot="sheet-overlay"] {
-  /* handled by shadcn defaults, just ensure dark mode is slightly more opaque */
+/* ======== Panel Overlay ======== */
+.panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(var(--black-rgb), 0.2);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.panel-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.dark .panel-overlay {
+  background: rgba(var(--black-rgb), 0.4);
+}
+
+[data-a11y-motion="reduce"] .panel-overlay {
+  transition: none;
+}
+
+/* Sheet overlay — retro tint matching panel-overlay style */
+[data-slot="sheet-overlay"] {
+  background: rgba(var(--black-rgb), 0.2) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.dark [data-slot="sheet-overlay"] {
+  background: rgba(var(--black-rgb), 0.4) !important;
 }
 
 /* Panel slide animation — gate by reduced motion */
 [data-a11y-motion="reduce"] [data-slot="sheet-content"] {
+  transition: none !important;
+}
+
+[data-a11y-motion="reduce"] [data-slot="sheet-overlay"] {
   transition: none !important;
 }
