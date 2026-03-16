@@ -4005,6 +4005,10 @@
   border-left-color: var(--surface-0);
 }
 
+.file-panel.dragging {
+  min-width: 300px;
+}
+
 /* ---- Header ---- */
 .file-panel-header {
   display: flex;
@@ -4413,6 +4417,61 @@
 .resize-handle:hover::after,
 .resize-handle.dragging::after {
   opacity: 1;
+}
+
+.resize-handle.dragging::after {
+  background: repeating-linear-gradient(
+    180deg,
+    var(--violet-3) 0px,
+    var(--violet-3) 2px,
+    transparent 2px,
+    transparent 5px
+  );
+}
+
+.resize-handle-sidebar {
+  margin-left: -3px;
+  margin-right: -2px;
+}
+
+.resize-handle-filepanel {
+  display: none;
+}
+
+.resize-handle-filepanel.visible {
+  display: block;
+}
+
+.resize-handle-wfpanel {
+  display: none;
+}
+
+.resize-handle-wfpanel.visible {
+  display: block;
+}
+
+.dark .resize-handle::after {
+  background: repeating-linear-gradient(
+    180deg,
+    var(--taupe-3) 0px,
+    var(--taupe-3) 2px,
+    transparent 2px,
+    transparent 5px
+  );
+}
+
+.dark .resize-handle.dragging::after {
+  background: repeating-linear-gradient(
+    180deg,
+    var(--violet-3) 0px,
+    var(--violet-3) 2px,
+    transparent 2px,
+    transparent 5px
+  );
+}
+
+[data-a11y-motion="reduce"] .resize-handle::after {
+  transition: none;
 }
 
 /* ============================================

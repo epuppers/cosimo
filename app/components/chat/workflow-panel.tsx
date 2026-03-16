@@ -48,7 +48,7 @@ export function WorkflowPanel({ run }: WorkflowPanelProps) {
     <>
       {/* Resize handle */}
       <div
-        className={cn('resize-handle', isDragging && 'dragging')}
+        className={cn('resize-handle resize-handle-wfpanel visible', isDragging && 'dragging')}
         onMouseDown={handleMouseDown}
       />
 

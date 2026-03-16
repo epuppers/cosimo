@@ -54,12 +54,12 @@ export function FilePanel() {
     <>
       {/* Resize handle */}
       <div
-        className={cn('resize-handle', isDragging && 'dragging')}
+        className={cn('resize-handle resize-handle-filepanel visible', isDragging && 'dragging')}
         onMouseDown={handleMouseDown}
       />
 
       <div
-        className={cn('file-panel h-full', isDragging && 'select-none')}
+        className={cn('file-panel h-full', isDragging && 'dragging select-none')}
         style={{ width: currentWidth }}
         aria-label="File panel"
       >
