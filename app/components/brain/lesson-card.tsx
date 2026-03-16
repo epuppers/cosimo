@@ -45,7 +45,7 @@ export function LessonCard({ lesson, onSelect }: LessonCardProps) {
           {lesson.scope === 'user' ? 'Personal' : 'Company'}
         </span>
         {workflowCount > 0 && (
-          <span className="flex items-center gap-1 font-[family-name:var(--mono)] text-[10px] text-[var(--taupe-2)]">
+          <span className="flex items-center gap-1 font-[family-name:var(--mono)] text-[10px] text-[var(--taupe-2)] dark:text-[var(--taupe-3)]">
             <Workflow className="size-3" />
             {workflowCount} workflow{workflowCount !== 1 ? 's' : ''}
           </span>
@@ -53,7 +53,7 @@ export function LessonCard({ lesson, onSelect }: LessonCardProps) {
       </div>
 
       {/* Title */}
-      <h4 className="font-[family-name:var(--mono)] text-[13px] font-bold text-[var(--taupe-5)] dark:text-[var(--taupe-1)] mb-1 tracking-[0.01em]">
+      <h4 className="font-[family-name:var(--mono)] text-[13px] font-bold text-[var(--taupe-5)] mb-1 tracking-[0.01em]">
         {lesson.title}
       </h4>
 
@@ -64,13 +64,13 @@ export function LessonCard({ lesson, onSelect }: LessonCardProps) {
 
       {/* Meta: date + author */}
       <div className="flex items-center gap-2">
-        <span className="font-[family-name:var(--mono)] text-[10px] text-[var(--taupe-2)]">
+        <span className="font-[family-name:var(--mono)] text-[10px] text-[var(--taupe-2)] dark:text-[var(--taupe-3)]">
           Updated {lesson.updated}
         </span>
         {lesson.author && (
           <>
-            <span className="text-[10px] text-[var(--taupe-2)]">·</span>
-            <span className="font-[family-name:var(--mono)] text-[10px] text-[var(--taupe-2)]">
+            <span className="text-[10px] text-[var(--taupe-2)] dark:text-[var(--taupe-3)]">·</span>
+            <span className="font-[family-name:var(--mono)] text-[10px] text-[var(--taupe-2)] dark:text-[var(--taupe-3)]">
               {lesson.author}
             </span>
           </>

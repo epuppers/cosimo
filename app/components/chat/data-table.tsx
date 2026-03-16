@@ -29,7 +29,7 @@ export function DataTable({ columns, rows, className }: DataTableProps) {
           {rows.map((row, rowIdx) => (
             <tr key={rowIdx}>
               {row.map((cell, cellIdx) => (
-                <td key={cellIdx}>{cell}</td>
+                <td key={cellIdx} dangerouslySetInnerHTML={{ __html: cell }} />
               ))}
             </tr>
           ))}

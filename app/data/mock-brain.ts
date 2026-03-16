@@ -41,6 +41,62 @@ export const MOCK_LESSONS: Record<string, Lesson> = {
     lastUsed: '2d ago',
     preview: 'All rent rolls must follow the standardized column layout: Unit, Tenant, Lease Start, Lease End, Monthly Rent, Status. Column headers use title case...',
     linkedWorkflows: ['rent-roll'],
+    sections: [
+      {
+        heading: 'Overview',
+        type: 'text',
+        body: 'All rent rolls processed by Cosimo must follow the firm\'s standardized format. This ensures consistency across properties, funds, and reporting periods. Deviations should be flagged for manual review.',
+      },
+      {
+        heading: 'Required Column Layout',
+        type: 'table',
+        columns: ['Column', 'Header Name', 'Format', 'Required'],
+        rows: [
+          ['A', 'Unit Number', 'Text (e.g., "101A")', 'Yes'],
+          ['B', 'Tenant Name', 'Text, Title Case', 'Yes'],
+          ['C', 'Lease Start', 'YYYY-MM-DD', 'Yes'],
+          ['D', 'Lease End', 'YYYY-MM-DD', 'Yes'],
+          ['E', 'Monthly Rent', 'USD, no decimals', 'Yes'],
+          ['F', 'Security Deposit', 'USD, no decimals', 'No'],
+          ['G', 'Status', 'Current / Vacant / Notice', 'Yes'],
+          ['H', 'Sq Footage', 'Integer', 'No'],
+        ],
+      },
+      {
+        heading: 'Status Color Coding',
+        type: 'colors',
+        swatches: [
+          { label: 'Current', value: '#3D8B40', color: '#3D8B40' },
+          { label: 'Notice', value: '#B8862B', color: '#B8862B' },
+          { label: 'Vacant', value: '#C04848', color: '#C04848' },
+          { label: 'Renewal Pending', value: '#749CB5', color: '#749CB5' },
+        ],
+      },
+      {
+        heading: 'Validation Rules',
+        type: 'list',
+        listStyle: 'ordered',
+        items: [
+          'No blank rows between data entries',
+          'Lease End must be after Lease Start',
+          'Monthly Rent must be > 0 for Current status',
+          'Vacant units should have Tenant Name set to "VACANT"',
+          'Unit Numbers must be unique within a property',
+          'Dates older than 10 years should be flagged for review',
+        ],
+      },
+      {
+        heading: 'Formatting Notes',
+        type: 'list',
+        listStyle: 'unordered',
+        items: [
+          'Header row: IBM Plex Mono 11px Bold, background #E8E6EC',
+          'Data rows: IBM Plex Mono 11px Regular, alternating #FFFFFF / #F8F6FA',
+          'Totals row: Bold, top border 2px solid #2D2D2E',
+          'Currency: Right-aligned, USD format with commas, no decimals',
+        ],
+      },
+    ],
   },
   'k1-extraction': {
     id: 'k1-extraction',
@@ -52,6 +108,49 @@ export const MOCK_LESSONS: Record<string, Lesson> = {
     lastUsed: '5d ago',
     preview: 'When extracting K-1 data, always pull: Partner name, TIN (last 4 only), ordinary income (Box 1), rental income (Box 2), guaranteed payments (Box 4c)...',
     linkedWorkflows: ['k1-extract'],
+    sections: [
+      {
+        heading: 'Overview',
+        type: 'text',
+        body: 'When extracting K-1 data, always pull the core fields listed below. Cosimo should verify TIN formatting and cross-reference partner names against the fund\'s investor registry.',
+      },
+      {
+        heading: 'Required Extraction Fields',
+        type: 'table',
+        columns: ['Box', 'Field', 'Format', 'Notes'],
+        rows: [
+          ['—', 'Partner Name', 'Text, Title Case', 'Cross-ref investor registry'],
+          ['—', 'TIN', 'Last 4 digits only', 'Never store full TIN'],
+          ['1', 'Ordinary Income', 'USD', 'May be negative'],
+          ['2', 'Rental Income', 'USD', 'Net rental real estate income'],
+          ['4c', 'Guaranteed Payments', 'USD', 'Only if applicable'],
+          ['11', 'Section 179 Deduction', 'USD', 'Pass through to partner'],
+          ['14', 'Self-Employment', 'Code + Amount', 'Check code A vs. C'],
+        ],
+      },
+      {
+        heading: 'Multi-State Rules',
+        type: 'list',
+        listStyle: 'ordered',
+        items: [
+          'Check Box 15 for state-level allocations',
+          'If multiple states, create separate line items per state',
+          'Apply state apportionment percentages from Schedule K-1 footnotes',
+          'Flag any state with less than 1% allocation for review',
+        ],
+      },
+      {
+        heading: 'Common Errors to Flag',
+        type: 'list',
+        listStyle: 'unordered',
+        items: [
+          'TIN format mismatch (should be XXX-XX-XXXX or XX-XXXXXXX)',
+          'Partner name doesn\'t match registry',
+          'Box 1 and Box 2 both zero — verify this is intentional',
+          'Missing state allocations for multi-state funds',
+        ],
+      },
+    ],
   },
   'waterfall-calc': {
     id: 'waterfall-calc',
@@ -63,6 +162,47 @@ export const MOCK_LESSONS: Record<string, Lesson> = {
     lastUsed: '1w ago',
     preview: 'Distribution follows European waterfall: (1) Return of capital, (2) Preferred return at 8%, (3) GP catch-up to 20%, (4) 80/20 split above hurdle...',
     linkedWorkflows: ['lp-waterfall'],
+    sections: [
+      {
+        heading: 'Overview',
+        type: 'text',
+        body: 'Distribution follows a European-style waterfall. All capital must be returned before any profit split. The preferred return accrues from the date of each capital call.',
+      },
+      {
+        heading: 'Waterfall Tiers',
+        type: 'table',
+        columns: ['Tier', 'Description', 'Rate / Split', 'Priority'],
+        rows: [
+          ['1', 'Return of Capital', '100% to LPs', 'First'],
+          ['2', 'Preferred Return', '8% annual, compounding', 'Second'],
+          ['3', 'GP Catch-Up', '100% to GP until 20% of profits', 'Third'],
+          ['4', 'Carried Interest', '80% LP / 20% GP', 'Remaining'],
+        ],
+      },
+      {
+        heading: 'Calculation Rules',
+        type: 'list',
+        listStyle: 'ordered',
+        items: [
+          'Calculate preferred return on unreturned capital from each drawdown date',
+          'Use actual/365 day count convention',
+          'Compound quarterly if specified in LPA, otherwise simple interest',
+          'GP catch-up applies only after full preferred return is satisfied',
+          'Carry split applies to all remaining distributable cash',
+        ],
+      },
+      {
+        heading: 'Edge Cases',
+        type: 'list',
+        listStyle: 'unordered',
+        items: [
+          'Partial return of capital: reduce unreturned balance pro-rata across drawdowns',
+          'Clawback provision: track cumulative GP distributions for potential clawback',
+          'Multi-currency funds: convert to USD at spot rate on distribution date',
+          'Recycling: reinvested capital does not reset the preferred return clock',
+        ],
+      },
+    ],
   },
   'report-formatting': {
     id: 'report-formatting',
@@ -74,6 +214,49 @@ export const MOCK_LESSONS: Record<string, Lesson> = {
     lastUsed: '3d ago',
     preview: 'Reports use DM Sans for body text, IBM Plex Mono for data tables. Primary color is #2D2D2E, accent is #74418F. Section headers are 16pt bold...',
     linkedWorkflows: [],
+    sections: [
+      {
+        heading: 'Overview',
+        type: 'text',
+        body: 'All quarterly reports generated by Cosimo must follow these formatting standards. Consistency across funds and reporting periods is critical for investor relations.',
+      },
+      {
+        heading: 'Typography',
+        type: 'table',
+        columns: ['Element', 'Font', 'Size', 'Weight'],
+        rows: [
+          ['Body text', 'DM Sans', '12pt', 'Regular'],
+          ['Data tables', 'IBM Plex Mono', '11pt', 'Regular'],
+          ['Section headers', 'DM Sans', '16pt', 'Bold'],
+          ['Table headers', 'IBM Plex Mono', '10pt', 'Bold, Uppercase'],
+          ['Footnotes', 'DM Sans', '9pt', 'Regular'],
+        ],
+      },
+      {
+        heading: 'Color Palette',
+        type: 'colors',
+        swatches: [
+          { label: 'Primary', value: '#2D2D2E', color: '#2D2D2E' },
+          { label: 'Accent', value: '#74418F', color: '#74418F' },
+          { label: 'Positive', value: '#3D8B40', color: '#3D8B40' },
+          { label: 'Negative', value: '#C04848', color: '#C04848' },
+          { label: 'Neutral', value: '#749CB5', color: '#749CB5' },
+        ],
+      },
+      {
+        heading: 'Report Structure',
+        type: 'list',
+        listStyle: 'ordered',
+        items: [
+          'Cover page with fund name, period, and date',
+          'Executive summary (max 1 page)',
+          'Portfolio overview with NAV table',
+          'Individual investment summaries',
+          'Financial statements (balance sheet, income statement)',
+          'Appendix with detailed schedules',
+        ],
+      },
+    ],
   },
   'fee-calc-rules': {
     id: 'fee-calc-rules',
@@ -85,6 +268,46 @@ export const MOCK_LESSONS: Record<string, Lesson> = {
     lastUsed: '2w ago',
     preview: 'Management fees are calculated on committed capital during investment period, then on invested capital post-investment period. Rate is 2% per annum...',
     linkedWorkflows: ['fee-calc'],
+    sections: [
+      {
+        heading: 'Overview',
+        type: 'text',
+        body: 'Management fees are calculated on committed capital during the investment period, then on invested capital post-investment period. The standard rate is 2% per annum, paid quarterly in advance.',
+      },
+      {
+        heading: 'Fee Schedule',
+        type: 'table',
+        columns: ['Period', 'Basis', 'Rate', 'Frequency'],
+        rows: [
+          ['Investment Period', 'Committed Capital', '2.00%', 'Quarterly, in advance'],
+          ['Post-Investment', 'Invested Capital', '2.00%', 'Quarterly, in advance'],
+          ['Extension Period', 'Invested Capital', '1.50%', 'Quarterly, in advance'],
+          ['Wind-Down', 'Net Asset Value', '1.00%', 'Quarterly, in arrears'],
+        ],
+      },
+      {
+        heading: 'Offset Rules',
+        type: 'list',
+        listStyle: 'ordered',
+        items: [
+          'Transaction fees received by GP offset management fees 100%',
+          'Monitoring fees offset at 80% (20% retained by GP)',
+          'Broken deal expenses are not offset against fees',
+          'Organizational expenses are capped at $500K and borne by the fund',
+        ],
+      },
+      {
+        heading: 'Calculation Notes',
+        type: 'list',
+        listStyle: 'unordered',
+        items: [
+          'Use actual/365 day count for partial periods',
+          'New LPs pay fees from their admission date, not fund inception',
+          'Fee waivers for GP affiliates must be tracked separately',
+          'Annual fee cap applies across all share classes combined',
+        ],
+      },
+    ],
   },
   'yardi-export': {
     id: 'yardi-export',
@@ -96,6 +319,50 @@ export const MOCK_LESSONS: Record<string, Lesson> = {
     lastUsed: '4d ago',
     preview: 'Yardi CSV exports need these corrections: (1) Remove the first 3 header rows, (2) Strip trailing whitespace from unit codes, (3) Convert dates from MM/DD/YYYY to ISO...',
     linkedWorkflows: [],
+    sections: [
+      {
+        heading: 'Overview',
+        type: 'text',
+        body: 'Yardi CSV exports require several cleanup steps before they can be used in downstream workflows. These corrections ensure compatibility with the firm\'s standardized data formats.',
+      },
+      {
+        heading: 'Cleanup Steps',
+        type: 'list',
+        listStyle: 'ordered',
+        items: [
+          'Remove the first 3 header rows (Yardi metadata, not data)',
+          'Strip trailing whitespace from unit codes',
+          'Convert dates from MM/DD/YYYY to ISO 8601 (YYYY-MM-DD)',
+          'Replace empty cells with "N/A" for text fields, 0 for numeric fields',
+          'Normalize currency values: remove $ and commas, ensure 2 decimal places',
+          'Deduplicate rows by Unit ID + Period (keep latest modified)',
+        ],
+      },
+      {
+        heading: 'Column Mapping',
+        type: 'table',
+        columns: ['Yardi Column', 'Standard Column', 'Transform'],
+        rows: [
+          ['sUnitCode', 'Unit Number', 'Trim whitespace'],
+          ['sTenantName', 'Tenant Name', 'Title case'],
+          ['dtLeaseFrom', 'Lease Start', 'MM/DD/YYYY → YYYY-MM-DD'],
+          ['dtLeaseTo', 'Lease End', 'MM/DD/YYYY → YYYY-MM-DD'],
+          ['curRent', 'Monthly Rent', 'Remove $, commas'],
+          ['sStatus', 'Status', 'Map codes to Current/Vacant/Notice'],
+        ],
+      },
+      {
+        heading: 'Known Issues',
+        type: 'list',
+        listStyle: 'unordered',
+        items: [
+          'Yardi sometimes exports duplicate header rows mid-file — detect and remove',
+          'Status code "P" (Past Tenant) should be mapped to "Vacant"',
+          'Date fields may contain "N/A" for month-to-month leases — keep as-is',
+          'Unicode characters in tenant names get garbled — use UTF-8 encoding',
+        ],
+      },
+    ],
   },
 };
 

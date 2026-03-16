@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { isRouteErrorResponse, useRouteError } from "react-router";
 import { toast } from "sonner";
 import { AlertCircle } from "lucide-react";
@@ -6,13 +6,9 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { getThread } from "~/services/threads";
-import { getRun, getCommands } from "~/services/workflows";
+import { getRun } from "~/services/workflows";
 import { MessageBlock } from "~/components/chat/message-block";
-import { MessageStream } from "~/components/chat/message-stream";
-import { ChatInput } from "~/components/chat/chat-input";
-import { FilePanel } from "~/components/chat/file-panel";
-import { WorkflowPanel } from "~/components/chat/workflow-panel";
-import { ScrollArea } from "~/components/ui/scroll-area";
+import { MessageStream, MessageThinking } from "~/components/chat/message-stream";
 import { useChatStore } from "~/stores/chat-store";
 import type { Route } from "./+types/_app.chat.$threadId";
 
@@ -28,15 +24,12 @@ export async function loader({ params }: Route.LoaderArgs) {
     run = await getRun(thread.workflowRunId);
   }
 
-  const commands = await getCommands();
-
-  return { thread, run, commands };
+  return { thread, run };
 }
 
-/** Thread detail view — scrollable messages + chat input + right-side panels */
+/** Thread detail view — messages + right-side panels */
 export default function ChatThreadRoute({ loaderData }: Route.ComponentProps) {
-  const { thread, run, commands } = loaderData;
-  const [modelName, setModelName] = useState("Analyst");
+  const { thread, run } = loaderData;
   const isWorkflowThread = !!thread.workflowRunId;
   const openWorkflowPanel = useChatStore((s) => s.openWorkflowPanel);
 
@@ -65,78 +58,45 @@ export default function ChatThreadRoute({ loaderData }: Route.ComponentProps) {
     prevThreadRef.current = thread.id;
   }, [run, thread.workflowRunId, thread.id, openWorkflowPanel]);
 
-  const handleSend = (text: string) => {
-    // TODO: send message via service layer
-    console.log("Send:", text);
-  };
-
   return (
-    <div className="flex h-full">
-      {/* Main chat column */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Scrollable message area */}
-        <ScrollArea className="flex-1 px-6 py-4">
-          {thread.messages.map((message) => {
-            // Erabor AI message uses streaming animation
-            if (thread.id === 'erabor' && message.id === 'erabor-m2') {
-              return <MessageStream key={message.id} />;
-            }
-            return (
-              <MessageBlock
-                key={message.id}
-                message={message}
-                isWorkflowThread={isWorkflowThread}
-              />
-            );
-          })}
-        </ScrollArea>
-
-        {/* Chat input */}
-        <ChatInput
-          onSend={handleSend}
-          commands={commands}
-          modelName={modelName}
-          onModelChange={(id) => {
-            const names: Record<string, string> = {
-              assistant: "Assistant",
-              analyst: "Analyst",
-              expert: "Expert",
-            };
-            setModelName(names[id] ?? "Analyst");
-          }}
-          placeholder={`Continue this thread...`}
-        />
-      </div>
-
-      {/* Right-side panels (only one visible at a time) */}
-      <FilePanel />
-      {run && <WorkflowPanel run={run} />}
-    </div>
+    <>
+      {thread.messages.map((message) => {
+        // Erabor AI message uses streaming animation
+        if (thread.id === 'erabor' && message.id === 'erabor-m2') {
+          return <MessageStream key={message.id} />;
+        }
+        // Q4LP AI message shows thinking cubes animation
+        if (thread.id === 'q4lp' && message.id === 'q4lp-m2') {
+          return <MessageThinking key={message.id} />;
+        }
+        return (
+          <MessageBlock
+            key={message.id}
+            message={message}
+            isWorkflowThread={isWorkflowThread}
+          />
+        );
+      })}
+    </>
   );
 }
 
 /** Loading skeleton — 3 message blocks of varying heights */
 export function HydrateFallback() {
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex-1 space-y-6 px-6 py-4">
-        {/* User message skeleton */}
-        <div className="flex justify-end">
-          <Skeleton className="h-16 w-3/5 rounded-lg" />
-        </div>
-        {/* AI message skeleton — tall */}
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-40 w-4/5 rounded-lg" />
-        </div>
-        {/* User message skeleton — short */}
-        <div className="flex justify-end">
-          <Skeleton className="h-10 w-2/5 rounded-lg" />
-        </div>
+    <div className="space-y-6">
+      {/* User message skeleton */}
+      <div className="flex justify-end">
+        <Skeleton className="h-16 w-3/5 rounded-lg" />
       </div>
-      {/* Input skeleton */}
-      <div className="border-t border-border px-6 py-3">
-        <Skeleton className="h-12 w-full rounded-lg" />
+      {/* AI message skeleton — tall */}
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-40 w-4/5 rounded-lg" />
+      </div>
+      {/* User message skeleton — short */}
+      <div className="flex justify-end">
+        <Skeleton className="h-10 w-2/5 rounded-lg" />
       </div>
     </div>
   );

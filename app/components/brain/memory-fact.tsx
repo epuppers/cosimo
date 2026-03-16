@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { MoreHorizontal, Pencil, Trash2, User, Building, FileText, Landmark } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -42,12 +44,21 @@ const CAT_CLASS: Record<string, string> = {
 /** A single memory fact card with category badge, entity chips, and edit/delete actions. */
 export function MemoryFactCard({ fact, onEntityClick }: MemoryFactProps) {
   const navigate = useNavigate();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
+
+  if (isDeleted) return null;
 
   const handleEntityClick = (entity: LinkedEntity) => {
     if (onEntityClick) {
       onEntityClick(entity.name);
     }
     navigate(`/brain/graph?entity=${encodeURIComponent(entity.name)}`);
+  };
+
+  const handleConfirmDelete = () => {
+    setIsDeleted(true);
+    toast('Memory deleted');
   };
 
   return (
@@ -69,15 +80,20 @@ export function MemoryFactCard({ fact, onEntityClick }: MemoryFactProps) {
         <DropdownMenu>
           <DropdownMenuTrigger
             className="mem-fact-menu-btn rounded p-1 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--violet-3)]"
+            aria-label="Memory menu"
           >
             <MoreHorizontal className="size-4" />
+            <span className="a11y-label">Menu</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom">
             <DropdownMenuItem>
               <Pencil className="size-4" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive">
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => setShowDeleteConfirm(true)}
+            >
               <Trash2 className="size-4" />
               Delete
             </DropdownMenuItem>
@@ -88,19 +104,9 @@ export function MemoryFactCard({ fact, onEntityClick }: MemoryFactProps) {
       {/* Fact text */}
       <p className="mem-fact-text">{fact.text}</p>
 
-      {/* Meta row: source + date */}
-      <div className="flex justify-between items-center">
-        {fact.source && (
-          <span className="mem-fact-source">{fact.source}</span>
-        )}
-        {fact.date && (
-          <span className="mem-fact-date">{fact.date}</span>
-        )}
-      </div>
-
       {/* Entity chips */}
       {fact.linkedEntities && fact.linkedEntities.length > 0 && (
-        <div className="mt-1.5 flex flex-wrap gap-1">
+        <div className="mt-1.5 mb-1.5 flex flex-wrap gap-1">
           {fact.linkedEntities.map((entity) => (
             <button
               key={entity.name}
@@ -112,6 +118,37 @@ export function MemoryFactCard({ fact, onEntityClick }: MemoryFactProps) {
               {entity.name}
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Meta row: source + date */}
+      <div className="flex justify-between items-center">
+        {fact.source && (
+          <span className="mem-fact-source">{fact.source}</span>
+        )}
+        {fact.date && (
+          <span className="mem-fact-date">{fact.date}</span>
+        )}
+      </div>
+
+      {/* Delete confirmation */}
+      {showDeleteConfirm && (
+        <div className="mem-delete-confirm">
+          <span>Delete this memory?</span>
+          <button
+            type="button"
+            className="mem-delete-yes"
+            onClick={handleConfirmDelete}
+          >
+            Yes
+          </button>
+          <button
+            type="button"
+            className="mem-delete-no"
+            onClick={() => setShowDeleteConfirm(false)}
+          >
+            No
+          </button>
         </div>
       )}
     </div>

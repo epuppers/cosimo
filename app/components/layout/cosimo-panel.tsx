@@ -50,8 +50,8 @@ function PanelMessageBubble({ message }: { message: PanelMessage }) {
     <div className={cn(
       'cosimo-panel-msg rounded-[var(--r-md)] px-3 py-2.5 text-[13px] leading-[1.5] mb-3',
       isAI
-        ? 'cosimo-panel-msg-ai bg-[rgba(var(--violet-3-rgb),0.06)] dark:bg-[rgba(var(--violet-3-rgb),0.1)] border border-[rgba(var(--violet-3-rgb),0.12)] dark:border-[rgba(var(--violet-3-rgb),0.18)] text-[var(--taupe-5)] dark:text-[var(--taupe-1)]'
-        : 'cosimo-panel-msg-user bg-[rgba(var(--berry-3-rgb),0.05)] dark:bg-[rgba(var(--berry-3-rgb),0.1)] border border-[rgba(var(--berry-3-rgb),0.12)] dark:border-[rgba(var(--berry-3-rgb),0.15)] text-[var(--taupe-5)] dark:text-[var(--taupe-1)] text-right'
+        ? 'cosimo-panel-msg-ai bg-[rgba(var(--violet-3-rgb),0.06)] dark:bg-[rgba(var(--violet-3-rgb),0.1)] border border-[rgba(var(--violet-3-rgb),0.12)] dark:border-[rgba(var(--violet-3-rgb),0.18)] text-[var(--taupe-5)]'
+        : 'cosimo-panel-msg-user bg-[rgba(var(--berry-3-rgb),0.05)] dark:bg-[rgba(var(--berry-3-rgb),0.1)] border border-[rgba(var(--berry-3-rgb),0.12)] dark:border-[rgba(var(--berry-3-rgb),0.15)] text-[var(--taupe-5)] text-right'
     )}>
       <div className={cn('mb-1.5 flex items-center gap-1.5', !isAI && 'justify-end')}>
         {isAI && (
@@ -189,11 +189,12 @@ export function CosimoPanel() {
               'bg-transparent border border-[var(--taupe-2)] dark:border-[var(--surface-3)] rounded-[var(--r-md)]',
               'cursor-pointer',
               'hover:text-[var(--taupe-5)] hover:border-[var(--taupe-3)]',
-              'dark:hover:text-[var(--taupe-1)] dark:hover:border-[var(--taupe-2)]',
+              'dark:hover:text-[var(--taupe-5)] dark:hover:border-[var(--taupe-2)]',
               'focus-visible:outline-2 focus-visible:outline-[var(--violet-3)] focus-visible:outline-offset-2',
             )}
           >
             <X className="h-3.5 w-3.5" />
+            <span className="a11y-label">Close</span>
           </button>
         </div>
 
@@ -238,7 +239,7 @@ export function CosimoPanel() {
                 'bg-[var(--off-white)] dark:bg-[var(--surface-0)]',
                 'px-2.5 py-[7px]',
                 'font-[family-name:var(--mono)] text-[12px] leading-[1.5]',
-                'text-[var(--taupe-5)] dark:text-[var(--taupe-1)]',
+                'text-[var(--taupe-5)]',
                 'placeholder:text-[var(--taupe-3)]',
                 'focus:outline-none focus:border-[var(--violet-3)]',
                 'overflow-y-auto whitespace-pre-wrap break-words',

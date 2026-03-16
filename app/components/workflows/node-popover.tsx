@@ -82,7 +82,8 @@ export function NodePopover({
             onClick={onClose}
             aria-label="Close popover"
           >
-            ✕
+            <span className="icon-char">✕</span>
+            <span className="a11y-label">Close</span>
           </button>
         </div>
 
@@ -105,7 +106,7 @@ export function NodePopover({
             className="node-popover-cosimo-btn"
             onClick={handleEditWithCosimo}
           >
-            ✦ Edit with Cosimo
+            <span className="icon-char">✦</span> Edit with Cosimo
           </button>
         </div>
       </PopoverContent>

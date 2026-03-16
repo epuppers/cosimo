@@ -1,5 +1,10 @@
 import { Outlet, useMatches } from "react-router";
 import { Skeleton } from "~/components/ui/skeleton";
+import { ChatHeader } from "~/components/chat/chat-header";
+import { ChatInput } from "~/components/chat/chat-input";
+import { FilePanel } from "~/components/chat/file-panel";
+import { WorkflowPanel } from "~/components/chat/workflow-panel";
+import type { Thread, WorkflowRun } from "~/services/types";
 
 /** Suggestion chips for the empty thread state */
 const SUGGESTIONS = [
@@ -11,40 +16,58 @@ const SUGGESTIONS = [
 
 /**
  * Chat layout route — wraps thread detail routes.
+ * Provides shared layout: .chat-with-panel > .chat-main > (.chat-scroll + ChatInput)
  * When no thread is selected (index), shows a centered placeholder.
  */
 export default function ChatRoute() {
   const matches = useMatches();
   // Check if a child thread route is matched (has threadId param)
-  const hasChildRoute = matches.some(
+  const threadMatch = matches.find(
     (m) => m.id === "routes/_app.chat.$threadId"
   );
+  const hasChildRoute = !!threadMatch;
+  const threadData = threadMatch?.data as { thread?: Thread; run?: WorkflowRun | null } | undefined;
+  const thread = threadData?.thread;
+  const run = threadData?.run;
 
-  if (!hasChildRoute) {
-    return (
-      <div className="empty-thread">
-        <div className="empty-thread-icon">◆</div>
-        <div className="empty-thread-title">What can Cosimo help with?</div>
-        <div className="empty-thread-sub">
-          Ask about fund performance, document analysis, compliance checks, or anything across your portfolio.
+  return (
+    <div className="chat-with-panel">
+      <div className="chat-main">
+        {thread && <ChatHeader thread={thread} />}
+        <div className="chat-scroll">
+          {hasChildRoute ? (
+            <Outlet />
+          ) : (
+            <div className="empty-thread">
+              <div className="empty-thread-icon">◆</div>
+              <div className="empty-thread-title">What can Cosimo help with?</div>
+              <div className="empty-thread-sub">
+                Ask about fund performance, document analysis, compliance checks, or anything across your portfolio.
+              </div>
+              <div className="empty-thread-suggestions">
+                {SUGGESTIONS.map((s) => (
+                  <button
+                    key={s.label}
+                    type="button"
+                    className="empty-thread-chip"
+                    data-suggestion={s.prompt}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        <div className="empty-thread-suggestions">
-          {SUGGESTIONS.map((s) => (
-            <button
-              key={s.label}
-              type="button"
-              className="empty-thread-chip"
-              data-suggestion={s.prompt}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
+        <ChatInput
+          onSend={() => {}}
+          placeholder="Ask Cosimo anything..."
+        />
       </div>
-    );
-  }
-
-  return <Outlet />;
+      <FilePanel />
+      {run && <WorkflowPanel run={run} />}
+    </div>
+  );
 }
 
 /** Loading skeleton — 6 thread items in sidebar placeholder */

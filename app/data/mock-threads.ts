@@ -54,6 +54,7 @@ export const MOCK_THREADS: Record<string, Thread> = {
         content: '<p><strong>Primary issue:</strong> US Large Cap is up 3.2 points since June, driven by the tech rally. International Developed is the mirror underweight.</p><p><strong>Recommendation:</strong> Paired trade — trim the S&P 500 position and rotate into the EAFE sleeve. I\'ve drafted the rebalancing memo for the IC. Want me to pull it up, or look at tax implications first?</p>',
         model: 'Analyst',
         timestamp: '2:32 PM',
+        latency: '3.2s',
         artifacts: [
           {
             title: 'Fund III — Allocation Drift Analysis',
@@ -61,11 +62,11 @@ export const MOCK_THREADS: Record<string, Thread> = {
             data: {
               headers: ['Sector', 'Mandate', 'Current', 'Drift', 'Action'],
               rows: [
-                ['US Large Cap', '35.0%', '38.2%', '+3.2%', 'Trim $2.4M'],
-                ['Intl Developed', '20.0%', '17.1%', '−2.9%', 'Add $2.1M'],
-                ['EM Equity', '10.0%', '11.4%', '+1.4%', 'Trim $1.0M'],
-                ['Fixed Income', '25.0%', '23.8%', '−1.2%', 'Add $0.9M'],
-                ['Alternatives', '10.0%', '9.5%', '−0.5%', 'Hold'],
+                ['US Large Cap', '35.0%', '38.2%', '<span class="drift-over">+3.2%</span>', '<span class="action-chip">Trim $2.4M</span>'],
+                ['Intl Developed', '20.0%', '17.1%', '<span class="drift-under">−2.9%</span>', '<span class="action-chip">Add $2.1M</span>'],
+                ['EM Equity', '10.0%', '11.4%', '<span class="drift-over">+1.4%</span>', '<span class="action-chip">Trim $1.0M</span>'],
+                ['Fixed Income', '25.0%', '23.8%', '<span class="drift-under">−1.2%</span>', '<span class="action-chip">Add $0.9M</span>'],
+                ['Alternatives', '10.0%', '9.5%', '−0.5%', '<span class="action-hold">Hold</span>'],
               ],
             },
           },
@@ -83,6 +84,7 @@ export const MOCK_THREADS: Record<string, Thread> = {
         content: '<p>Lot-level analysis against the 30-day wash sale window complete. Two positions flagged:</p><div class="flag-box safe"><div class="flag-label"><span class="ticker">MSFT</span><span class="status status-safe">SAFE</span></div><div class="flag-detail">Loss harvested <strong>August 8</strong>. Repurchase window closes <strong>March 7</strong>. Safe to include in the rebalance.</div></div><div class="flag-box warn"><div class="flag-label"><span class="ticker">AAPL</span><span class="status status-warn">CAUTION</span></div><div class="flag-detail">Loss harvested <strong>September 14</strong>. Window open until <strong>October 14</strong>. Trim + index reconstitution risks wash sale on <strong>~$340K</strong> of harvested losses. Recommend excluding AAPL lots and trimming through other large-cap names.</div></div><div class="summary-bar"><div class="summary-item"><span class="summary-label">ST Gains</span><span class="summary-value neg">$18.2K</span></div><div class="summary-divider"></div><div class="summary-item"><span class="summary-label">LT Losses Avail</span><span class="summary-value pos">$42.6K</span></div><div class="summary-divider"></div><div class="summary-item"><span class="summary-label">Net Tax Benefit</span><span class="summary-value net">~$24.4K</span></div></div>',
         model: 'Expert',
         timestamp: '2:35 PM',
+        latency: '4.8s',
       },
       {
         id: 'fund3-m5',
@@ -122,6 +124,7 @@ export const MOCK_THREADS: Record<string, Thread> = {
         content: '<p>Fee analysis complete. Key findings:</p><p><strong>Pre-step-down (Q1 2025 – Q4 2025):</strong> Quarterly fee of $376,250 on $86M committed at 1.75%. Annual total: $1,505,000.</p><p><strong>Post-step-down (Q1 2026 onward):</strong> Rate drops to 1.25%, reducing quarterly fee to $268,750. Annual total: $1,075,000 — a $430K annual saving for LPs.</p><p><strong>Offset provisions:</strong> Q2 and Q3 2025 have portfolio company monitoring fees of $42,000 and $18,500 respectively that should offset against the management fee per the LPA. Net fees adjusted in the output.</p>',
         model: 'Analyst',
         timestamp: '4:16 PM',
+        latency: '2.8s',
         attachments: [
           { name: 'Hilgard_Fund_II_Fee_Analysis.xlsx', type: 'xlsx', size: '84 KB' },
         ],
@@ -138,6 +141,7 @@ export const MOCK_THREADS: Record<string, Thread> = {
         content: '<p>Cross-referenced against <strong>Hilgard_Monitoring_Fees_2025.pdf</strong> from your Feb 15 upload. Both offset amounts match — $42,000 (Q2, Brightfield advisory) and $18,500 (Q3, Crestline consulting). The xlsx is accurate. No discrepancies found.</p>',
         model: 'Analyst',
         timestamp: '4:19 PM',
+        latency: '1.4s',
       },
     ],
   },
@@ -167,6 +171,7 @@ export const MOCK_THREADS: Record<string, Thread> = {
         content: '<p><em>Cosimo is thinking...</em></p>',
         model: 'Assistant',
         timestamp: '11:20 AM',
+        latency: '1.1s',
       },
     ],
   },
@@ -193,9 +198,16 @@ export const MOCK_THREADS: Record<string, Thread> = {
       {
         id: 'k1-m2',
         type: 'ai',
-        content: '<p><strong>Unable to complete request</strong></p><p>Connection to Ridgeline Capital document vault timed out after 30s. The K-1 extraction pipeline could not retrieve the source documents. This may be due to an expired API token or a temporary outage on the custodian\'s end.</p><p><em>Error 504 · Gateway Timeout · Vault Integration · Feb 20, 9:46 AM</em></p>',
+        content: '',
         model: 'Expert',
         timestamp: '9:45 AM',
+        latency: '30.1s',
+        isError: true,
+        error: {
+          title: 'Unable to complete request',
+          detail: 'Connection to Ridgeline Capital document vault timed out after 30s. The K-1 extraction pipeline could not retrieve the source documents. This may be due to an expired API token or a temporary outage on the custodian\'s end.',
+          meta: 'Error 504 · Gateway Timeout · Vault Integration · Feb 20, 9:46 AM',
+        },
       },
     ],
   },
@@ -226,6 +238,7 @@ export const MOCK_THREADS: Record<string, Thread> = {
           '<p>Overall, the structure is largely in line with institutional norms for a fund of this size and strategy. However, I\'ve identified three provisions that deviate from our standard terms in ways that could create friction or optionality issues down the road. I\'ve detailed each section below with flagged items highlighted.</p>',
         model: 'Expert',
         timestamp: '3:30 PM',
+        latency: '6.4s',
         artifacts: [
           {
             title: 'Erabor Partnership — Economic Terms',

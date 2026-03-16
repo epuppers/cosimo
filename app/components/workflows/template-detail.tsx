@@ -147,7 +147,7 @@ export function TemplateDetail({ template, run }: TemplateDetailProps) {
       <div className="wf-detail-header">
         <div className="wf-detail-top">
           <button className="back-btn" onClick={handleBack}>
-            ← Back
+            <span className="icon-char">←</span> Back
           </button>
           <span className="wf-detail-name">{template.title}</span>
         </div>
@@ -184,6 +184,7 @@ export function TemplateDetail({ template, run }: TemplateDetailProps) {
             <DropdownMenu>
               <DropdownMenuTrigger className="wf-detail-actions-btn" aria-label="Template actions">
                 <MoreHorizontal className="size-4" />
+                <span className="a11y-label">Actions</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" sideOffset={6}>
                 <DropdownMenuItem onClick={() => openCosimoPanel({ type: 'template', text: template.title })}>
@@ -204,7 +205,7 @@ export function TemplateDetail({ template, run }: TemplateDetailProps) {
 
             <button className="wf-detail-run-btn" onClick={handleRun}>
               <Play className="size-3.5" />
-              Run
+              <span>Run</span>
             </button>
           </div>
         </div>

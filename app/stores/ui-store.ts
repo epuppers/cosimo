@@ -33,9 +33,15 @@ interface UIState {
   profileSubpanelOpen: boolean;
   /** Whether the brain nav section in the sidebar is collapsed */
   brainNavCollapsed: boolean;
+  /** Current sidebar width in pixels (default 256 = 16rem) */
+  sidebarWidth: number;
+  /** Sidebar drag-resize state: idle, dragging, or narrow (snap zone) */
+  sidebarDragState: 'idle' | 'dragging' | 'narrow';
 
   setMode: (mode: ViewMode) => void;
   toggleSidebar: () => void;
+  setSidebarWidth: (width: number) => void;
+  setSidebarDragState: (state: 'idle' | 'dragging' | 'narrow') => void;
   toggleBrainNav: () => void;
   openCosimoPanel: (context?: CosimoContext) => void;
   closeCosimoPanel: () => void;
@@ -59,10 +65,18 @@ export const useUIStore = create<UIState>((set) => ({
   usagePanelOpen: false,
   profileMenuOpen: false,
   profileSubpanelOpen: false,
-  brainNavCollapsed: false,
+  brainNavCollapsed: true,
+  sidebarWidth: 280,
+  sidebarDragState: 'idle',
 
   setMode: (mode) => set({ currentMode: mode }),
-  toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+  toggleSidebar: () => set((s) => ({
+    sidebarCollapsed: !s.sidebarCollapsed,
+    // Reset to default width when expanding from collapsed
+    sidebarWidth: s.sidebarCollapsed ? 280 : s.sidebarWidth,
+  })),
+  setSidebarWidth: (width) => set({ sidebarWidth: width }),
+  setSidebarDragState: (state) => set({ sidebarDragState: state }),
   toggleBrainNav: () => set((s) => ({ brainNavCollapsed: !s.brainNavCollapsed })),
   openCosimoPanel: (context) => set({ cosimoPanelOpen: true, cosimoPanelContext: context ?? null }),
   closeCosimoPanel: () => set({ cosimoPanelOpen: false, cosimoPanelContext: null }),

@@ -79,7 +79,7 @@ export default function WorkflowsRoute({ loaderData }: Route.ComponentProps) {
       ) : (
         <div className="wf-no-results">
           <Workflow className="size-10 opacity-30" style={{ color: 'var(--taupe-2)' }} />
-          <p className="font-[family-name:var(--pixel)] text-[var(--taupe-3)] dark:text-[var(--taupe-2)]">No workflows yet</p>
+          <p className="font-[family-name:var(--pixel)] text-[var(--taupe-3)] dark:text-[var(--taupe-3)]">No workflows yet</p>
         </div>
       )}
     </div>

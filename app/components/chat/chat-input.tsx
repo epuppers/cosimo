@@ -234,6 +234,7 @@ export function ChatInput({
                   aria-label={`Remove ${file.name}`}
                 >
                   <X className="h-2.5 w-2.5" />
+                  <span className="a11y-label">Remove</span>
                 </button>
               )}
             </div>

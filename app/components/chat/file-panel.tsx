@@ -11,8 +11,6 @@ import { getSpreadsheet } from '~/services/panels';
 import type { SpreadsheetData } from '~/services/types';
 import { cn } from '~/lib/utils';
 
-type PanelTab = 'spreadsheet' | 'folder';
-
 /**
  * FilePanel — resizable right-side panel with spreadsheet and folder views.
  * Controlled by useChatStore.filePanelOpen.
@@ -20,8 +18,8 @@ type PanelTab = 'spreadsheet' | 'folder';
 export function FilePanel() {
   const isOpen = useChatStore((s) => s.filePanelOpen);
   const close = useChatStore((s) => s.closeFilePanel);
-
-  const [activeTab, setActiveTab] = useState<PanelTab>('spreadsheet');
+  const activeTab = useChatStore((s) => s.filePanelTab);
+  const setActiveTab = useChatStore((s) => s.setFilePanelTab);
   const [spreadsheet, setSpreadsheet] = useState<SpreadsheetData | null>(null);
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
   const { currentWidth, isDragging, handleMouseDown } = useResizePanel({
@@ -84,7 +82,8 @@ export function FilePanel() {
             onClick={close}
             aria-label="Close file panel"
           >
-            ✕
+            <span className="icon-char">✕</span>
+            <span className="a11y-label">Close</span>
           </button>
         </div>
 
@@ -98,7 +97,7 @@ export function FilePanel() {
             cellFormula={cellFormula}
           />
         ) : (
-          <FolderView />
+          <FolderView onFileClick={() => setActiveTab('spreadsheet')} />
         )}
       </div>
     </>
@@ -196,7 +195,7 @@ function SpreadsheetView({ data, selectedCell, onSelectCell, cellRef, cellFormul
 // ============================================
 
 /** Folder file list matching reference design. */
-function FolderView() {
+function FolderView({ onFileClick }: { onFileClick: () => void }) {
   return (
     <>
       <div className="fp-folder-header">
@@ -204,7 +203,7 @@ function FolderView() {
         <span className="fp-folder-count">1 file</span>
       </div>
       <div className="fp-file-list">
-        <div className="fp-file-item active">
+        <div className="fp-file-item active" onClick={onFileClick} style={{ cursor: 'pointer' }}>
           <div className="fp-file-item-icon">▦</div>
           <div className="fp-file-item-info">
             <div className="fp-file-item-name">Hilgard_Fund_II_Fee_Analysis.xlsx</div>

@@ -7,18 +7,124 @@
    ============================================ */
 
 /* ======== Dyslexia Font ======== */
-/* Lexend is a Google Font designed for readability.
-   Loaded via @import so it's available when toggled. */
-@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap");
+/* OpenDyslexic — locally hosted, optimised for dyslexic readers. */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+}
 
-[data-a11y-font="dyslexia"] {
-  --font-sans: 'Lexend', sans-serif;
-  --font-mono: 'Lexend', sans-serif;
-  --font-pixel: 'Lexend', sans-serif;
-  /* Also override the original token names used in inline styles */
-  --sans: 'Lexend', sans-serif;
-  --mono: 'Lexend', sans-serif;
-  --pixel: 'Lexend', sans-serif;
+html[data-a11y-font="dyslexia"] {
+  --font-sans: 'OpenDyslexic', sans-serif;
+  --font-mono: 'OpenDyslexic', sans-serif;
+  --font-pixel: 'OpenDyslexic', sans-serif;
+  --sans: 'OpenDyslexic', sans-serif;
+  --mono: 'OpenDyslexic', sans-serif;
+  --pixel: 'OpenDyslexic', sans-serif;
+}
+
+/* ---- Dyslexia hierarchy: Display tier (was --pixel) ---- */
+/* These elements used ChicagoFLF for a chunky display look.
+   With OpenDyslexic: bold + letter-spacing recreates that weight. */
+html[data-a11y-font="dyslexia"] h1,
+html[data-a11y-font="dyslexia"] h2,
+html[data-a11y-font="dyslexia"] h3,
+html[data-a11y-font="dyslexia"] h4 {
+  font-weight: 700;
+}
+
+html[data-a11y-font="dyslexia"] .header-title,
+html[data-a11y-font="dyslexia"] .brain-empty-title,
+html[data-a11y-font="dyslexia"] .lesson-block h3 {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* ---- Dyslexia hierarchy: Label tier (was --mono) ---- */
+/* Sender names, model badges, section labels — need to feel
+   distinct from body prose. Lean on weight + spacing. */
+html[data-a11y-font="dyslexia"] .msg-sender {
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+}
+
+html[data-a11y-font="dyslexia"] .model-badge {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+html[data-a11y-font="dyslexia"] .sidebar-section-label,
+html[data-a11y-font="dyslexia"] .mem-section-label {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+html[data-a11y-font="dyslexia"] .msg-timestamp {
+  font-size: 0.625rem;
+  letter-spacing: 0.03em;
+  opacity: 0.7;
+}
+
+html[data-a11y-font="dyslexia"] .label-mono {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+/* ---- Dyslexia hierarchy: Body tier (was --sans) ---- */
+/* Message content and descriptions — prioritise readability.
+   OpenDyslexic benefits from extra line-height and word-spacing. */
+html[data-a11y-font="dyslexia"] .msg-body {
+  font-weight: 400;
+  line-height: 1.7;
+  word-spacing: 0.05em;
+}
+
+html[data-a11y-font="dyslexia"] .wf-card-desc,
+html[data-a11y-font="dyslexia"] .lesson-block p,
+html[data-a11y-font="dyslexia"] .lesson-block li {
+  line-height: 1.65;
+  word-spacing: 0.05em;
+}
+
+/* ---- Card/list title differentiation ---- */
+html[data-a11y-font="dyslexia"] .wf-card-title {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ---- Data tables ---- */
+html[data-a11y-font="dyslexia"] .data-tbl th {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.6875rem;
+}
+
+/* ---- Logo wordmark ---- */
+html[data-a11y-font="dyslexia"] [data-sidebar="header"] .font-\[family-name\:var\(--pixel\)\] {
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 /* ======== Reduced Motion ======== */
@@ -73,7 +179,45 @@
 [data-a11y-labels="show"] .panel-send-btn [data-icon],
 [data-a11y-labels="show"] .panel-send-btn svg:not(.a11y-keep),
 [data-a11y-labels="show"] .attach-option [data-icon],
-[data-a11y-labels="show"] .attach-option svg:not(.a11y-keep) {
+[data-a11y-labels="show"] .attach-option svg:not(.a11y-keep),
+[data-a11y-labels="show"] .msg-action-btn [data-icon],
+[data-a11y-labels="show"] .msg-action-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .cosimo-close-btn [data-icon],
+[data-a11y-labels="show"] .cosimo-close-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .file-panel-close [data-icon],
+[data-a11y-labels="show"] .file-panel-close svg:not(.a11y-keep),
+[data-a11y-labels="show"] .wf-detail-actions-btn [data-icon],
+[data-a11y-labels="show"] .wf-detail-actions-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .mem-fact-menu-btn [data-icon],
+[data-a11y-labels="show"] .mem-fact-menu-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .art-toggle [data-icon],
+[data-a11y-labels="show"] .art-toggle svg:not(.a11y-keep),
+[data-a11y-labels="show"] .node-popover-close [data-icon],
+[data-a11y-labels="show"] .node-popover-close svg:not(.a11y-keep),
+[data-a11y-labels="show"] .input-file-chip-remove [data-icon],
+[data-a11y-labels="show"] .input-file-chip-remove svg:not(.a11y-keep),
+[data-a11y-labels="show"] .sidebar-toggle-btn [data-icon],
+[data-a11y-labels="show"] .sidebar-toggle-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .brain-nav-toggle [data-icon],
+[data-a11y-labels="show"] .brain-nav-toggle svg:not(.a11y-keep),
+[data-a11y-labels="show"] .sidebar-new-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .wf-detail-run-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .lesson-action-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .node-popover-cosimo-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .back-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .lesson-back-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .brain-nav-btn svg:not(.a11y-keep),
+[data-a11y-labels="show"] .mem-entity-chip svg:not(.a11y-keep) {
+  display: none;
+}
+
+/* Hide text-character icons (✕, ✦, ←, ◈, ▦) in labels mode */
+[data-a11y-labels="show"] .top-icon-btn .th-icon,
+[data-a11y-labels="show"] .file-panel-close .icon-char,
+[data-a11y-labels="show"] .node-popover-close .icon-char,
+[data-a11y-labels="show"] .node-popover-cosimo-btn .icon-char,
+[data-a11y-labels="show"] .back-btn .icon-char,
+[data-a11y-labels="show"] .lesson-back-btn .icon-char {
   display: none;
 }
 
@@ -92,7 +236,7 @@
   padding: 4px 8px;
 }
 [data-a11y-labels="show"] .header-btn .a11y-label {
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 
 /* Chat send & attach buttons */
@@ -100,7 +244,7 @@
   padding: 8px 12px;
 }
 [data-a11y-labels="show"] .cmd-btn .a11y-label {
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 
 /* Feedback buttons — override fixed 24x24 to fit text */
@@ -112,7 +256,7 @@
   padding: 4px 8px;
 }
 [data-a11y-labels="show"] .feedback-btn .a11y-label {
-  font-size: 9px;
+  font-size: 0.5625rem;
 }
 
 /* Top header icon buttons — override fixed 28x28 to fit text */
@@ -122,21 +266,30 @@
   padding: 0 8px;
 }
 [data-a11y-labels="show"] .top-icon-btn .a11y-label {
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 /* Reposition task badge inline after label text */
 [data-a11y-labels="show"] .top-icon-btn .th-badge {
-  position: static;
+  position: relative;
+  top: 0;
+  right: auto;
   order: 2;
-  margin-left: 6px;
+  margin-left: 10px;
 }
 [data-a11y-labels="show"] .top-icon-btn .a11y-label {
   order: 1;
 }
 
-/* Cosimo panel send button */
+/* Cosimo panel send button — override fixed 28x28 to fit label */
+[data-a11y-labels="show"] .panel-send-btn {
+  width: auto;
+  height: auto;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 4px 8px;
+}
 [data-a11y-labels="show"] .panel-send-btn .a11y-label {
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 
 /* Attach sub-menu buttons — override fixed 32x32 */
@@ -147,5 +300,100 @@
   padding: 4px 10px;
 }
 [data-a11y-labels="show"] .attach-option .a11y-label {
-  font-size: 9px;
+  font-size: 0.5625rem;
+}
+
+/* Message hover action buttons (Copy, Edit, Retry) */
+[data-a11y-labels="show"] .msg-action-btn {
+  width: auto;
+  height: auto;
+  padding: 3px 7px;
+}
+[data-a11y-labels="show"] .msg-action-btn .a11y-label {
+  font-size: 0.5625rem;
+}
+
+/* Cosimo panel close button */
+[data-a11y-labels="show"] .cosimo-close-btn .a11y-label {
+  font-size: 0.625rem;
+}
+
+/* File panel close button */
+[data-a11y-labels="show"] .file-panel-close {
+  width: auto;
+  height: auto;
+  padding: 2px 8px;
+}
+[data-a11y-labels="show"] .file-panel-close .a11y-label {
+  font-size: 0.625rem;
+}
+
+/* Workflow detail actions button (⋯) */
+[data-a11y-labels="show"] .wf-detail-actions-btn {
+  width: auto;
+  height: auto;
+  padding: 4px 8px;
+}
+[data-a11y-labels="show"] .wf-detail-actions-btn .a11y-label {
+  font-size: 0.625rem;
+}
+
+/* Memory fact menu button (⋯) */
+[data-a11y-labels="show"] .mem-fact-menu-btn {
+  width: auto;
+  height: auto;
+  padding: 2px 6px;
+}
+[data-a11y-labels="show"] .mem-fact-menu-btn .a11y-label {
+  font-size: 0.5625rem;
+}
+
+/* Artifact toggle (expand/collapse) */
+[data-a11y-labels="show"] .art-toggle {
+  width: auto;
+  height: auto;
+  padding: 2px 6px;
+}
+[data-a11y-labels="show"] .art-toggle .a11y-label {
+  font-size: 0.5625rem;
+}
+
+/* Node popover close */
+[data-a11y-labels="show"] .node-popover-close {
+  width: auto;
+  height: auto;
+  padding: 2px 8px;
+}
+[data-a11y-labels="show"] .node-popover-close .a11y-label {
+  font-size: 0.625rem;
+}
+
+/* File chip remove button */
+[data-a11y-labels="show"] .input-file-chip-remove {
+  width: auto;
+  height: auto;
+  padding: 2px 5px;
+}
+[data-a11y-labels="show"] .input-file-chip-remove .a11y-label {
+  font-size: 0.5rem;
+}
+
+/* Sidebar toggle button */
+[data-a11y-labels="show"] .sidebar-toggle-btn {
+  width: auto;
+  height: auto;
+  padding: 2px 6px;
+}
+[data-a11y-labels="show"] .sidebar-toggle-btn .a11y-label {
+  font-size: 0.5625rem;
+}
+
+/* Brain nav collapse toggle */
+[data-a11y-labels="show"] .brain-nav-toggle {
+  width: auto;
+  height: auto;
+  padding: 2px 6px;
+}
+[data-a11y-labels="show"] .brain-nav-toggle .a11y-label {
+  font-size: 0.5625rem;
 }

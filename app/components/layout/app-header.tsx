@@ -1,15 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import {
-  CheckSquare,
-  Calendar,
-  BarChart3,
   ChevronRight,
   ArrowLeft,
   Sun,
   Moon,
-  Plus,
 } from "lucide-react";
 import { Switch } from "~/components/ui/switch";
 import {
@@ -17,6 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
+import { cn } from "~/lib/utils";
 import { useUIStore } from "~/stores/ui-store";
 import { useThemeStore } from "~/stores/theme-store";
 import { getTasks, getCalendar, getUsage } from "~/services/panels";
@@ -24,10 +21,37 @@ import type { TaskData, CalendarData, UsageData } from "~/services/types";
 
 // ======== Mode Tabs ========
 
+/** Custom SVG icons matching the reference prototype */
+function ChatIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" width="12" height="12">
+      <path d="M1 3h14v9H5l-4 3v-3H1z" />
+    </svg>
+  );
+}
+
+function WorkflowsIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" width="12" height="12">
+      <circle cx="8" cy="8" r="2.5" />
+      <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" />
+    </svg>
+  );
+}
+
+function GaugeIcon() {
+  return (
+    <svg viewBox="0 0 16 12" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="11">
+      <path d="M1 11 A7 7 0 0 1 15 11" />
+      <line x1="8" y1="11" x2="10.5" y2="4" strokeWidth="2" strokeLinecap="square" />
+      <rect x="6.5" y="9.5" width="3" height="3" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 const TABS = [
-  { label: "Chat", path: "/chat" },
-  { label: "Workflows", path: "/workflows" },
-  { label: "Brain", path: "/brain/memory" },
+  { label: "Chat", path: "/chat", icon: ChatIcon },
+  { label: "Workflows", path: "/workflows", icon: WorkflowsIcon },
 ] as const;
 
 /** Determines which tab is active based on the current route */
@@ -35,7 +59,6 @@ function useActiveTab() {
   const location = useLocation();
   const path = location.pathname;
   if (path.startsWith("/workflows")) return "/workflows";
-  if (path.startsWith("/brain")) return "/brain/memory";
   return "/chat";
 }
 
@@ -199,7 +222,7 @@ function UsagePanelContent({ usage }: { usage: UsageData }) {
       </div>
 
       {/* Stats rows */}
-      <div className="usage-stats px-3 pb-2">
+      <div className="usage-stats pb-2">
         <div className="usage-stat-row">
           <span className="usage-stat-label">Plan Limit</span>
           <span className="usage-stat-value">{usage.planLimit}</span>
@@ -245,10 +268,10 @@ function TaskButton() {
         className="top-icon-btn"
         aria-label="Assigned Tasks"
       >
-        <CheckSquare className="size-3.5" />
+        <span className="th-icon">◈</span>
         <span className="a11y-label">Tasks</span>
         {tasks.length > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex min-w-[14px] h-[14px] items-center justify-center rounded-[var(--r-sm)] bg-[var(--red)] border border-solid border-[var(--red-hi)] font-[family-name:var(--mono)] text-[9px] font-bold text-white px-0.5"
+          <span className="th-badge absolute -right-0.5 -top-0.5 flex min-w-[14px] h-[14px] items-center justify-center rounded-[var(--r-sm)] bg-[var(--red)] border border-solid border-[var(--red-hi)] font-[family-name:var(--mono)] text-[9px] font-bold text-white px-0.5"
             style={{ borderColor: 'var(--red-hi) var(--red-lo) var(--red-lo) var(--red-hi)' }}>
             {tasks.length}
           </span>
@@ -277,7 +300,7 @@ function CalendarButton() {
         className="top-icon-btn"
         aria-label="Calendar"
       >
-        <Calendar className="size-3.5" />
+        <span className="th-icon">▦</span>
         <span className="a11y-label">Calendar</span>
       </PopoverTrigger>
       <PopoverContent align="end" className="th-dropdown-panel w-[280px] p-0">
@@ -307,7 +330,7 @@ function UsageButton() {
         className="top-icon-btn"
         aria-label="Usage"
       >
-        <BarChart3 className="size-3.5" />
+        <GaugeIcon />
         <span className="a11y-label">Usage</span>
       </PopoverTrigger>
       <PopoverContent align="end" className="th-dropdown-panel w-[300px] p-0">
@@ -332,13 +355,15 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
   const purpleIntensity = useThemeStore((s) => s.purpleIntensity);
   const setPurpleIntensity = useThemeStore((s) => s.setPurpleIntensity);
   const fontSizeLevel = useThemeStore((s) => s.fontSizeLevel);
-  const cycleFontSize = useThemeStore((s) => s.cycleFontSize);
+  const setFontSizeLevel = useThemeStore((s) => s.setFontSizeLevel);
   const dyslexiaFont = useThemeStore((s) => s.dyslexiaFont);
   const toggleDyslexiaFont = useThemeStore((s) => s.toggleDyslexiaFont);
   const reducedMotion = useThemeStore((s) => s.reducedMotion);
   const toggleReducedMotion = useThemeStore((s) => s.toggleReducedMotion);
   const highContrast = useThemeStore((s) => s.highContrast);
   const toggleHighContrast = useThemeStore((s) => s.toggleHighContrast);
+  const iconLabels = useThemeStore((s) => s.iconLabels);
+  const toggleIconLabels = useThemeStore((s) => s.toggleIconLabels);
 
   return (
     <div className="profile-menu-subpanel" style={{ display: 'flex' }}>
@@ -351,7 +376,7 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
         <span className="profile-menu-back-icon">
           <ArrowLeft className="size-3.5" />
         </span>
-        <span className="profile-menu-subpanel-title">Appearance</span>
+        <span className="profile-menu-subpanel-title">Appearance &amp; Accessibility</span>
       </button>
 
       <div className="profile-menu-divider" />
@@ -360,7 +385,7 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
       <div className="profile-menu-theme" role="button" tabIndex={0} onClick={toggleTheme} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleTheme(); }}>
         <span className="profile-menu-theme-label">
           {theme === "dark" ? <Moon className="size-3.5" /> : <Sun className="size-3.5" />}
-          Dark Mode
+          Dark mode
         </span>
         <Switch
           size="sm"
@@ -372,31 +397,44 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
       {/* Purple intensity slider */}
       <div className="profile-menu-contrast">
         <div className="profile-menu-contrast-header">
-          <span className="profile-menu-contrast-label">Purple Intensity</span>
+          <span className="profile-menu-theme-label">Purple intensity</span>
           <span className="profile-menu-contrast-value">{purpleIntensity}%</span>
         </div>
         <input
           type="range"
           className="profile-menu-slider"
           min={0}
-          max={100}
+          max={150}
           value={purpleIntensity}
           onChange={(e) => setPurpleIntensity(Number(e.target.value))}
         />
+        <div className="profile-menu-slider-labels">
+          <span>Subtle</span>
+          <span>Default</span>
+          <span>Vivid</span>
+        </div>
       </div>
 
-      {/* Text size */}
-      <div className="profile-menu-font-size">
-        <span className="profile-menu-font-size-label">Text Size</span>
-        <button
-          type="button"
-          className="profile-menu-font-size-btn"
-          onClick={cycleFontSize}
-          aria-label="Cycle text size"
-        >
-          {FONT_SIZE_LABELS[fontSizeLevel]}
-          <Plus className="size-2.5" />
-        </button>
+      {/* Text size slider */}
+      <div className="profile-menu-contrast">
+        <div className="profile-menu-contrast-header">
+          <span className="profile-menu-theme-label">Text size</span>
+          <span className="profile-menu-contrast-value">{FONT_SIZE_LABELS[fontSizeLevel]}</span>
+        </div>
+        <input
+          type="range"
+          className="profile-menu-slider"
+          min={0}
+          max={4}
+          step={1}
+          value={fontSizeLevel}
+          onChange={(e) => setFontSizeLevel(Number(e.target.value))}
+        />
+        <div className="profile-menu-slider-labels">
+          <span>100%</span>
+          <span>110%</span>
+          <span>120%</span>
+        </div>
       </div>
 
       <div className="profile-menu-divider" />
@@ -404,9 +442,9 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
       {/* Accessibility section */}
       <div className="profile-menu-section-label">Accessibility</div>
 
-      {/* Dyslexia font */}
-      <div className="profile-menu-toggle-row">
-        <span className="profile-menu-toggle-label">Dyslexia Font</span>
+      {/* Dyslexia-friendly font */}
+      <div className="profile-menu-theme">
+        <span className="profile-menu-theme-label">Dyslexia-friendly font</span>
         <Switch
           size="sm"
           checked={dyslexiaFont}
@@ -415,8 +453,8 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* Reduced motion */}
-      <div className="profile-menu-toggle-row">
-        <span className="profile-menu-toggle-label">Reduced Motion</span>
+      <div className="profile-menu-theme">
+        <span className="profile-menu-theme-label">Reduced motion</span>
         <Switch
           size="sm"
           checked={reducedMotion}
@@ -424,13 +462,23 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
         />
       </div>
 
-      {/* High contrast */}
-      <div className="profile-menu-toggle-row">
-        <span className="profile-menu-toggle-label">High Contrast</span>
+      {/* High contrast & focus */}
+      <div className="profile-menu-theme">
+        <span className="profile-menu-theme-label">High contrast &amp; focus</span>
         <Switch
           size="sm"
           checked={highContrast}
           onCheckedChange={toggleHighContrast}
+        />
+      </div>
+
+      {/* Icon labels */}
+      <div className="profile-menu-theme">
+        <span className="profile-menu-theme-label">Icon labels</span>
+        <Switch
+          size="sm"
+          checked={iconLabels}
+          onCheckedChange={toggleIconLabels}
         />
       </div>
     </div>
@@ -439,6 +487,7 @@ function AppearancePanel({ onBack }: { onBack: () => void }) {
 
 /** Profile avatar button with dropdown — main menu + appearance sub-panel */
 function ProfileAvatar() {
+  const navigate = useNavigate();
   const profileMenuOpen = useUIStore((s) => s.profileMenuOpen);
   const toggleProfileMenu = useUIStore((s) => s.toggleProfileMenu);
   const [view, setView] = useState<"main" | "appearance">("main");
@@ -460,11 +509,25 @@ function ProfileAvatar() {
     <Popover open={profileMenuOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger
         aria-label="Profile menu"
-        className="top-profile-avatar"
+        className="top-profile"
       >
-        E
+        <div className="top-profile-avatar">E</div>
+        <span className="top-profile-name">Eliot Puplett</span>
       </PopoverTrigger>
-      <PopoverContent align="end" className="th-dropdown-panel th-dropdown-profile p-0" style={{ width: view === "appearance" ? 240 : 200 }}>
+      <PopoverContent
+          align="end"
+          sideOffset={6}
+          className={cn(
+            "border-2 border-solid",
+            "border-t-[var(--taupe-2)] border-r-[var(--taupe-3)] border-b-[var(--taupe-3)] border-l-[var(--taupe-2)]",
+            "dark:border-[var(--surface-0)]",
+            "bg-[var(--white)] dark:bg-[var(--surface-2)]",
+            "shadow-none dark:shadow-none",
+            "data-open:animate-none data-closed:animate-none duration-0",
+            "overflow-hidden p-0 gap-0 w-auto",
+          )}
+          style={{ width: view === "appearance" ? 240 : 200 }}
+        >
         {view === "main" ? (
           <div className="profile-menu-view">
             {/* User info */}
@@ -480,7 +543,7 @@ function ProfileAvatar() {
 
             {/* Appearance & Accessibility */}
             <button type="button" className="profile-menu-item" onClick={() => setView("appearance")}>
-              <span>Appearance</span>
+              <span>Appearance &amp; Accessibility</span>
               <span className="profile-menu-item-chevron">
                 <ChevronRight className="size-3.5" />
               </span>
@@ -494,7 +557,7 @@ function ProfileAvatar() {
             <div className="profile-menu-divider" />
 
             {/* Sign Out */}
-            <button type="button" className="profile-menu-item profile-menu-signout">
+            <button type="button" className="profile-menu-item profile-menu-signout" onClick={() => navigate("/login")}>
               <span>Sign Out</span>
             </button>
           </div>
@@ -518,12 +581,14 @@ export function AppHeader() {
       <nav className="contents" aria-label="Main navigation">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.path;
+          const TabIcon = tab.icon;
           return (
             <Link
               key={tab.path}
               to={tab.path}
               className={`top-tab${isActive ? " active" : ""}`}
             >
+              <span className="top-tab-icon"><TabIcon /></span>
               {tab.label}
             </Link>
           );
@@ -540,7 +605,7 @@ export function AppHeader() {
         <UsageButton />
 
         {/* Divider */}
-        <div className="h-5 w-px bg-[var(--taupe-2)]" />
+        <div className="th-divider" />
 
         <ProfileAvatar />
       </div>

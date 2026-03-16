@@ -203,7 +203,7 @@ function tokenizeHTML(html: string): HTMLToken[] {
 // ============================================
 
 /** Animated thinking cubes — 3 small squares that bounce and rotate */
-function ThinkingCubes({ fading }: { fading: boolean }) {
+export function ThinkingCubes({ fading }: { fading: boolean }) {
   return (
     <div className={cn('cosimo-thinking', fading && 'fading')}>
       {[0, 1, 2].map((i) => (
@@ -556,6 +556,33 @@ export function MessageStream() {
             </button>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================
+// THINKING-ONLY COMPONENT (Q4LP etc.)
+// ============================================
+
+/**
+ * Standalone "Cosimo is thinking" message block.
+ * Shows the AI message header + perpetual thinking cubes animation.
+ * Used for threads where Cosimo hasn't responded yet.
+ */
+export function MessageThinking({ timestamp = '11:20 AM', model = 'Assistant' }: { timestamp?: string; model?: string }) {
+  return (
+    <div className="msg-block">
+      <div>
+        <div className="msg-header">
+          <div className="msg-badge msg-badge-ai">◆</div>
+          <span className="msg-sender">Cosimo</span>
+          <span className="msg-timestamp">{timestamp}</span>
+          <span className="model-badge">{model}</span>
+        </div>
+        <div className="pl-[30px]">
+          <ThinkingCubes fading={false} />
+        </div>
       </div>
     </div>
   );

@@ -1,38 +1,103 @@
 import { useState } from 'react';
 import { cn } from '~/lib/utils';
-import type { PersonalityTrait } from '~/services/types';
 
 interface TraitBadgesProps {
-  traits: PersonalityTrait[];
+  selectedTraits: string[];
+  presetTraits: string[];
 }
 
-/** Grid of toggleable personality trait badges. Active traits show berry styling. */
-export function TraitBadges({ traits: initialTraits }: TraitBadgesProps) {
-  const [traits, setTraits] = useState<PersonalityTrait[]>(initialTraits);
+/** Personality trait badges split into selected / presets / custom input sections. */
+export function TraitBadges({ selectedTraits: initialSelected, presetTraits }: TraitBadgesProps) {
+  const [selected, setSelected] = useState<string[]>(initialSelected);
+  const [customInput, setCustomInput] = useState('');
 
-  const handleToggle = (index: number) => {
-    setTraits((prev) =>
-      prev.map((t, i) => (i === index ? { ...t, active: !t.active } : t))
-    );
+  const removeTrait = (name: string) => {
+    setSelected((prev) => prev.filter((t) => t !== name));
+  };
+
+  const addTrait = (name: string) => {
+    if (!selected.includes(name)) {
+      setSelected((prev) => [...prev, name]);
+    }
+  };
+
+  const addCustomTrait = () => {
+    const trimmed = customInput.trim();
+    if (trimmed && !selected.includes(trimmed)) {
+      setSelected((prev) => [...prev, trimmed]);
+      setCustomInput('');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addCustomTrait();
+    }
   };
 
   return (
-    <div className="flex flex-wrap gap-1.5">
-      {traits.map((trait, index) => (
+    <>
+      {/* Selected traits */}
+      <div className="mem-trait-selected">
+        {selected.map((name) => (
+          <button
+            key={name}
+            type="button"
+            onClick={() => removeTrait(name)}
+            className={cn(
+              'mem-trait-tag active',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--violet-3)]'
+            )}
+          >
+            {name}
+            <span className="trait-x">&times;</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Preset traits */}
+      <div className="mem-trait-presets">
+        {presetTraits.map((name) => {
+          const isSelected = selected.includes(name);
+          return (
+            <button
+              key={name}
+              type="button"
+              onClick={() => !isSelected && addTrait(name)}
+              className={cn(
+                'mem-trait-tag',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--violet-3)]',
+                isSelected && 'disabled'
+              )}
+            >
+              {name}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Custom trait input */}
+      <div className="mem-trait-custom">
+        <input
+          type="text"
+          className="mem-trait-input"
+          placeholder="Add a custom trait..."
+          value={customInput}
+          onChange={(e) => setCustomInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
         <button
-          key={trait.name}
           type="button"
-          onClick={() => handleToggle(index)}
           className={cn(
-            'mem-trait-tag',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--violet-3)]',
-            trait.active && 'active'
+            'mem-trait-add-btn',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--violet-3)]'
           )}
+          onClick={addCustomTrait}
         >
-          {trait.name}
-          {trait.active && <span className="ml-1 text-[13px] opacity-70">×</span>}
+          Add
         </button>
-      ))}
-    </div>
+      </div>
+    </>
   );
 }

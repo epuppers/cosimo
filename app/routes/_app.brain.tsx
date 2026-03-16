@@ -1,46 +1,48 @@
 // ============================================
-// Brain Layout Route — section tabs + child outlet
+// Brain Layout Route — section header + child outlet
 // ============================================
 
-import { Outlet, Link, useLocation } from 'react-router';
-import { cn } from '~/lib/utils';
+import { Outlet, useLocation } from 'react-router';
+import { useBrainStore } from '~/stores/brain-store';
+import { useUIStore } from '~/stores/ui-store';
 
 const BRAIN_SECTIONS = [
-  { label: 'Memory', path: '/brain/memory' },
-  { label: 'Lessons', path: '/brain/lessons' },
-  { label: 'Graphs', path: '/brain/graph' },
+  { label: 'Memory', path: '/brain/memory', action: '+ Add Memory' },
+  { label: 'Lessons', path: '/brain/lessons', action: '+ New Lesson' },
+  { label: 'Data Graphs', path: '/brain/graph', action: null },
 ] as const;
 
-/** Brain layout route — renders section navigation tabs and child content. */
+/** Brain layout route — renders section header and child content. */
 export default function BrainRoute() {
   const location = useLocation();
 
+  const currentSection = BRAIN_SECTIONS.find((s) =>
+    location.pathname.startsWith(s.path)
+  ) ?? BRAIN_SECTIONS[0];
+
   return (
     <div className="flex h-full flex-col bg-[var(--off-white)] dark:bg-[var(--surface-0)]">
-      {/* Section tabs */}
-      <nav className="flex shrink-0 gap-1 border-b border-[var(--taupe-2)] px-4 pt-2 dark:border-[var(--taupe-4)]">
-        {BRAIN_SECTIONS.map((section) => {
-          const isActive = location.pathname.startsWith(section.path);
-          return (
-            <Link
-              key={section.path}
-              to={section.path}
-              className={cn(
-                'relative px-3 py-2 font-[family-name:var(--pixel)] text-[11px] uppercase tracking-[0.08em] transition-colors',
-                'hover:text-[var(--taupe-5)] dark:hover:text-[var(--taupe-1)] focus-visible:outline-2 focus-visible:outline-[var(--violet-3)] focus-visible:outline-offset-1 rounded-t-[var(--r-md)]',
-                isActive
-                  ? 'text-[var(--taupe-5)] dark:text-[var(--taupe-1)]'
-                  : 'text-[var(--taupe-3)]'
-              )}
+      {/* Section header */}
+      <div className="main-header">
+        <span className="header-title">{currentSection.label}</span>
+        <div className="header-actions">
+          {currentSection.action && (
+            <button
+              type="button"
+              className="header-btn bevel label-mono primary"
+              onClick={() => {
+                if (currentSection.label === 'Memory') {
+                  useBrainStore.getState().toggleAddMemoryForm();
+                } else if (currentSection.label === 'Lessons') {
+                  useUIStore.getState().openCosimoPanel({ type: 'lesson', text: 'New Lesson' });
+                }
+              }}
             >
-              {section.label}
-              {isActive && (
-                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--violet-3)]" />
-              )}
-            </Link>
-          );
-        })}
-      </nav>
+              {currentSection.action}
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Child route content */}
       <div className="flex-1 overflow-hidden">

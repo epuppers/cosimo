@@ -1,10 +1,14 @@
 import { create } from 'zustand';
 
+type FilePanelTab = 'spreadsheet' | 'folder';
+
 interface ChatState {
   /** Currently selected thread ID */
   activeThreadId: string | null;
   /** Whether the file panel is open */
   filePanelOpen: boolean;
+  /** Active tab in the file panel */
+  filePanelTab: FilePanelTab;
   /** Whether the workflow context panel is open */
   workflowPanelOpen: boolean;
   /** Active workflow run ID shown in the workflow context panel */
@@ -17,8 +21,9 @@ interface ChatState {
   isStreaming: boolean;
 
   selectThread: (threadId: string | null) => void;
-  openFilePanel: () => void;
+  openFilePanel: (tab?: FilePanelTab) => void;
   closeFilePanel: () => void;
+  setFilePanelTab: (tab: FilePanelTab) => void;
   openWorkflowPanel: (runId: string) => void;
   closeWorkflowPanel: () => void;
   showAutocomplete: () => void;
@@ -31,6 +36,7 @@ interface ChatState {
 export const useChatStore = create<ChatState>((set) => ({
   activeThreadId: null,
   filePanelOpen: false,
+  filePanelTab: 'spreadsheet',
   workflowPanelOpen: false,
   activeWorkflowRunId: null,
   autocompleteOpen: false,
@@ -45,8 +51,9 @@ export const useChatStore = create<ChatState>((set) => ({
     autocompleteOpen: false,
     autocompleteIndex: 0,
   }),
-  openFilePanel: () => set({ filePanelOpen: true, workflowPanelOpen: false }),
+  openFilePanel: (tab) => set({ filePanelOpen: true, workflowPanelOpen: false, ...(tab ? { filePanelTab: tab } : {}) }),
   closeFilePanel: () => set({ filePanelOpen: false }),
+  setFilePanelTab: (tab) => set({ filePanelTab: tab }),
   openWorkflowPanel: (runId) => set({
     workflowPanelOpen: true,
     activeWorkflowRunId: runId,

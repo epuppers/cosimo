@@ -56,11 +56,19 @@ export interface Message {
   content: string;
   model?: string;
   timestamp?: string;
+  latency?: string;
   attachments?: Attachment[];
   artifacts?: Artifact[];
   isGate?: boolean;
   gateStatus?: 'awaiting' | 'resolved';
   commandChip?: string;
+  /** Error state — renders as a red error box instead of normal content */
+  isError?: boolean;
+  error?: {
+    title: string;
+    detail: string;
+    meta: string;
+  };
 }
 
 /** A chat thread containing messages */
@@ -272,6 +280,18 @@ export interface MemoryData {
 // BRAIN — LESSONS
 // ============================================
 
+/** A structured content section within a lesson */
+export interface LessonSection {
+  heading: string;
+  type: 'text' | 'table' | 'list' | 'colors';
+  body?: string;
+  items?: string[];
+  listStyle?: 'ordered' | 'unordered';
+  columns?: string[];
+  rows?: string[][];
+  swatches?: { label: string; value: string; color: string }[];
+}
+
 /** A domain knowledge lesson */
 export interface Lesson {
   id: string;
@@ -283,6 +303,7 @@ export interface Lesson {
   lastUsed: string;
   preview: string;
   content?: string;
+  sections?: LessonSection[];
   linkedWorkflows?: string[];
 }
 

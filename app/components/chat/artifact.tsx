@@ -42,6 +42,7 @@ export function Artifact({ artifact, className }: ArtifactProps) {
           ) : (
             <ChevronUp className="h-3.5 w-3.5" />
           )}
+          <span className="a11y-label">{collapsed ? 'Expand' : 'Collapse'}</span>
         </button>
       </div>
 
@@ -95,7 +96,7 @@ function ArtifactBody({ artifact }: { artifact: ArtifactType }) {
       const content = artifact.data as string;
       return (
         <div
-          className="text-[13px] leading-relaxed font-[family-name:var(--sans)] text-[var(--taupe-5)] dark:text-[var(--taupe-1)] [&_p]:mb-2 [&_p:last-child]:mb-0"
+          className="text-[13px] leading-relaxed font-[family-name:var(--sans)] text-[var(--taupe-5)] [&_p]:mb-2 [&_p:last-child]:mb-0"
           dangerouslySetInnerHTML={{ __html: content }}
         />
       );

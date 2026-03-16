@@ -1,6 +1,7 @@
-import { Copy, RotateCcw, Pencil, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Copy, RotateCcw, Pencil, ThumbsUp, ThumbsDown, RotateCw } from 'lucide-react';
 import type { Message, Attachment } from '~/services/types';
 import { Artifact } from '~/components/chat/artifact';
+import { useChatStore } from '~/stores/chat-store';
 import { cn } from '~/lib/utils';
 
 /** Returns an icon character for a file attachment based on its type */
@@ -27,6 +28,7 @@ function fileIconClass(type: string): string {
 
 /** Renders a file attachment chip */
 function FileAttachment({ attachment }: { attachment: Attachment }) {
+  const openFilePanel = useChatStore((s) => s.openFilePanel);
   const meta: string[] = [];
   if (attachment.pages) meta.push(`${attachment.pages} pages`);
   if (attachment.sheets?.length) meta.push(`${attachment.sheets.length} sheets`);
@@ -34,7 +36,7 @@ function FileAttachment({ attachment }: { attachment: Attachment }) {
   if (attachment.size) meta.push(attachment.size);
 
   return (
-    <div className="file-attachment">
+    <div className="file-attachment" onClick={() => openFilePanel('spreadsheet')} style={{ cursor: 'pointer' }}>
       <div className={cn('file-attachment-icon', fileIconClass(attachment.type))}>
         {fileIconChar(attachment.type)}
       </div>
@@ -127,9 +129,11 @@ function UserMessage({ message, isWorkflowThread }: { message: Message; isWorkfl
       <div className="msg-actions">
         <button className="msg-action-btn" title="Copy" aria-label="Copy message">
           <Copy />
+          <span className="a11y-label">Copy</span>
         </button>
         <button className="msg-action-btn" title="Edit" aria-label="Edit message">
           <Pencil />
+          <span className="a11y-label">Edit</span>
         </button>
       </div>
     </div>
@@ -150,6 +154,9 @@ function AIMessage({ message }: { message: Message }) {
           {message.timestamp && (
             <span className="msg-timestamp">{message.timestamp}</span>
           )}
+          {message.latency && (
+            <span className="latency-chip">{message.latency}</span>
+          )}
           {message.model && (
             <span className="model-badge">{message.model}</span>
           )}
@@ -158,21 +165,46 @@ function AIMessage({ message }: { message: Message }) {
           )}
         </div>
 
+        {/* Error state */}
+        {message.isError && message.error && (
+          <div className="msg-body">
+            <div className="cosimo-error">
+              <div className="cosimo-error-icon">!</div>
+              <div className="cosimo-error-content">
+                <div className="cosimo-error-title label-mono">{message.error.title}</div>
+                <div className="cosimo-error-detail">{message.error.detail}</div>
+                <div className="cosimo-error-meta">{message.error.meta}</div>
+              </div>
+              <button className="cosimo-error-retry label-mono" aria-label="Retry request">
+                <RotateCw className="retry-icon" size={12} />
+                Retry
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Message body */}
-        {message.content && (
+        {!message.isError && message.content && (
           <div className="msg-body">
             <div dangerouslySetInnerHTML={{ __html: message.content }} />
           </div>
         )}
 
-        {/* Artifacts */}
-        {message.artifacts && message.artifacts.length > 0 && (
-          <div className="ml-[30px]">
-            {message.artifacts.map((art, i) => (
-              <Artifact key={i} artifact={art} />
+        {/* File attachments (AI-generated files) */}
+        {message.attachments && message.attachments.length > 0 && (
+          <div className="msg-file-attachments">
+            {message.attachments.map((att, i) => (
+              <FileAttachment key={i} attachment={att} />
             ))}
           </div>
         )}
+
+        {/* Artifacts */}
+        {message.artifacts && message.artifacts.length > 0 &&
+          message.artifacts.map((art, i) => (
+            <Artifact key={i} artifact={art} />
+          ))
+        }
 
         {/* Feedback buttons (AI messages only, non-gate) */}
         {!isGate && (
@@ -201,9 +233,11 @@ function AIMessage({ message }: { message: Message }) {
       <div className="msg-actions">
         <button className="msg-action-btn" title="Copy" aria-label="Copy message">
           <Copy />
+          <span className="a11y-label">Copy</span>
         </button>
         <button className="msg-action-btn" title="Regenerate" aria-label="Regenerate response">
           <RotateCcw />
+          <span className="a11y-label">Retry</span>
         </button>
       </div>
     </div>

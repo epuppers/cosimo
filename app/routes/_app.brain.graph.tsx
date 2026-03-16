@@ -11,6 +11,7 @@ import { Button } from '~/components/ui/button';
 import { getGraphData } from '~/services/brain';
 import { EntityGraph } from '~/components/brain/entity-graph';
 import { EntityDetail } from '~/components/brain/entity-detail';
+import { useBrainStore } from '~/stores/brain-store';
 import type { GraphNode } from '~/services/types';
 import type { Route } from './+types/_app.brain.graph';
 
@@ -24,53 +25,90 @@ export async function loader() {
 export default function BrainGraphRoute({ loaderData }: Route.ComponentProps) {
   const { graphData } = loaderData;
   const [searchParams, setSearchParams] = useSearchParams();
-  const entityParam = searchParams.get('entity');
 
-  const [selectedEntityId, setSelectedEntityId] = useState<string | null>(
-    entityParam
-  );
+  const {
+    graphLevel,
+    graphActiveCategory,
+    graphSelectedEntity,
+    navigateGraph,
+    openGraphEntity,
+    closeGraphEntity,
+  } = useBrainStore();
 
-  // Sync URL param to state on mount/change
+  // Sync URL params → store on mount
   useEffect(() => {
-    if (entityParam) {
-      setSelectedEntityId(entityParam);
-    }
-  }, [entityParam]);
+    const level = searchParams.get('level');
+    const category = searchParams.get('category');
+    const entity = searchParams.get('entity');
 
-  // Resolve selected entity node and its category (supports both ID and label lookup)
+    if (entity && category) {
+      openGraphEntity(entity, category);
+    } else if (category) {
+      navigateGraph(category);
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync store → URL params
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (graphLevel !== 'root') params.level = graphLevel;
+    if (graphActiveCategory) params.category = graphActiveCategory;
+    if (graphSelectedEntity) params.entity = graphSelectedEntity;
+    setSearchParams(params, { replace: true });
+  }, [graphLevel, graphActiveCategory, graphSelectedEntity, setSearchParams]);
+
+  // Resolve selected entity for the detail panel
   const selectedEntity = useMemo<{ node: GraphNode; category: string } | null>(() => {
-    if (!selectedEntityId) return null;
+    if (!graphSelectedEntity || !graphActiveCategory) return null;
+    const nodes = graphData.nodes[graphActiveCategory] ?? [];
+    const node = nodes.find(
+      (n) => n.id === graphSelectedEntity || n.label === graphSelectedEntity
+    );
+    if (node) return { node, category: graphActiveCategory };
+    // Fallback: search all categories
     for (const cat of Object.keys(graphData.nodes)) {
-      const node = graphData.nodes[cat].find(
-        (n) => n.id === selectedEntityId || n.label === selectedEntityId
+      const found = graphData.nodes[cat].find(
+        (n) => n.id === graphSelectedEntity || n.label === graphSelectedEntity
       );
-      if (node) return { node, category: cat };
+      if (found) return { node: found, category: cat };
     }
     return null;
-  }, [selectedEntityId, graphData]);
+  }, [graphSelectedEntity, graphActiveCategory, graphData]);
 
-  const handleSelectEntity = (id: string) => {
-    setSelectedEntityId(id);
-    setSearchParams({ entity: id }, { replace: true });
-  };
+  // Navigate to a related entity (may be in a different category)
+  const handleNavigateToRelated = (entityId: string) => {
+    // Find which category this entity is in
+    let targetCat: string | null = null;
+    for (const cat of Object.keys(graphData.nodes)) {
+      if (graphData.nodes[cat].some((n) => n.id === entityId)) {
+        targetCat = cat;
+        break;
+      }
+    }
+    if (!targetCat) return;
 
-  const handleNavigateToRelated = (id: string) => {
-    handleSelectEntity(id);
+    if (targetCat === graphActiveCategory) {
+      // Same category — just open the entity
+      openGraphEntity(entityId, targetCat);
+    } else {
+      // Different category — navigate to cluster first, then open entity after animation
+      navigateGraph(targetCat);
+      setTimeout(() => {
+        openGraphEntity(entityId, targetCat!);
+      }, 520);
+    }
   };
 
   const handleCloseDetail = () => {
-    setSelectedEntityId(null);
-    setSearchParams({}, { replace: true });
+    closeGraphEntity();
   };
 
   return (
     <div className="relative h-full overflow-hidden">
       {/* Graph area (full) */}
-      <EntityGraph
-        graphData={graphData}
-        selectedEntityId={selectedEntityId}
-        onSelectEntity={handleSelectEntity}
-      />
+      <EntityGraph graphData={graphData} />
 
       {/* Detail panel — slides up from bottom inside the graph container */}
       {selectedEntity && (

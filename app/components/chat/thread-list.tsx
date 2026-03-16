@@ -6,7 +6,6 @@
 // Navigates to /chat/:threadId on click.
 
 import { Link, useLocation } from "react-router";
-import { Settings } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -25,26 +24,7 @@ interface ThreadListProps {
 
 // ======== Status Indicator ========
 
-/** Status dot + label for workflow thread indicators */
-function RunStatusIndicator({ status }: { status: "running" | "waiting" }) {
-  if (status === "waiting") {
-    return (
-      <span className="inline-flex items-center gap-1 font-[family-name:var(--mono)] text-[10px] text-[var(--amber)]">
-        <span className="inline-block size-1.5 rounded-full bg-[var(--amber)]" />
-        Waiting
-      </span>
-    );
-  }
-
-  return (
-    <span className="inline-flex items-center gap-1 font-[family-name:var(--mono)] text-[10px] text-[var(--violet-3)]">
-      <span className="inline-block size-1.5 rounded-full bg-[var(--violet-3)] animate-[wf-pulse_2s_ease-in-out_infinite] motion-reduce:animate-none" />
-      Running
-    </span>
-  );
-}
-
-/** Thread indicator badge (ready, error, waiting, etc.) */
+/** Thread indicator badge (ready, error, waiting, running, etc.) */
 function ThreadIndicatorBadge({ type, label }: { type: string; label: string }) {
   const colorMap: Record<string, string> = {
     ready: "text-[var(--green)] border-[var(--green)] bg-[rgba(var(--green-rgb),0.15)]",
@@ -65,7 +45,8 @@ function ThreadIndicatorBadge({ type, label }: { type: string; label: string }) 
 
 // ======== Thread Item ========
 
-/** A single thread item in the sidebar list */
+/** A single thread item in the sidebar list — matches reference structure:
+ *  title text (with optional ⚙ icon inline), timestamp div, indicator badge */
 function ThreadItem({
   thread,
   isActive,
@@ -83,29 +64,26 @@ function ThreadItem({
         size="sm"
         className="h-auto items-start rounded-[var(--r-md)] border border-transparent py-2 px-2 font-[family-name:var(--mono)] text-xs leading-[1.3] text-[var(--taupe-2)] dark:text-[var(--taupe-4)]"
       >
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <div className="flex items-center gap-1">
-            {isWorkflowThread && (
-              <span
-                className="shrink-0 text-[10px] text-[var(--taupe-3)]"
-                aria-label="Workflow thread"
-              >
-                ⚙
-              </span>
-            )}
-            <span className="truncate text-xs font-semibold">{thread.title}</span>
-          </div>
-          <span className="truncate font-[family-name:var(--sans)] text-[10px] text-[var(--taupe-3)]">
-            {thread.preview}
-          </span>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[9px] text-[var(--taupe-3)]">
-              {thread.timestamp}
+        <div className="min-w-0 flex-1">
+          {isWorkflowThread && (
+            <span
+              className="mr-[3px] inline text-[10px] text-[var(--taupe-3)]"
+              aria-label="Workflow thread"
+            >
+              ⚙
             </span>
-            {thread.indicators.map((ind, i) => (
-              <ThreadIndicatorBadge key={i} type={ind.type} label={ind.label} />
-            ))}
+          )}
+          <span className="text-xs">{thread.title}</span>
+          <div className="mt-0.5 text-xs text-[var(--taupe-3)]">
+            {thread.timestamp}
           </div>
+          {thread.indicators.length > 0 && (
+            <div className="mt-0.5">
+              {thread.indicators.map((ind, i) => (
+                <ThreadIndicatorBadge key={i} type={ind.type} label={ind.label} />
+              ))}
+            </div>
+          )}
         </div>
       </SidebarMenuButton>
     </SidebarMenuItem>
@@ -114,7 +92,8 @@ function ThreadItem({
 
 // ======== Active Run Item ========
 
-/** Thread item for active workflow runs with run status indicator */
+/** Thread item for active workflow runs — ⚙ icon inline with title,
+ *  timestamp below, then run status indicator on its own line */
 function ActiveRunItem({
   thread,
   runStatus,
@@ -132,16 +111,14 @@ function ActiveRunItem({
         size="sm"
         className="h-auto items-start rounded-[var(--r-md)] border border-transparent py-1.5 px-2 font-[family-name:var(--mono)] text-xs text-[var(--taupe-2)] dark:text-[var(--taupe-4)]"
       >
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <div className="flex items-center gap-1">
-            <Settings className="size-3 shrink-0 text-[var(--taupe-3)]" />
-            <span className="truncate text-[11px] font-semibold text-[var(--taupe-1)] dark:text-[var(--taupe-5)]">{thread.title}</span>
+        <div className="min-w-0 flex-1">
+          <span className="mr-[3px] inline text-[10px] text-[var(--taupe-3)]" aria-label="Workflow thread">⚙</span>
+          <span className="text-xs text-[var(--taupe-1)] dark:text-[var(--taupe-5)]">{thread.title}</span>
+          <div className="mt-0.5 text-xs text-[var(--taupe-3)]">
+            {thread.timestamp}
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-[var(--taupe-3)]">
-              {thread.timestamp}
-            </span>
-            <RunStatusIndicator status={runStatus} />
+          <div className="mt-0.5">
+            <ThreadIndicatorBadge type={runStatus} label={runStatus === "running" ? "Running" : "Waiting"} />
           </div>
         </div>
       </SidebarMenuButton>
@@ -181,8 +158,8 @@ export function ThreadList({ threads, runs = {} }: ThreadListProps) {
       {activeRuns.length > 0 && (
         <SidebarMenu>
           <div className="mb-1 rounded-[var(--r-md)] bg-[rgba(var(--violet-3-rgb),0.04)] px-1.5 py-1.5 dark:bg-[rgba(var(--violet-3-rgb),0.06)] border-b border-[var(--chinese-4)] dark:border-[var(--chinese-5)]">
-            <div className="mb-1 px-0.5 font-[family-name:var(--mono)] text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--taupe-3)]">
-              Active Runs
+            <div className="sidebar-section-label px-2 pt-1 pb-0.5">
+              Active
             </div>
             {activeRuns.map(({ thread, status }) => (
               <ActiveRunItem
@@ -195,6 +172,9 @@ export function ThreadList({ threads, runs = {} }: ThreadListProps) {
           </div>
         </SidebarMenu>
       )}
+
+      {/* Recent label */}
+      <div className="sidebar-section-label">Recent</div>
 
       {/* Regular Threads */}
       <SidebarMenu>
