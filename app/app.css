@@ -1388,6 +1388,101 @@
     font-size: 9px;
     color: rgba(var(--white-pure-rgb), 0.4);
   }
+
+  /* ======== Toast Notifications (sonner overrides) ======== */
+
+  [data-sonner-toaster] [data-sonner-toast] {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 6px 16px;
+    background: var(--taupe-5);
+    color: var(--taupe-1);
+    border: 1px solid;
+    border-color: var(--taupe-4) var(--surface-0) var(--surface-0) var(--taupe-4);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+    border-radius: var(--r-md);
+    --normal-bg: var(--taupe-5);
+    --normal-text: var(--taupe-1);
+    --normal-border: var(--taupe-4);
+  }
+
+  /* Success toast — green left border */
+  [data-sonner-toaster] [data-sonner-toast][data-type="success"] {
+    border-left: 3px solid var(--green);
+  }
+
+  /* Error toast — red left border */
+  [data-sonner-toaster] [data-sonner-toast][data-type="error"] {
+    border-left: 3px solid var(--red);
+  }
+
+  /* Info toast — blue left border */
+  [data-sonner-toaster] [data-sonner-toast][data-type="info"] {
+    border-left: 3px solid var(--blue-3);
+  }
+
+  /* Toast title */
+  [data-sonner-toaster] [data-sonner-toast] [data-title] {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* Toast description */
+  [data-sonner-toaster] [data-sonner-toast] [data-description] {
+    font-family: var(--sans);
+    font-size: 10px;
+    color: var(--taupe-2);
+  }
+
+  /* Toast close button */
+  [data-sonner-toaster] [data-sonner-toast] [data-close-button] {
+    border-color: var(--taupe-3);
+    background: var(--taupe-4);
+    color: var(--taupe-1);
+  }
+
+  /* Dark mode toast overrides */
+  .dark [data-sonner-toaster] [data-sonner-toast] {
+    background: var(--taupe-1);
+    color: var(--taupe-5);
+    border-color: var(--taupe-2);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+    --normal-bg: var(--taupe-1);
+    --normal-text: var(--taupe-5);
+    --normal-border: var(--taupe-2);
+  }
+
+  .dark [data-sonner-toaster] [data-sonner-toast] [data-description] {
+    color: var(--taupe-3);
+  }
+
+  .dark [data-sonner-toaster] [data-sonner-toast] [data-close-button] {
+    border-color: var(--taupe-2);
+    background: var(--taupe-2);
+    color: var(--taupe-5);
+  }
+
+  /* Dark mode keeps colored left borders for typed toasts */
+  .dark [data-sonner-toaster] [data-sonner-toast][data-type="success"] {
+    border-left: 3px solid var(--green);
+  }
+
+  .dark [data-sonner-toaster] [data-sonner-toast][data-type="error"] {
+    border-left: 3px solid var(--red);
+  }
+
+  .dark [data-sonner-toaster] [data-sonner-toast][data-type="info"] {
+    border-left: 3px solid var(--blue-3);
+  }
+
+  /* Gate toast animation by reduced motion */
+  [data-a11y-motion="reduce"] [data-sonner-toaster] [data-sonner-toast] {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 /* ======== Sidebar Custom Styles ========

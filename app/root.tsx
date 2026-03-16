@@ -34,6 +34,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const dyslexiaFont = useThemeStore((s) => s.dyslexiaFont);
   const reducedMotion = useThemeStore((s) => s.reducedMotion);
   const highContrast = useThemeStore((s) => s.highContrast);
+  const iconLabels = useThemeStore((s) => s.iconLabels);
 
   const fontSize = CONFIG.fontZoomLevels[fontSizeLevel];
 
@@ -44,6 +45,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       data-a11y-font={dyslexiaFont ? "dyslexia" : undefined}
       data-a11y-motion={reducedMotion ? "reduce" : undefined}
       data-a11y-contrast={highContrast ? "high" : undefined}
+      data-a11y-labels={iconLabels ? "show" : undefined}
       style={{ fontSize: fontSize !== 1 ? `${fontSize}em` : undefined }}
     >
       <head>
@@ -57,7 +59,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Toaster
           position="bottom-right"
           toastOptions={{
-            className: "font-[var(--font-mono)] text-xs",
+            className: "font-[family-name:var(--mono)] text-[11px] font-semibold tracking-wide",
           }}
         />
         <ScrollRestoration />
