@@ -85,6 +85,7 @@ export function EntityDetail({
             aria-label="Close entity detail"
           >
             <X className="size-4" />
+            <span className="a11y-label">Close</span>
           </button>
         </div>
       </div>

@@ -250,13 +250,14 @@ export function CosimoPanel() {
               disabled={!inputValue.trim()}
               aria-label="Send message"
               className={cn(
-                'shrink-0 h-[28px] w-[28px] rounded-[var(--r-md)]',
+                'panel-send-btn shrink-0 h-[28px] w-[28px] rounded-[var(--r-md)]',
                 'bg-[var(--violet-3)] text-white border-0',
                 'hover:bg-[var(--violet-4)]',
                 'disabled:bg-[var(--taupe-2)] disabled:text-[var(--taupe-3)] disabled:opacity-60',
               )}
             >
               <Send className="h-3.5 w-3.5" />
+              <span className="a11y-label">Send</span>
             </Button>
           </div>
         </div>
