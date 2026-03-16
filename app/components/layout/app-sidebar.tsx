@@ -36,7 +36,14 @@ function SidebarToggle() {
     <button
       onClick={toggleSidebar}
       aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-      className="ml-auto flex size-[22px] items-center justify-center rounded-[var(--r-sm)] border border-transparent bg-transparent text-[var(--taupe-3)] transition-all hover:border-[var(--taupe-2)] hover:bg-[rgba(var(--violet-3-rgb),0.08)] hover:text-[var(--violet-3)] active:bg-[rgba(var(--violet-3-rgb),0.14)] focus-visible:outline-2 focus-visible:outline-[var(--violet-3)] focus-visible:outline-offset-1 dark:hover:border-[var(--taupe-3)] dark:hover:bg-[rgba(var(--violet-3-rgb),0.12)] dark:active:bg-[rgba(var(--violet-3-rgb),0.2)]"
+      className={cn(
+        "flex size-[22px] shrink-0 items-center justify-center rounded-[var(--r-sm)] border border-transparent bg-transparent text-[var(--taupe-3)] transition-all",
+        "hover:border-[var(--taupe-2)] hover:bg-[rgba(var(--violet-3-rgb),0.08)] hover:text-[var(--violet-3)]",
+        "active:bg-[rgba(var(--violet-3-rgb),0.14)]",
+        "focus-visible:outline-2 focus-visible:outline-[var(--violet-3)] focus-visible:outline-offset-1",
+        "dark:hover:border-[var(--taupe-3)] dark:hover:bg-[rgba(var(--violet-3-rgb),0.12)] dark:active:bg-[rgba(var(--violet-3-rgb),0.2)]",
+        isCollapsed ? "mx-auto" : "ml-auto"
+      )}
     >
       {isCollapsed ? <ChevronRight className="size-3.5" /> : <ChevronLeft className="size-3.5" />}
     </button>
@@ -51,7 +58,10 @@ function LogoRow() {
   const isCollapsed = state === "collapsed";
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={cn(
+      "flex items-center gap-2 overflow-hidden",
+      isCollapsed && "justify-center gap-0 min-h-[33px]"
+    )}>
       <LogoMark />
       {!isCollapsed && (
         <>

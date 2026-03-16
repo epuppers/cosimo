@@ -1601,6 +1601,62 @@
   border-top-color: var(--surface-3);
 }
 
+/* ======== Sidebar Collapsed State ========
+   When shadcn sidebar is collapsed (data-collapsible="icon"),
+   hide thread lists, active runs, section labels, and brain nav
+   to match the original .sidebar.collapsed behavior. */
+
+[data-collapsible="icon"] [data-sidebar="content"] [data-sidebar="menu"] {
+  display: none;
+}
+
+[data-collapsible="icon"] .sidebar-section-label {
+  display: none;
+}
+
+[data-collapsible="icon"] [data-sidebar="header"] {
+  padding: 14px 4px 4px;
+  border-bottom: none;
+}
+
+[data-collapsible="icon"] [data-sidebar="header"] .sidebar-new-btn,
+[data-collapsible="icon"] [data-sidebar="header"] .sidebar-search-input {
+  display: none;
+}
+
+[data-collapsible="icon"] [data-sidebar="footer"] {
+  justify-content: center;
+  padding: 10px 0;
+  border-top: none;
+}
+
+/* ======== Sidebar Narrow State ========
+   Applied when sidebar is resized to an intermediate width
+   (below ~110px threshold but not fully collapsed). Uses a
+   .sidebar-narrow class set by the resize handler.
+   Hides the same elements as collapsed state. */
+
+.sidebar-narrow .sidebar-section-label,
+.sidebar-narrow .sidebar-new-btn,
+.sidebar-narrow .sidebar-search-input,
+.sidebar-narrow .brain-nav {
+  display: none;
+}
+
+.sidebar-narrow [data-sidebar="header"] {
+  padding: 14px 4px 4px;
+  border-bottom: none;
+}
+
+.sidebar-narrow [data-sidebar="footer"] {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.sidebar-narrow [data-sidebar="content"] [data-sidebar="menu"] {
+  display: none;
+}
+
 /* ======== Top Tab Bar (header mode tabs) ======== */
 .top-tab-bar {
   display: flex;
