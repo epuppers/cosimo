@@ -657,31 +657,6 @@
   border-top: none;
 }
 
-/* ======== Sidebar Narrow State ========
-   Applied when sidebar is resized to an intermediate width
-   (below ~110px threshold but not fully collapsed). Uses a
-   .sidebar-narrow class set by the resize handler.
-   Hides the same elements as collapsed state. */
-
-.sidebar-narrow .sidebar-new-btn,
-.sidebar-narrow .sidebar-search-input,
-.sidebar-narrow .brain-nav {
-  display: none;
-}
-
-.sidebar-narrow [data-sidebar="header"] {
-  padding: 14px 4px 4px;
-  border-bottom: none;
-}
-
-.sidebar-narrow [data-sidebar="footer"] {
-  justify-content: center;
-  padding: 10px 0;
-}
-
-.sidebar-narrow [data-sidebar="content"] [data-sidebar="menu"] {
-  display: none;
-}
 
 /* ======== Top Tab Bar — pseudo-element (kept, not expressible in Tailwind) ======== */
 .top-tab.active::before {
@@ -1147,11 +1122,6 @@
   transition: none;
 }
 
-/* Suppress sidebar width transitions during drag resize */
-.sidebar-dragging [data-slot="sidebar-gap"],
-.sidebar-dragging [data-slot="sidebar-container"] {
-  transition: none !important;
-}
 
 /* ======== Workflow Tab pseudo-elements (can't be Tailwind) ======== */
 .tab-btn.active::before,

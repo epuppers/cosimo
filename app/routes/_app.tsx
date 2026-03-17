@@ -3,10 +3,7 @@ import { AlertCircle } from "lucide-react";
 import { AppSidebar, AppSidebarProvider } from "~/components/layout/app-sidebar";
 import { AppHeader } from "~/components/layout/app-header";
 import { SidebarInset } from "~/components/ui/sidebar";
-import { SidebarResizeHandle } from "~/components/layout/sidebar-resize-handle";
 import { CosimoPanel } from "~/components/layout/cosimo-panel";
-import { cn } from "~/lib/utils";
-import { useUIStore } from "~/stores/ui-store";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { LogoMark } from "~/components/layout/logo";
@@ -26,20 +23,14 @@ export async function clientLoader() {
 /** App shell layout wrapping all authenticated routes — sidebar, header, main content, Cosimo panel */
 export default function AppLayout({ loaderData }: Route.ComponentProps) {
   const { threads, runs, templates } = loaderData;
-  const sidebarDragState = useUIStore((s) => s.sidebarDragState);
 
   // Global keyboard shortcuts (Escape chain, Cmd+K)
   useKeyboard();
 
   return (
-    <div className={cn(
-      "app-frame flex w-screen h-screen p-1 overflow-hidden bg-taupe-4",
-      sidebarDragState === "narrow" && "sidebar-narrow",
-      sidebarDragState !== "idle" && "sidebar-dragging"
-    )}>
+    <div className="app-frame flex w-screen h-screen p-1 overflow-hidden bg-taupe-4">
       <AppSidebarProvider>
         <AppSidebar threads={threads} runs={runs} templates={templates} />
-        <SidebarResizeHandle />
         <SidebarInset>
           <AppHeader />
 

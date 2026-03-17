@@ -1,7 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router";
 import {
-  ChevronLeft,
-  ChevronRight,
   ChevronDown,
   Search,
   Plus,
@@ -23,33 +21,9 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarProvider,
+  SidebarRail,
   useSidebar,
 } from "~/components/ui/sidebar";
-
-// ======== Sidebar Toggle Button ========
-
-/** Toggle button to collapse/expand the sidebar */
-function SidebarToggle() {
-  const { state, toggleSidebar } = useSidebar();
-  const isCollapsed = state === "collapsed";
-
-  return (
-    <button
-      onClick={toggleSidebar}
-      aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-      className={cn(
-        "sidebar-toggle-btn flex size-[22px] shrink-0 items-center justify-center rounded-[var(--r-sm)] border border-transparent bg-transparent text-taupe-3 transition-all",
-        "hover:border-taupe-2 hover:bg-[rgba(var(--violet-3-rgb),0.08)] hover:text-violet-3",
-        "active:bg-[rgba(var(--violet-3-rgb),0.14)]",
-        "focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-1",
-        "dark:hover:border-taupe-3 dark:hover:bg-[rgba(var(--violet-3-rgb),0.12)] dark:active:bg-[rgba(var(--violet-3-rgb),0.2)]",
-        isCollapsed ? "mx-auto" : "ml-auto"
-      )}
-    >
-      {isCollapsed ? <ChevronRight className="size-3.5 a11y-keep" /> : <ChevronLeft className="size-3.5 a11y-keep" />}
-    </button>
-  );
-}
 
 // ======== Logo Row ========
 
@@ -71,9 +45,11 @@ function LogoRow() {
   }
 
   return (
-    <div className="flex items-center gap-2 overflow-hidden">
-      <LogoMark />
-      <div className="min-w-0 flex-1 overflow-hidden whitespace-nowrap">
+    <div className="flex items-start gap-2 overflow-hidden">
+      <div className="mt-[2px]">
+        <LogoMark />
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden whitespace-nowrap">
         <div className="font-[family-name:var(--pixel)] text-[22px] leading-none tracking-[1px] text-taupe-1 [text-shadow:1px_1px_0_rgba(0,0,0,0.4)] dark:text-taupe-5 dark:[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]">
           COSIMO
         </div>
@@ -81,7 +57,6 @@ function LogoRow() {
           MEDICI &amp; COMPANY
         </div>
       </div>
-      <SidebarToggle />
     </div>
   );
 }
@@ -246,6 +221,9 @@ export function AppSidebar({ threads, runs, templates }: AppSidebarProps) {
       <SidebarFooter className="p-0">
         <BrainNav />
       </SidebarFooter>
+
+      {/* Rail — thin hover line at sidebar edge to toggle open/close */}
+      <SidebarRail />
     </Sidebar>
   );
 }
@@ -255,7 +233,6 @@ export function AppSidebar({ threads, runs, templates }: AppSidebarProps) {
 /** Wraps the app with SidebarProvider, connecting shadcn sidebar state to UIStore */
 export function AppSidebarProvider({ children }: { children: React.ReactNode }) {
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed);
-  const sidebarWidth = useUIStore((s) => s.sidebarWidth);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
   return (
@@ -267,7 +244,6 @@ export function AppSidebarProvider({ children }: { children: React.ReactNode }) 
           toggleSidebar();
         }
       }}
-      style={{ '--sidebar-width': `${sidebarWidth}px` } as React.CSSProperties}
     >
       {children}
     </SidebarProvider>
