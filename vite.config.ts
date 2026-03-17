@@ -6,6 +6,6 @@ import tsconfigPaths from "vite-tsconfig-paths";
 const isGitHubPages = process.env.GITHUB_PAGES === "true";
 
 export default defineConfig({
-  base: isGitHubPages ? "/MediciNewUX/" : "/",
+  base: isGitHubPages ? "/cosimo/" : "/",
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
 });
