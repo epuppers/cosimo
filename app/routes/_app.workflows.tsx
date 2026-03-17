@@ -5,7 +5,6 @@
 import { Outlet, useMatches, useNavigate, useRouteError } from "react-router";
 import { toast } from "sonner";
 import { Workflow } from "lucide-react";
-import { Skeleton } from "~/components/ui/skeleton";
 import { ErrorBoundaryContent } from "~/components/ui/error-boundary-content";
 import { getTemplates, findRunThread } from "~/services/workflows";
 import { getLessons } from "~/services/brain";
@@ -14,7 +13,7 @@ import { WorkflowCard } from "~/components/workflows/workflow-card";
 import type { Route } from "./+types/_app.workflows";
 
 /** Loader — fetches all workflow templates and lesson names for card chips */
-export async function loader() {
+export async function clientLoader() {
   const [templates, lessons] = await Promise.all([
     getTemplates(),
     getLessons(),
@@ -90,24 +89,4 @@ export function ErrorBoundary() {
   const error = useRouteError();
   console.error('Workflows route error:', error);
   return <ErrorBoundaryContent message="An unexpected error occurred while loading workflows." />;
-}
-
-/** Loading skeleton — grid of 6 workflow cards */
-export function HydrateFallback() {
-  return (
-    <div className="flex h-full flex-col gap-4 p-6">
-      {/* Stats bar skeleton */}
-      <div className="flex gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 flex-1 rounded-lg" />
-        ))}
-      </div>
-      {/* Card grid skeleton */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-48 rounded-lg" />
-        ))}
-      </div>
-    </div>
-  );
 }

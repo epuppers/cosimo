@@ -5,7 +5,6 @@
 import { useState, useMemo } from 'react';
 import { Outlet, useMatches, useNavigate, useRouteError } from 'react-router';
 import { Search } from 'lucide-react';
-import { Skeleton } from '~/components/ui/skeleton';
 import { ErrorBoundaryContent } from '~/components/ui/error-boundary-content';
 import { EmptyState } from '~/components/ui/empty-state';
 import { getLessons } from '~/services/brain';
@@ -16,7 +15,7 @@ import { LESSON_SCOPE_FILTERS } from '~/lib/brain-constants';
 import type { Route } from './+types/_app.brain.lessons';
 
 /** Loads all lessons for the lesson list. */
-export async function loader() {
+export async function clientLoader() {
   const lessons = await getLessons();
   return { lessons };
 }
@@ -100,17 +99,4 @@ export function ErrorBoundary() {
   const error = useRouteError();
   console.error('Lessons route error:', error);
   return <ErrorBoundaryContent message="An unexpected error occurred while loading lessons." />;
-}
-
-/** Loading skeleton — 4 lesson cards */
-export function HydrateFallback() {
-  return (
-    <div className="h-full overflow-y-auto p-4">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-36 rounded-lg" />
-        ))}
-      </div>
-    </div>
-  );
 }

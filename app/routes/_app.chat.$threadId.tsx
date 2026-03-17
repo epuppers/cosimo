@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { isRouteErrorResponse, useRouteError } from "react-router";
 import { toast } from "sonner";
-import { Skeleton } from "~/components/ui/skeleton";
 import { ErrorBoundaryContent } from "~/components/ui/error-boundary-content";
 import { getThread } from "~/services/threads";
 import { getRun } from "~/services/workflows";
@@ -11,7 +10,7 @@ import { useChatStore } from "~/stores/chat-store";
 import type { Route } from "./+types/_app.chat.$threadId";
 
 /** Loader — fetches thread by ID and optionally its workflow run */
-export async function loader({ params }: Route.LoaderArgs) {
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   const thread = await getThread(params.threadId);
   if (!thread) {
     throw new Response("Thread not found", { status: 404 });
@@ -76,27 +75,6 @@ export default function ChatThreadRoute({ loaderData }: Route.ComponentProps) {
         );
       })}
     </>
-  );
-}
-
-/** Loading skeleton — 3 message blocks of varying heights */
-export function HydrateFallback() {
-  return (
-    <div className="space-y-6">
-      {/* User message skeleton */}
-      <div className="flex justify-end">
-        <Skeleton className="h-16 w-3/5 rounded-lg" />
-      </div>
-      {/* AI message skeleton — tall */}
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-40 w-4/5 rounded-lg" />
-      </div>
-      {/* User message skeleton — short */}
-      <div className="flex justify-end">
-        <Skeleton className="h-10 w-2/5 rounded-lg" />
-      </div>
-    </div>
   );
 }
 

@@ -1,12 +1,11 @@
 import { useRouteError } from 'react-router';
-import { Skeleton } from '~/components/ui/skeleton';
 import { ErrorBoundaryContent } from '~/components/ui/error-boundary-content';
 import { getMemory } from '~/services/brain';
 import { MemoryList } from '~/components/brain/memory-list';
 import type { Route } from './+types/_app.brain.memory';
 
 /** Loads memory data for the Brain Memory route. */
-export async function loader() {
+export async function clientLoader() {
   const memory = await getMemory();
   return { memory };
 }
@@ -22,28 +21,4 @@ export function ErrorBoundary() {
   const error = useRouteError();
   console.error('Memory route error:', error);
   return <ErrorBoundaryContent message="An unexpected error occurred while loading memory data." />;
-}
-
-/** Loading skeleton — trait section + 5 fact cards */
-export function HydrateFallback() {
-  return (
-    <div className="h-full overflow-y-auto p-4 space-y-6">
-      {/* Trait section skeleton */}
-      <div className="space-y-3">
-        <Skeleton className="h-5 w-32" />
-        <div className="flex flex-wrap gap-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="h-7 w-20 rounded-full" />
-          ))}
-        </div>
-      </div>
-      {/* Fact cards skeleton */}
-      <div className="space-y-3">
-        <Skeleton className="h-5 w-24" />
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-20 w-full rounded-lg" />
-        ))}
-      </div>
-    </div>
-  );
 }

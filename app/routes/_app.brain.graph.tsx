@@ -4,7 +4,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useRouteError } from 'react-router';
-import { Skeleton } from '~/components/ui/skeleton';
 import { ErrorBoundaryContent } from '~/components/ui/error-boundary-content';
 import { getGraphData } from '~/services/brain';
 import { EntityGraph } from '~/components/brain/entity-graph';
@@ -14,7 +13,7 @@ import type { GraphNode } from '~/services/types';
 import type { Route } from './+types/_app.brain.graph';
 
 /** Loads graph data for the entity graph visualization. */
-export async function loader() {
+export async function clientLoader() {
   const graphData = await getGraphData();
   return { graphData };
 }
@@ -127,16 +126,4 @@ export function ErrorBoundary() {
   const error = useRouteError();
   console.error('Graph route error:', error);
   return <ErrorBoundaryContent message="An unexpected error occurred while loading the knowledge graph." />;
-}
-
-/** Loading skeleton — graph area + detail panel */
-export function HydrateFallback() {
-  return (
-    <div className="relative h-full overflow-hidden">
-      {/* Graph area skeleton */}
-      <div className="h-full w-full p-6">
-        <Skeleton className="h-full w-full rounded-[var(--r-lg)]" />
-      </div>
-    </div>
-  );
 }

@@ -16,7 +16,7 @@ import { getAllRuns, getTemplates } from "~/services/workflows";
 import type { Route } from "./+types/_app";
 
 /** Loader — fetches threads and runs for the sidebar */
-export async function loader() {
+export async function clientLoader() {
   const [threads, runs, templates] = await Promise.all([
     getThreads(), getAllRuns(), getTemplates(),
   ]);

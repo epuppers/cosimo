@@ -1,5 +1,4 @@
 import { Outlet, useMatches } from "react-router";
-import { Skeleton } from "~/components/ui/skeleton";
 import { ChatHeader } from "~/components/chat/chat-header";
 import { ChatInput } from "~/components/chat/chat-input";
 import { FilePanel } from "~/components/chat/file-panel";
@@ -66,25 +65,6 @@ export default function ChatRoute() {
       </div>
       <FilePanel />
       {run && <WorkflowPanel run={run} />}
-    </div>
-  );
-}
-
-/** Loading skeleton — 6 thread items in sidebar placeholder */
-export function HydrateFallback() {
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
-      <div className="w-full max-w-md space-y-3 px-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-3 rounded-md p-3">
-            <Skeleton className="size-8 shrink-0 rounded-full" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-3 w-1/2" />
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

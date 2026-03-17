@@ -1,7 +1,7 @@
 import { redirect } from "react-router";
 
 /** Index route — redirects to /chat */
-export function loader() {
+export function clientLoader() {
   return redirect("/chat");
 }
 
