@@ -48,3 +48,13 @@ Learnings:
 - Section headers use // ==== with ALL CAPS section names
 - Existing pattern: type unions for status/category fields, optional fields with ?
 
+---
+[Iteration 2] Story US-002: Cloud storage mock data
+Date: 2026-03-18
+Summary: Created /app/data/mock-cloud-storage.ts with all 8 mock data exports following existing conventions (MOCK_* naming, typed imports from ~/services/types, // ==== section headers). Includes providers, SharePoint sites, Google Drive config, combined settings, cloud source tree, cloud files keyed by source ID, recent cloud files, and data scope toggles.
+Files modified:
+- /app/data/mock-cloud-storage.ts
+Learnings:
+- Mock data files use ALLCAPS const exports with MOCK_ prefix
+- Record<string, CloudFile[]> pattern works well for files keyed by source/folder ID
+- Recent files are a flat array referencing the same file shapes from the keyed collections
