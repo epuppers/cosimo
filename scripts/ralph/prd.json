@@ -1,0 +1,286 @@
+{
+  "project": "Cosimo Cloud Drive Integration",
+  "branchName": "cloudconnect",
+  "description": "Add cloud drive integration to Cosimo — cloud file browsing/attach in the File Panel, and Cloud Storage admin settings modal. Supports SharePoint and Google Drive with unified UX across providers.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Cloud storage TypeScript types",
+      "description": "Add a new 'CLOUD STORAGE' section to /app/services/types.ts with all interfaces needed for the cloud drive feature. Read the existing file first to match comment style (/** JSDoc */ on each interface, // ==== section headers). Add interfaces: CloudProvider, SharePointSite, SharePointLibrary, GoogleDriveConfig, GoogleSharedFolder, CloudStorageSettings, CloudFile, CloudSource, DataScopeToggle. See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 1 for exact field definitions.",
+      "acceptanceCriteria": [
+        "New 'CLOUD STORAGE' section exists at bottom of /app/services/types.ts",
+        "All 9 interfaces are defined with full JSDoc comments",
+        "Section header style matches existing sections (// ==== blocks)",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "All 9 interfaces added with JSDoc and section headers matching existing style. Typecheck clean."
+    },
+    {
+      "id": "US-002",
+      "title": "Cloud storage mock data",
+      "description": "Create /app/data/mock-cloud-storage.ts with mock data for cloud providers, SharePoint sites, Google Drive config, cloud sources tree, cloud files, recent files, and data scope toggles. Read /app/data/mock-panels.ts and /app/data/mock-threads.ts first to match conventions (MOCK_* naming, typed imports from ~/services/types, ALLCAPS exports, // ==== section headers). See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 2 for exact data values.",
+      "acceptanceCriteria": [
+        "New file /app/data/mock-cloud-storage.ts exists",
+        "Exports: MOCK_CLOUD_PROVIDERS, MOCK_SHAREPOINT_SITES, MOCK_GOOGLE_DRIVE_CONFIG, MOCK_CLOUD_STORAGE_SETTINGS, MOCK_CLOUD_SOURCES, MOCK_CLOUD_FILES, MOCK_RECENT_CLOUD_FILES, MOCK_DATA_SCOPE_TOGGLES",
+        "All imports reference ~/services/types",
+        "File follows the same comment/section pattern as mock-panels.ts",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Cloud storage service layer",
+      "description": "Create /app/services/cloud-storage.ts with async functions wrapping the mock data. Read /app/services/panels.ts and /app/services/threads.ts first to match the service layer pattern. Export: getCloudStorageSettings(), getCloudSources(), getCloudFiles(sourceId), getRecentCloudFiles(), getDataScopeToggles(), searchCloudFiles(query). See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 3 for exact function signatures.",
+      "acceptanceCriteria": [
+        "New file /app/services/cloud-storage.ts exists",
+        "All 6 async functions exported with correct return types",
+        "Functions import from ~/data/mock-cloud-storage",
+        "JSDoc comments on each function match existing service file style",
+        "searchCloudFiles filters across all MOCK_CLOUD_FILES entries by name match",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Expand chat store for cloud drive state",
+      "description": "Add cloud drive state to the existing Zustand store in /app/stores/chat-store.ts. Read the file first. ONLY ADD — do not refactor or rename existing code. Expand FilePanelTab type to include 'cloud'. Add fields: cloudDriveMode, selectedCloudFiles, cloudActiveSourceId, cloudBreadcrumb, cloudSearchQuery, cloudSearchActive. Add actions: openCloudDrive, setCloudActiveSource, setCloudBreadcrumb, toggleCloudFileSelection, clearCloudSelection, setCloudSearchQuery, setCloudSearchActive. See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 4 for exact types and behavior.",
+      "acceptanceCriteria": [
+        "FilePanelTab type now includes 'cloud'",
+        "All 6 new state fields added to ChatState interface with defaults",
+        "All 7 new actions added to ChatState interface and implemented in create()",
+        "No existing fields, actions, or default values modified",
+        "openCloudDrive sets filePanelOpen:true, filePanelTab:'cloud', workflowPanelOpen:false",
+        "toggleCloudFileSelection adds/removes from the array correctly",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Cloud source tree component",
+      "description": "Create /app/components/chat/cloud-source-tree.tsx — the left rail provider/source navigation. Read /app/components/chat/file-panel.tsx (especially FolderView) for styling patterns. Component receives sources (CloudSource[]), activeSourceId, onSelectSource. Grouped by provider with uppercase headers and colored left borders. Active source highlighted. See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 5 for exact styling.",
+      "acceptanceCriteria": [
+        "New file /app/components/chat/cloud-source-tree.tsx exists",
+        "CloudSourceTree component exported with typed props",
+        "Provider headers: SHAREPOINT / GOOGLE in mono uppercase with left accent border",
+        "Source items are buttons with proper hover/active/focus-visible states",
+        "Nested children (libraries under sites) indented",
+        "Active source uses berry/violet highlight colors",
+        "All classes use cn() for merging, dark mode variants present",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Cloud file list component",
+      "description": "Create /app/components/chat/cloud-file-list.tsx — the main file/folder listing area. Read /app/components/chat/file-panel.tsx (FolderView) and /app/components/chat/workflow-panel.tsx (file manifest rows) for styling patterns. Component shows files with type icons, name, metadata, and optional checkboxes in attach mode. Folders show chevron and item count. Loading state uses Skeleton from ~/components/ui/skeleton. See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 6 for exact specs.",
+      "acceptanceCriteria": [
+        "New file /app/components/chat/cloud-file-list.tsx exists",
+        "CloudFileList component exported with typed props: files, mode, selectedFileIds, onFileClick, onToggleSelect, isLoading",
+        "File type icons: colored squares matching FolderView pattern (green spreadsheet, violet docs, blue PDFs, amber folders)",
+        "Attach mode shows checkboxes on file rows (not folder rows)",
+        "Checkbox checked state: bg-violet-3 with white checkmark",
+        "Loading state shows 4 Skeleton rows",
+        "Empty state shows 'No files found' message",
+        "Row styling matches existing FolderView beveled border pattern",
+        "All interactive elements have focus-visible states",
+        "Dark mode variants on all bg/text/border classes",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Cloud navigation bar component",
+      "description": "Create /app/components/chat/cloud-nav-bar.tsx — breadcrumb navigation + search input above the file list. Read /app/components/ui/search-filter-bar.tsx and /app/components/ui/input.tsx for search/input patterns. Breadcrumb with clickable segments, provider as first crumb, last segment bold and non-clickable. Compact search input with Search icon and X clear button. See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 7 for exact specs.",
+      "acceptanceCriteria": [
+        "New file /app/components/chat/cloud-nav-bar.tsx exists",
+        "CloudNavBar component exported with typed props: breadcrumb, provider, searchQuery, onSearchChange, onBreadcrumbClick, onClearSearch, searchActive",
+        "Breadcrumb segments are clickable (except last) with hover:text-violet-3",
+        "Separator is › in mono text-taupe-3",
+        "Search input uses inset border style (border-t-taupe-3 border-l-taupe-3 border-b-taupe-1 border-r-taupe-1)",
+        "Search has Search icon on left, X button when active",
+        "When searchActive, breadcrumb shows 'Search results' instead of path",
+        "Bar background: bg-off-white dark:bg-surface-1 with bottom border",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Cloud selection bar component",
+      "description": "Create /app/components/chat/cloud-selection-bar.tsx — the bottom action bar for attach mode. Read /app/components/chat/chat-input.tsx (staged files strip, lines 222-244) for the file selection display pattern. Shows 'N files selected (total size)' on left, Clear + Attach Files buttons on right. Attach button uses retro 3D raised beveled style with violet colors, disabled when no selection. See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 8 for exact specs.",
+      "acceptanceCriteria": [
+        "New file /app/components/chat/cloud-selection-bar.tsx exists",
+        "CloudSelectionBar component exported with typed props: selectedFiles (CloudFile[]), onAttach, onClear",
+        "Left side shows file count and total size string",
+        "Clear button: ghost style bg-transparent text-taupe-4",
+        "Attach Files button: bg-violet-3 text-white with beveled borders (border-t-violet-2 border-l-violet-2 border-b-violet-5 border-r-violet-5)",
+        "Attach button disabled (opacity-50) when no files selected",
+        "Paperclip icon before 'Attach Files' text",
+        "Bar has border-t and bg-white dark:bg-surface-1",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Assemble cloud drive tab in FilePanel",
+      "description": "Modify /app/components/chat/file-panel.tsx to add the Cloud Drive tab. Read the ENTIRE file first. Add a third tab button 'Cloud' using the EXACT same className as existing tabs. Import and wire CloudSourceTree, CloudFileList, CloudNavBar, CloudSelectionBar. Add cloud state selectors from useChatStore. Add useState for cloudSources, cloudFiles, cloudLoading. Add useEffects to load sources on mount and files when source/search changes. Create local CloudDriveContent sub-component (matching SpreadsheetView/FolderView pattern). Layout: left rail (140px source tree) + right area (nav bar + file list + optional selection bar). Set initialWidth to 560. See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 9 for the full wiring spec.",
+      "acceptanceCriteria": [
+        "Third tab 'Cloud' appears in the FilePanel header tabs",
+        "Tab button className matches existing two tab buttons exactly",
+        "CloudDriveContent renders when activeTab === 'cloud'",
+        "Layout: 140px left source tree rail + flexible right content area",
+        "Source tree loads via getCloudSources() on mount",
+        "File list loads via getCloudFiles() when cloudActiveSourceId changes",
+        "Recent files shown when no source selected (getRecentCloudFiles)",
+        "Search triggers searchCloudFiles when cloudSearchActive",
+        "SelectionBar appears only when cloudDriveMode === 'attach'",
+        "File click in browse mode navigates folders or switches to spreadsheet tab for preview",
+        "File click in attach mode toggles selection",
+        "Panel initialWidth updated to 560",
+        "No existing SpreadsheetView or FolderView code modified",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Wire attach button to cloud drive tab",
+      "description": "Connect the 'From cloud drive' attach menu to the file panel. Read /app/routes/_app.chat.tsx and /app/components/chat/chat-input.tsx. In _app.chat.tsx: import useChatStore, get openCloudDrive, create handleAttach that calls openCloudDrive('attach') for 'drive' type and console.log for 'computer' type. Pass handleAttach as onAttach to ChatInput. See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 10.",
+      "acceptanceCriteria": [
+        "Clicking 'From cloud drive' in attach menu opens the file panel on Cloud tab",
+        "Cloud tab opens in attach mode (checkboxes visible, selection bar at bottom)",
+        "Clicking 'From computer' logs to console (placeholder for native picker)",
+        "useChatStore.openCloudDrive called with 'attach' argument",
+        "No changes to chat-input.tsx or attach-button.tsx needed",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Cloud storage settings modal shell and provider cards",
+      "description": "Create /app/components/settings/cloud-storage-settings.tsx — admin settings dialog for managing cloud drive connections. Read /app/components/ui/dialog.tsx, /app/components/ui/switch.tsx, /app/components/ui/tabs.tsx for component patterns. Use Dialog from ~/components/ui/dialog. DialogTitle 'Cloud Storage' with ADMIN badge. Provider cards for SharePoint and Google Drive with Connected badge, expand/collapse, site/library toggles (Switch component), shared folder list. '+ Connect a service' link at bottom. See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 11 for full specs. NOTE: you have approval to create the /app/components/settings/ directory.",
+      "acceptanceCriteria": [
+        "New directory /app/components/settings/ created",
+        "New file /app/components/settings/cloud-storage-settings.tsx exists",
+        "CloudStorageSettings component exported with props: open, onOpenChange",
+        "Uses Dialog from ~/components/ui/dialog",
+        "Title shows 'Cloud Storage' with ADMIN badge (violet styling)",
+        "SharePoint card: expandable, shows sites with library Switch toggles, 'Remove site' links, '+ Add site' link",
+        "Google Drive card: expandable, shows service account with copy button, shared folders list with file counts",
+        "Both cards: Connected badge (green), ChevronDown expand toggle",
+        "'+ Connect a service' link at bottom of dialog",
+        "All toggle state is local (useState)",
+        "Dialog max-width ~520px",
+        "Dark mode variants on all elements",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "title": "Wire settings modal to app header",
+      "description": "Connect the Cloud Storage Settings modal to the profile dropdown. Read /app/components/layout/app-header.tsx — find the ProfileAvatar component and the 'Account Settings' button. Add local state for settingsOpen. When 'Account Settings' is clicked: set settingsOpen(true) and close the profile popover. Render CloudStorageSettings OUTSIDE the Popover (not constrained by portal). See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 12.",
+      "acceptanceCriteria": [
+        "Clicking 'Account Settings' in profile dropdown opens the Cloud Storage Settings modal",
+        "Profile popover closes when settings modal opens",
+        "CloudStorageSettings rendered outside the Popover component",
+        "Modal can be closed independently (X button or overlay click)",
+        "No other changes to app-header.tsx beyond the wiring",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-013",
+      "title": "Data scope toggles for email and calendar",
+      "description": "Add email and calendar placeholder toggles inside each provider card in the settings modal. Read /app/components/settings/cloud-storage-settings.tsx. Add a 'DATA SCOPES' section inside each ProviderCard's expanded area, below files and above Disconnect. Microsoft: Outlook Mail (Mail icon), Outlook Calendar (Calendar icon), SharePoint Files ('Managed above'). Google: Gmail (Mail icon), Google Calendar (Calendar icon), Drive Files ('Managed above'). See CLOUD-DRIVE-BUILD-REFERENCE.md Prompt 13.",
+      "acceptanceCriteria": [
+        "DATA SCOPES section visible in both SharePoint and Google Drive expanded cards",
+        "Section separated by a thin border-t divider",
+        "Microsoft shows: Outlook Mail toggle, Outlook Calendar toggle, SharePoint Files 'Managed above' text",
+        "Google shows: Gmail toggle, Google Calendar toggle, Drive Files 'Managed above' text",
+        "Each row has a Lucide icon (Mail, Calendar) + label + Switch toggle",
+        "'Managed above' items show italic text instead of a toggle",
+        "All toggles use local state (useState)",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 13,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-014",
+      "title": "Dark mode and accessibility polish pass",
+      "description": "Read ALL files created or modified in this feature (listed in acceptance criteria). For each file verify: (1) every bg-*, text-*, border-* class has a dark: variant, (2) every interactive element has focus-visible states, (3) all icon-only buttons have aria-label, (4) no inline styles (style={}), (5) no raw hex/rgb colors, (6) all conditional classes use cn(), (7) no @ts-ignore or any types. Fix anything found. Keep diffs minimal.",
+      "acceptanceCriteria": [
+        "Review /app/services/types.ts cloud section",
+        "Review /app/data/mock-cloud-storage.ts",
+        "Review /app/services/cloud-storage.ts",
+        "Review /app/stores/chat-store.ts",
+        "Review /app/components/chat/cloud-source-tree.tsx",
+        "Review /app/components/chat/cloud-file-list.tsx",
+        "Review /app/components/chat/cloud-nav-bar.tsx",
+        "Review /app/components/chat/cloud-selection-bar.tsx",
+        "Review /app/components/chat/file-panel.tsx",
+        "Review /app/components/settings/cloud-storage-settings.tsx",
+        "Review /app/routes/_app.chat.tsx",
+        "Review /app/components/layout/app-header.tsx",
+        "No inline styles found in any file",
+        "No missing dark: variants on color classes",
+        "All buttons have focus-visible:outline-2 focus-visible:outline-violet-3",
+        "All icon-only buttons have aria-label",
+        "npx tsc --noEmit passes with zero errors"
+      ],
+      "priority": 14,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-015",
+      "title": "Final build verification",
+      "description": "Verify the complete feature build. Run directory checks and typecheck. Confirm all expected files exist. This is verification only — do not create or modify files unless something is broken.",
+      "acceptanceCriteria": [
+        "ls app/components/settings/ shows cloud-storage-settings.tsx",
+        "ls app/components/chat/cloud-* shows 4 files: cloud-source-tree.tsx, cloud-file-list.tsx, cloud-nav-bar.tsx, cloud-selection-bar.tsx",
+        "ls app/data/mock-cloud* shows mock-cloud-storage.ts",
+        "ls app/services/cloud* shows cloud-storage.ts",
+        "npx tsc --noEmit passes with zero errors",
+        "No untracked files outside the expected set"
+      ],
+      "priority": 15,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
