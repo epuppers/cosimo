@@ -124,6 +124,7 @@ export default function ChatRoute() {
           onAttach={handleAttach}
           stagedFiles={pendingFiles.map((f) => ({ name: f.name, type: f.type, size: f.size ?? '' }))}
           onRemoveFile={removePendingFile}
+          onClearAll={clearPendingFiles}
           placeholder="Ask Cosimo anything..."
         />
       </div>

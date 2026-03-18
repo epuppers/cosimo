@@ -53,6 +53,7 @@ interface ChatState {
   setCloudActiveSource: (sourceId: string | null) => void;
   setCloudBreadcrumb: (crumbs: BreadcrumbSegment[]) => void;
   toggleCloudFileSelection: (fileId: string) => void;
+  selectAllCloudFiles: (fileIds: string[]) => void;
   clearCloudSelection: () => void;
   setCloudSearchQuery: (query: string) => void;
   setCloudSearchActive: (active: boolean) => void;
@@ -143,6 +144,7 @@ export const useChatStore = create<ChatState>((set) => ({
       ? state.selectedCloudFiles.filter((id) => id !== fileId)
       : [...state.selectedCloudFiles, fileId],
   })),
+  selectAllCloudFiles: (fileIds) => set({ selectedCloudFiles: fileIds }),
   clearCloudSelection: () => set({ selectedCloudFiles: [] }),
   setCloudSearchQuery: (query) => set({ cloudSearchQuery: query }),
   setCloudSearchActive: (active) => set({ cloudSearchActive: active }),

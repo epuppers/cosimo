@@ -13,6 +13,9 @@ import {
 } from '~/data/mock-cloud-storage';
 import type { CloudStorageSettings, CloudSource, CloudFile, DataScopeToggle } from './types';
 
+/** Simulate network latency for mock data */
+const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
 /** Returns the full cloud storage settings (providers, sites, config). */
 export async function getCloudStorageSettings(): Promise<CloudStorageSettings> {
   return { ...MOCK_CLOUD_STORAGE_SETTINGS };
@@ -25,11 +28,13 @@ export async function getCloudSources(): Promise<CloudSource[]> {
 
 /** Returns cloud files for a given source or folder ID. */
 export async function getCloudFiles(sourceId: string): Promise<CloudFile[]> {
+  await delay(2000);
   return [...(MOCK_CLOUD_FILES[sourceId] ?? [])];
 }
 
 /** Returns recently accessed cloud files across all providers. */
 export async function getRecentCloudFiles(): Promise<CloudFile[]> {
+  await delay(2000);
   return [...MOCK_RECENT_CLOUD_FILES];
 }
 
@@ -40,6 +45,7 @@ export async function getDataScopeToggles(): Promise<DataScopeToggle[]> {
 
 /** Searches cloud files across all sources by name (case-insensitive). */
 export async function searchCloudFiles(query: string): Promise<CloudFile[]> {
+  await delay(2000);
   const lowerQuery = query.toLowerCase();
   return Object.values(MOCK_CLOUD_FILES)
     .flat()

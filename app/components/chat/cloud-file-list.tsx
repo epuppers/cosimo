@@ -4,7 +4,7 @@
 // Renders a scrollable list of cloud files and folders with
 // type icons, metadata, and optional attach-mode checkboxes.
 
-import { ChevronRight } from 'lucide-react';
+import { AlertCircle, ChevronRight, RotateCcw } from 'lucide-react';
 import { Skeleton } from '~/components/ui/skeleton';
 import { cn } from '~/lib/utils';
 import type { CloudFile } from '~/services/types';
@@ -65,6 +65,10 @@ interface CloudFileListProps {
   onToggleSelect: (fileId: string) => void;
   /** Whether files are loading */
   isLoading?: boolean;
+  /** Whether loading failed */
+  error?: boolean;
+  /** Called when user clicks retry after an error */
+  onRetry?: () => void;
   /** Show "Recently accessed" label above file list */
   showRecentLabel?: boolean;
 }
@@ -84,8 +88,31 @@ export function CloudFileList({
   onFileClick,
   onToggleSelect,
   isLoading,
+  error,
+  onRetry,
   showRecentLabel,
 }: CloudFileListProps) {
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-2.5 py-12">
+        <AlertCircle className="h-5 w-5 text-red" />
+        <span className="font-[family-name:var(--mono)] text-[0.6875rem] font-semibold text-taupe-4">Failed to load files</span>
+        <span className="font-[family-name:var(--mono)] text-[0.625rem] text-taupe-3">Check your connection and try again</span>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="inline-flex items-center gap-1.5 mt-1 px-3 py-1.5 font-[family-name:var(--mono)] text-[0.6875rem] font-semibold text-taupe-4 bg-off-white border border-solid border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 rounded-[var(--r-md)] cursor-pointer hover:bg-berry-1 hover:text-berry-5 hover:border-berry-2 active:border-t-taupe-3 active:border-l-taupe-3 active:border-b-taupe-2 active:border-r-taupe-2 focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-2 dark:bg-surface-2 dark:border-taupe-2 dark:text-taupe-3 dark:hover:bg-berry-1 dark:hover:text-berry-3"
+          >
+            <RotateCcw className="h-3 w-3" />
+            Try again
+          </button>
+        )}
+      </div>
+    );
+  }
+
   // Loading state
   if (isLoading) {
     return (

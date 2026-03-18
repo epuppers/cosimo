@@ -9,7 +9,7 @@ import { useMatches } from 'react-router';
 import { FileCheck, FileCode, FileImage, FileSpreadsheet, FileText, Folder, Mail, Paperclip, Presentation, X, type LucideIcon } from 'lucide-react';
 import { useChatStore, EMPTY_ATTACHMENTS, type BreadcrumbSegment } from '~/stores/chat-store';
 import { useResizePanel } from '~/hooks/use-resize-panel';
-import { getSpreadsheet } from '~/services/panels';
+import { getSpreadsheet, hasSpreadsheetData } from '~/services/panels';
 import type { SpreadsheetData, CloudSource, CloudFile, Attachment, Thread } from '~/services/types';
 import { cn } from '~/lib/utils';
 import { CloudSourceTree } from '~/components/chat/cloud-source-tree';
@@ -29,6 +29,7 @@ export function FilePanel() {
   const setActiveTab = useChatStore((s) => s.setFilePanelTab);
   const pendingFiles = useChatStore((s) => s.pendingFilesByThread[s.activeThreadId ?? ''] ?? EMPTY_ATTACHMENTS);
   const removePendingFile = useChatStore((s) => s.removePendingFile);
+  const clearPendingFiles = useChatStore((s) => s.clearPendingFiles);
 
   // Get thread data from route match (same pattern as _app.chat.tsx)
   const matches = useMatches();
@@ -59,14 +60,17 @@ export function FilePanel() {
     side: 'right',
   });
 
-  // Load spreadsheet data on mount
+  // Load spreadsheet data when selected file changes
   useEffect(() => {
     let cancelled = false;
-    getSpreadsheet().then((data) => {
-      if (!cancelled) setSpreadsheet(data);
+    getSpreadsheet(selectedFile?.name).then((data) => {
+      if (!cancelled) {
+        setSpreadsheet(data);
+        setSelectedCell(null);
+      }
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [selectedFile]);
 
   if (!isOpen) return null;
 
@@ -137,7 +141,7 @@ export function FilePanel() {
 
         {/* Content */}
         {activeTab === 'spreadsheet' && (
-          selectedFile && selectedFile.name !== 'Hilgard_Fund_II_Fee_Analysis.xlsx' ? (
+          selectedFile && !hasSpreadsheetData(selectedFile.name) ? (
             <FilePlaceholder file={selectedFile} />
           ) : (
             <SpreadsheetView
@@ -146,6 +150,8 @@ export function FilePanel() {
               onSelectCell={setSelectedCell}
               cellRef={cellRef}
               cellFormula={cellFormula}
+              fileName={selectedFile?.name}
+              fileType={selectedFile?.type}
             />
           )
         )}
@@ -156,10 +162,11 @@ export function FilePanel() {
             createdFiles={aiAttachments}
             onFileClick={(att) => { setSelectedFile(att); setActiveTab('spreadsheet'); }}
             onRemovePending={removePendingFile}
+            onClearPending={clearPendingFiles}
           />
         )}
         {activeTab === 'cloud' && (
-          <CloudDriveContent />
+          <CloudDriveContent onSelectFile={(att) => { setSelectedFile(att); setActiveTab('spreadsheet'); }} />
         )}
       </div>
     </>
@@ -201,10 +208,12 @@ interface SpreadsheetViewProps {
   onSelectCell: (cell: { row: number; col: number } | null) => void;
   cellRef: string;
   cellFormula: string;
+  fileName?: string;
+  fileType?: string;
 }
 
 /** Renders spreadsheet data with file bar, formula bar, and grid. */
-function SpreadsheetView({ data, selectedCell, onSelectCell, cellRef, cellFormula }: SpreadsheetViewProps) {
+function SpreadsheetView({ data, selectedCell, onSelectCell, cellRef, cellFormula, fileName = 'Hilgard_Fund_II_Fee_Analysis.xlsx', fileType = 'xlsx' }: SpreadsheetViewProps) {
   if (!data) {
     return (
       <div className="flex flex-1 items-center justify-center font-[family-name:var(--mono)] text-[11px] text-taupe-3">
@@ -217,8 +226,8 @@ function SpreadsheetView({ data, selectedCell, onSelectCell, cellRef, cellFormul
     <>
       {/* Dark file bar */}
       <div className="flex items-center gap-2 p-[8px_12px] bg-taupe-5 dark:bg-surface-2 border-b border-taupe-4">
-        <FileSpreadsheet className="h-3.5 w-3.5 text-green" />
-        <span className="font-mono text-[0.6875rem] font-semibold text-taupe-1 dark:text-taupe-4">Hilgard_Fund_II_Fee_Analysis.xlsx</span>
+        {(() => { const Icon = getFileTypeIcon(fileType); return <Icon className="h-3.5 w-3.5 text-green" />; })()}
+        <span className="font-mono text-[0.6875rem] font-semibold text-taupe-1 dark:text-taupe-4">{fileName}</span>
       </div>
 
       {/* Formula bar */}
@@ -388,11 +397,12 @@ function fileSubtitle(att: Attachment): string {
 }
 
 /** A section of files with a header label and file list */
-function FileSection({ label, files, onFileClick, onRemove, variant = 'default' }: {
+function FileSection({ label, files, onFileClick, onRemove, onClearAll, variant = 'default' }: {
   label: string;
   files: Attachment[];
   onFileClick: (att: Attachment) => void;
   onRemove?: (index: number) => void;
+  onClearAll?: () => void;
   variant?: 'pending' | 'default';
 }) {
   if (files.length === 0) return null;
@@ -402,7 +412,18 @@ function FileSection({ label, files, onFileClick, onRemove, variant = 'default' 
     <div>
       <div className="flex items-center justify-between px-3 py-2 bg-off-white dark:bg-surface-1 border-b border-taupe-2 dark:border-surface-3">
         <span className="font-mono text-[0.625rem] font-bold uppercase tracking-[0.1em] text-taupe-3">{label}</span>
-        <span className="font-mono text-[0.5625rem] text-taupe-3">{files.length}</span>
+        <div className="flex items-center gap-2.5">
+          {isPending && onClearAll && files.length > 1 && (
+            <button
+              type="button"
+              onClick={onClearAll}
+              className="font-mono text-[0.625rem] font-semibold text-violet-3 cursor-pointer hover:text-red focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-1 dark:text-violet-3 dark:hover:text-red"
+            >
+              Clear All
+            </button>
+          )}
+          <span className="font-mono text-[0.5625rem] text-taupe-3 tabular-nums">{files.length}</span>
+        </div>
       </div>
       <div className="p-1.5 flex flex-col gap-1.5">
         {files.map((att, i) => {
@@ -447,12 +468,13 @@ function FileSection({ label, files, onFileClick, onRemove, variant = 'default' 
 }
 
 /** Folder file list split into pending, uploaded, and created sections. */
-function FolderView({ pendingFiles, uploadedFiles, createdFiles, onFileClick, onRemovePending }: {
+function FolderView({ pendingFiles, uploadedFiles, createdFiles, onFileClick, onRemovePending, onClearPending }: {
   pendingFiles: Attachment[];
   uploadedFiles: Attachment[];
   createdFiles: Attachment[];
   onFileClick: (att: Attachment) => void;
   onRemovePending: (index: number) => void;
+  onClearPending: () => void;
 }) {
   const totalCount = pendingFiles.length + uploadedFiles.length + createdFiles.length;
 
@@ -468,7 +490,7 @@ function FolderView({ pendingFiles, uploadedFiles, createdFiles, onFileClick, on
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto">
-          <FileSection label="Pending" files={pendingFiles} onFileClick={onFileClick} onRemove={onRemovePending} variant="pending" />
+          <FileSection label="Pending" files={pendingFiles} onFileClick={onFileClick} onRemove={onRemovePending} onClearAll={onClearPending} variant="pending" />
           <FileSection label="Uploaded" files={uploadedFiles} onFileClick={onFileClick} />
           <FileSection label="Created by Cosimo" files={createdFiles} onFileClick={onFileClick} />
         </div>
@@ -525,7 +547,7 @@ function buildSourceBreadcrumb(sources: CloudSource[], targetId: string): Breadc
 // ============================================
 
 /** Cloud drive tab layout: left source tree rail + right content area */
-function CloudDriveContent() {
+function CloudDriveContent({ onSelectFile }: { onSelectFile: (att: Attachment) => void }) {
   // Store state
   const mode = useChatStore((s) => s.cloudDriveMode);
   const selectedFileIds = useChatStore((s) => s.selectedCloudFiles);
@@ -536,6 +558,7 @@ function CloudDriveContent() {
   const setCloudActiveSource = useChatStore((s) => s.setCloudActiveSource);
   const setCloudBreadcrumb = useChatStore((s) => s.setCloudBreadcrumb);
   const toggleCloudFileSelection = useChatStore((s) => s.toggleCloudFileSelection);
+  const selectAllCloudFiles = useChatStore((s) => s.selectAllCloudFiles);
   const clearCloudSelection = useChatStore((s) => s.clearCloudSelection);
   const setCloudSearchQuery = useChatStore((s) => s.setCloudSearchQuery);
   const setCloudSearchActive = useChatStore((s) => s.setCloudSearchActive);
@@ -545,6 +568,8 @@ function CloudDriveContent() {
   const [sources, setSources] = useState<CloudSource[]>([]);
   const [files, setFiles] = useState<CloudFile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -573,27 +598,58 @@ function CloudDriveContent() {
   useEffect(() => {
     let cancelled = false;
     setIsLoading(true);
+    setLoadError(false);
     const load = async () => {
-      let result: CloudFile[];
-      if (searchActive && searchQuery) {
-        result = await searchCloudFiles(searchQuery);
-      } else if (activeSourceId) {
-        result = await getCloudFiles(activeSourceId);
-      } else {
-        result = await getRecentCloudFiles();
-      }
-      if (!cancelled) {
-        setFiles(result);
-        setIsLoading(false);
+      try {
+        let result: CloudFile[];
+        if (searchActive && searchQuery) {
+          result = await searchCloudFiles(searchQuery);
+        } else if (activeSourceId) {
+          result = await getCloudFiles(activeSourceId);
+        } else {
+          result = await getRecentCloudFiles();
+        }
+        if (!cancelled) {
+          setFiles(result);
+          setIsLoading(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setIsLoading(false);
+          setLoadError(true);
+        }
       }
     };
     load();
     return () => { cancelled = true; };
-  }, [activeSourceId, searchActive, searchQuery]);
+  }, [activeSourceId, searchActive, searchQuery, retryKey]);
 
   // Derived values
   const providerLabel = findProviderLabel(sources, activeSourceId);
+  const selectableFiles = files.filter((f) => !f.isFolder);
   const selectedFiles = files.filter((f) => selectedFileIds.includes(f.id));
+
+  const handleSelectAll = () => {
+    selectAllCloudFiles(selectableFiles.map((f) => f.id));
+  };
+
+  // Cmd/Ctrl+A to select/deselect all in attach mode
+  useEffect(() => {
+    if (mode !== 'attach') return;
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'a') {
+        e.preventDefault();
+        const allSelected = selectableFiles.length > 0 && selectedFileIds.length >= selectableFiles.length;
+        if (allSelected) {
+          clearCloudSelection();
+        } else {
+          selectAllCloudFiles(selectableFiles.map((f) => f.id));
+        }
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [mode, selectableFiles, selectedFileIds, clearCloudSelection, selectAllCloudFiles]);
 
   // Callbacks
   const handleSelectSource = (sourceId: string) => {
@@ -615,7 +671,7 @@ function CloudDriveContent() {
       setCloudActiveSource(file.id);
       setCloudBreadcrumb([...breadcrumb, { id: file.id, name: file.name }]);
     } else {
-      setFilePanelTab('spreadsheet');
+      onSelectFile({ name: file.name, type: file.type, size: file.size });
     }
   };
 
@@ -691,13 +747,17 @@ function CloudDriveContent() {
             onFileClick={handleFileClick}
             onToggleSelect={toggleCloudFileSelection}
             isLoading={isLoading}
+            error={loadError}
+            onRetry={() => setRetryKey((k) => k + 1)}
             showRecentLabel={activeSourceId === null && !searchActive}
           />
         </div>
         {mode === 'attach' && (
           <CloudSelectionBar
             selectedFiles={selectedFiles}
+            totalSelectableCount={selectableFiles.length}
             onAttach={handleAttach}
+            onSelectAll={handleSelectAll}
             onClear={clearCloudSelection}
           />
         )}
