@@ -744,6 +744,17 @@
   40%, 100% { transform: translateY(0) rotate(360deg); }
 }
 
+/* ======== Collapsible Panel Animation ======== */
+@keyframes collapsible-open {
+  from { height: 0; opacity: 0; }
+  to { height: var(--collapsible-panel-height); opacity: 1; }
+}
+
+@keyframes collapsible-closed {
+  from { height: var(--collapsible-panel-height); opacity: 1; }
+  to { height: 0; opacity: 0; }
+}
+
 /* ======== Profile Panel Slide Animations ======== */
 @keyframes profile-slide-right {
   from { opacity: 0; transform: translateX(-8px); }

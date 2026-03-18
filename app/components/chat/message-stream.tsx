@@ -1,25 +1,64 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import { useThemeStore } from '~/stores/theme-store';
 import { useChatStore } from '~/stores/chat-store';
+import { Collapsible, CollapsibleTrigger, CollapsiblePanel } from '~/components/ui/collapsible';
 
 // ============================================
 // ERABOR STREAMING DATA
 // ============================================
 
-/** Reasoning steps shown during the "thinking" phase */
-const REASONING_STEPS = [
-  'Locating Erabor Partners LP Agreement (executed Dec 2024)...',
-  'Extracting Section 4 — Management Fee & Carry provisions',
-  'GP commitment: 3.5% of total commitments ($7.0M on $200M fund) — <span class="reasoning-flag">above our standard 2.5%</span>',
-  'Fee structure: 2.0% on committed during investment period, step-down to 1.5% on invested capital post-Year 5',
-  'Scanning for side letter provisions...',
-  'Found 3 side letters — Northgate Capital, Westbridge RE, and one redacted entity',
-  'Northgate side letter grants MFN on fees + co-invest priority — <span class="reasoning-flag">non-standard</span>',
-  'Cross-referencing clawback language against Fund III template...',
-  'Clawback: interim clawback with annual true-up, 100% GP obligation — matches standard',
-  'Key person clause names Marcus Tilden + one other — <span class="reasoning-flag">single-trigger suspension</span>, not our standard dual-trigger',
-  'Compiling summary with flagged deviations...',
+/** A grouped reasoning step with title and detailed thoughts */
+interface ReasoningStep {
+  title: string;
+  thoughts: string[];
+  duration?: string;
+}
+
+/** Reasoning steps grouped into logical phases */
+const REASONING_GROUPS: ReasoningStep[] = [
+  {
+    title: 'Locating document',
+    thoughts: [
+      'Locating Erabor Partners LP Agreement (executed Dec 2024)...',
+    ],
+    duration: '0.3s',
+  },
+  {
+    title: 'Extracting economic terms',
+    thoughts: [
+      'Extracting Section 4 — Management Fee & Carry provisions',
+      'GP commitment: 3.5% of total commitments ($7.0M on $200M fund) — <span class="reasoning-flag">above our standard 2.5%</span>',
+      'Fee structure: 2.0% on committed during investment period, step-down to 1.5% on invested capital post-Year 5',
+    ],
+    duration: '1.1s',
+  },
+  {
+    title: 'Scanning side letters',
+    thoughts: [
+      'Scanning for side letter provisions...',
+      'Found 3 side letters — Northgate Capital, Westbridge RE, and one redacted entity',
+      'Northgate side letter grants MFN on fees + co-invest priority — <span class="reasoning-flag">non-standard</span>',
+    ],
+    duration: '0.8s',
+  },
+  {
+    title: 'Cross-referencing templates',
+    thoughts: [
+      'Cross-referencing clawback language against Fund III template...',
+      'Clawback: interim clawback with annual true-up, 100% GP obligation — matches standard',
+      'Key person clause names Marcus Tilden + one other — <span class="reasoning-flag">single-trigger suspension</span>, not our standard dual-trigger',
+    ],
+    duration: '0.9s',
+  },
+  {
+    title: 'Compiling summary',
+    thoughts: [
+      'Compiling summary with flagged deviations...',
+    ],
+    duration: '0.4s',
+  },
 ];
 
 interface SectionKV {
@@ -223,26 +262,102 @@ export function ThinkingCubes({ fading }: { fading: boolean }) {
   );
 }
 
-/** Reasoning panel — shows "Cosimo is thinking..." with steps appearing one by one */
-function ReasoningPanel({ visibleSteps }: { visibleSteps: number }) {
+/** Reasoning panel — shows grouped, collapsible reasoning steps */
+function ReasoningPanel({
+  visibleGroups,
+  activeGroup,
+  visibleThoughts,
+  openGroups,
+  onToggleGroup,
+  isThinking,
+}: {
+  visibleGroups: number;
+  activeGroup: number;
+  visibleThoughts: number;
+  openGroups: Set<number>;
+  onToggleGroup: (idx: number) => void;
+  isThinking: boolean;
+}) {
   return (
-    <div className="my-1 ml-[30px] border-2 border-t-taupe-2 border-l-taupe-2 border-b-taupe-4 border-r-taupe-4 bg-off-white overflow-hidden rounded-[var(--r-md)] dark:border-taupe-2">
+    <div className="my-1 ml-[30px] border-2 border-t-taupe-2 border-l-taupe-2 border-b-taupe-4 border-r-taupe-4 bg-off-white overflow-hidden rounded-[var(--r-md)] dark:border-taupe-2 dark:bg-surface-1">
+      {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2 bg-taupe-5 border-b border-taupe-4 rounded-t-[var(--r-sm)] dark:bg-surface-2">
         <span className="text-[0.625rem] text-violet-2">◆</span>
-        <span className="font-mono text-[0.6875rem] font-semibold text-taupe-1 tracking-[0.05em] dark:text-taupe-4">Cosimo is thinking...</span>
-        <div className="w-1.5 h-1.5 bg-violet-2 border border-violet-3 animate-[reason-pulse_1.5s_ease-in-out_infinite] ml-auto" />
+        <span className="font-mono text-[0.6875rem] font-semibold text-taupe-1 tracking-[0.05em] dark:text-taupe-4">
+          {isThinking ? 'Cosimo is thinking...' : `Reasoning · ${REASONING_GROUPS.length} steps`}
+        </span>
+        {isThinking && (
+          <div className="w-1.5 h-1.5 bg-violet-2 border border-violet-3 animate-[reason-pulse_1.5s_ease-in-out_infinite] ml-auto" />
+        )}
       </div>
-      <div className="px-3 py-2 max-h-[300px] overflow-y-auto">
-        {REASONING_STEPS.map((step, i) => (
-          <div
-            key={i}
-            className={cn(
-              'font-mono text-[0.6875rem] leading-[1.6] text-taupe-4 py-[3px] border-b border-taupe-1 opacity-0 translate-y-1 transition-all duration-300 ease-in-out last:border-b-0 dark:border-surface-3',
-              i < visibleSteps && 'opacity-100 translate-y-0'
-            )}
-            dangerouslySetInnerHTML={{ __html: step }}
-          />
-        ))}
+
+      {/* Stepped reasoning groups */}
+      <div className="py-1">
+        {REASONING_GROUPS.slice(0, visibleGroups).map((group, groupIdx) => {
+          const isOpen = openGroups.has(groupIdx);
+          const isActive = groupIdx === activeGroup && isThinking;
+          const thoughtCount = isActive ? visibleThoughts : group.thoughts.length;
+
+          return (
+            <Collapsible
+              key={groupIdx}
+              open={isOpen}
+              onOpenChange={() => onToggleGroup(groupIdx)}
+            >
+              <CollapsibleTrigger
+                className={cn(
+                  'flex items-center gap-2 w-full px-3 py-2 text-left cursor-pointer transition-colors duration-100',
+                  'border-b border-taupe-1 last:border-b-0 dark:border-surface-3',
+                  'hover:bg-[rgba(var(--violet-3-rgb),0.04)] dark:hover:bg-[rgba(var(--violet-3-rgb),0.08)]',
+                  'focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-[-2px]'
+                )}
+              >
+                {/* Timeline dot */}
+                <div className={cn(
+                  'w-1.5 h-1.5 shrink-0 border',
+                  isActive
+                    ? 'bg-violet-2 border-violet-3 animate-[reason-pulse_1.5s_ease-in-out_infinite]'
+                    : 'bg-violet-2 border-violet-3 opacity-60'
+                )} />
+
+                {/* Step number + title */}
+                <span className="font-mono text-[0.6875rem] font-semibold text-taupe-5 tracking-[0.03em] dark:text-taupe-4">
+                  {groupIdx + 1}. {group.title}
+                </span>
+
+                {/* Duration badge */}
+                {group.duration && !isActive && (
+                  <span className="font-mono text-[0.5625rem] text-taupe-3 ml-auto mr-1">
+                    {group.duration}
+                  </span>
+                )}
+
+                {/* Chevron */}
+                <ChevronDown className={cn(
+                  'h-3 w-3 shrink-0 text-taupe-3 transition-transform duration-200',
+                  isOpen && 'rotate-180',
+                  !group.duration || isActive ? 'ml-auto' : ''
+                )} />
+              </CollapsibleTrigger>
+
+              <CollapsiblePanel className="data-[open]:animate-[collapsible-open_200ms_ease-out] data-[closed]:animate-[collapsible-closed_200ms_ease-in]">
+                <div className="px-3 pb-2 pt-0.5 ml-[22px] border-l-2 border-l-[rgba(var(--violet-3-rgb),0.2)]">
+                  {group.thoughts.slice(0, thoughtCount).map((thought, thoughtIdx) => (
+                    <div
+                      key={thoughtIdx}
+                      className={cn(
+                        'font-mono text-[0.6875rem] leading-[1.6] text-taupe-4 py-[3px]',
+                        'transition-all duration-300 ease-in-out',
+                        thoughtIdx < thoughtCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
+                      )}
+                      dangerouslySetInnerHTML={{ __html: thought }}
+                    />
+                  ))}
+                </div>
+              </CollapsiblePanel>
+            </Collapsible>
+          );
+        })}
       </div>
     </div>
   );
@@ -382,11 +497,16 @@ function SectionBlockStreaming({ section, onDone, showCursor }: { section: Strea
 export function MessageStream() {
   const [phase, setPhase] = useState<Phase>('thinking');
   const [thinkingFading, setThinkingFading] = useState(false);
-  const [visibleSteps, setVisibleSteps] = useState(0);
   const [showLatency, setShowLatency] = useState(false);
   const [visibleBlocks, setVisibleBlocks] = useState(0);
   const [activeBlockIdx, setActiveBlockIdx] = useState(0);
   const [streamDone, setStreamDone] = useState(false);
+
+  // Reasoning step state
+  const [visibleGroups, setVisibleGroups] = useState(0);
+  const [activeGroup, setActiveGroup] = useState(0);
+  const [visibleThoughts, setVisibleThoughts] = useState(0);
+  const [openGroups, setOpenGroups] = useState<Set<number>>(new Set());
 
   const reducedMotion = useThemeStore((s) => s.reducedMotion);
   const setStreaming = useChatStore((s) => s.setStreaming);
@@ -409,6 +529,19 @@ export function MessageStream() {
     }
   }, []);
 
+  /** Toggle a reasoning group open/closed (user interaction) */
+  const handleToggleGroup = useCallback((idx: number) => {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) {
+        next.delete(idx);
+      } else {
+        next.add(idx);
+      }
+      return next;
+    });
+  }, []);
+
   // Run the animation sequence on mount
   useEffect(() => {
     setStreaming(true);
@@ -417,7 +550,7 @@ export function MessageStream() {
     if (reducedMotion) {
       setPhase('done');
       setShowLatency(true);
-      setVisibleSteps(REASONING_STEPS.length);
+      setVisibleGroups(REASONING_GROUPS.length);
       setVisibleBlocks(STREAM_BLOCKS.length);
       setActiveBlockIdx(STREAM_BLOCKS.length);
       setStreamDone(true);
@@ -431,17 +564,35 @@ export function MessageStream() {
       schedule(() => {
         setPhase('reasoning');
 
-        // Phase 2: Reveal reasoning steps one by one (550ms apart)
-        REASONING_STEPS.forEach((_, i) => {
+        // Phase 2: Animate reasoning groups one by one
+        let cumulativeDelay = 0;
+
+        REASONING_GROUPS.forEach((group, groupIdx) => {
+          // Show this group and expand it
           schedule(() => {
-            setVisibleSteps(i + 1);
+            setVisibleGroups(groupIdx + 1);
+            setActiveGroup(groupIdx);
+            setVisibleThoughts(0);
+            setOpenGroups(new Set([groupIdx]));
             softScroll();
-          }, i * 550);
+          }, cumulativeDelay);
+
+          // Show each thought within the group
+          group.thoughts.forEach((_, thoughtIdx) => {
+            cumulativeDelay += 400;
+            schedule(() => {
+              setVisibleThoughts(thoughtIdx + 1);
+              softScroll();
+            }, cumulativeDelay);
+          });
+
+          // Pause after group completes
+          cumulativeDelay += 300;
         });
 
-        // After all steps + 1s pause, collapse reasoning and start streaming
-        const totalStepTime = REASONING_STEPS.length * 550 + 1000;
+        // After all groups, collapse all and transition to streaming
         schedule(() => {
+          setOpenGroups(new Set());
           setShowLatency(true);
           setPhase('streaming');
 
@@ -450,7 +601,7 @@ export function MessageStream() {
             setActiveBlockIdx(0);
             softScroll();
           }, 500);
-        }, totalStepTime);
+        }, cumulativeDelay + 600);
       }, 500);
     }, 2000);
 
@@ -500,9 +651,16 @@ export function MessageStream() {
           </div>
         )}
 
-        {/* Phase 2: Reasoning panel */}
-        {phase === 'reasoning' && (
-          <ReasoningPanel visibleSteps={visibleSteps} />
+        {/* Phase 2+: Reasoning panel (persists through streaming and done) */}
+        {(phase === 'reasoning' || phase === 'streaming' || phase === 'done') && (
+          <ReasoningPanel
+            visibleGroups={visibleGroups}
+            activeGroup={activeGroup}
+            visibleThoughts={visibleThoughts}
+            openGroups={openGroups}
+            onToggleGroup={handleToggleGroup}
+            isThinking={phase === 'reasoning'}
+          />
         )}
 
         {/* Phase 3 / Done: Streamed reply */}
