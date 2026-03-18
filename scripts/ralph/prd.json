@@ -236,8 +236,8 @@
         "npx tsc --noEmit passes with zero errors"
       ],
       "priority": 13,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "MicrosoftDataScopes and GoogleDataScopes sub-components added. Outlook Mail/Calendar toggles, Gmail/Google Calendar toggles, SharePoint Files/Drive Files as 'Managed above'. All toggle state local. Typecheck clean."
     },
     {
       "id": "US-014",
