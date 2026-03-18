@@ -122,7 +122,7 @@ export function CloudFileList({
             type="button"
             data-slot="cloud-file-row"
             className={cn(
-              'flex items-center gap-2.5 p-2.5 border border-solid cursor-pointer transition-all duration-[120ms] rounded-[var(--r-md)] text-left w-full',
+              'group flex items-center gap-2.5 p-2.5 border border-solid cursor-pointer transition-all duration-[120ms] rounded-[var(--r-md)] text-left w-full',
               'bg-off-white dark:bg-surface-2',
               'border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 dark:border-taupe-2',
               'hover:bg-berry-1 hover:border-taupe-2 dark:hover:bg-[rgba(var(--violet-3-rgb),0.12)] dark:hover:border-surface-3',

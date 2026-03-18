@@ -139,7 +139,7 @@ function SharePointContent({
               <button
                 type="button"
                 className={cn(
-                  'mt-1 font-mono text-[0.625rem] text-taupe-3 hover:text-red-500 dark:hover:text-red-400',
+                  'mt-1 cursor-pointer font-mono text-[0.625rem] text-taupe-3 hover:text-red',
                   'focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-2'
                 )}
               >
@@ -154,7 +154,7 @@ function SharePointContent({
       <button
         type="button"
         className={cn(
-          'flex items-center gap-1 font-mono text-[0.6875rem] text-violet-3 hover:text-violet-4',
+          'flex items-center gap-1 cursor-pointer font-mono text-[0.6875rem] text-violet-3 hover:text-violet-4',
           'focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-2'
         )}
       >
@@ -176,7 +176,7 @@ function SharePointContent({
       <button
         type="button"
         className={cn(
-          'mt-1 font-mono text-[0.625rem] text-taupe-3 hover:text-red-500 dark:hover:text-red-400',
+          'mt-1 cursor-pointer font-mono text-[0.625rem] text-taupe-3 hover:text-red',
           'focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-2'
         )}
       >
@@ -270,7 +270,7 @@ function GoogleDriveContent({
       <button
         type="button"
         className={cn(
-          'mt-1 font-mono text-[0.625rem] text-taupe-3 hover:text-red-500 dark:hover:text-red-400',
+          'mt-1 cursor-pointer font-mono text-[0.625rem] text-taupe-3 hover:text-red',
           'focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-2'
         )}
       >
@@ -503,7 +503,7 @@ export function CloudStorageSettings({
         <button
           type="button"
           className={cn(
-            'flex items-center gap-1 font-mono text-[0.6875rem] text-violet-3 hover:text-violet-4',
+            'flex items-center gap-1 cursor-pointer font-mono text-[0.6875rem] text-violet-3 hover:text-violet-4',
             'focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-2'
           )}
         >

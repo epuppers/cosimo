@@ -187,3 +187,15 @@ Learnings:
 - MicrosoftDataScopes and GoogleDataScopes extracted as small sub-components for clean separation
 - "Managed above" items use italic text-taupe-3 instead of a Switch toggle
 - Data scopes section separated by border-t divider with pt-3 spacing
+
+---
+[Iteration 14] Story US-014: Dark mode and accessibility polish pass
+Date: 2026-03-18
+Summary: Reviewed all 12 cloud-related files for dark mode, accessibility, and code quality issues. Found and fixed 3 issues: (1) cloud-file-list.tsx missing `group` class on file row button causing folder chevron to never appear on hover, (2) cloud-storage-settings.tsx 5 buttons missing `cursor-pointer`, (3) cloud-storage-settings.tsx using Tailwind default `red-500`/`red-400` instead of project `red` token on Remove/Disconnect buttons.
+Files modified:
+- /app/components/chat/cloud-file-list.tsx
+- /app/components/settings/cloud-storage-settings.tsx
+Learnings:
+- Tailwind v4 preflight resets button cursor to default — always add cursor-pointer explicitly
+- group-hover requires a `group` class on an ancestor — easy to miss when sub-components reference parent classes
+- Project uses `text-red` / `hover:text-red` token, not Tailwind's `red-500` / `red-400` defaults
