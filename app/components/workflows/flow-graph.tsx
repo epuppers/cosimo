@@ -12,6 +12,51 @@ import { FlowEdgeComponent } from './flow-edge';
 
 // old CSS: .flow-graph-svg, .flow-graph-compact, .flow-edge-arrow → ported to Tailwind below
 
+export interface FlowViewBox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** Computes the natural viewBox for a set of flow nodes with minimum dimension enforcement. */
+export function computeFlowViewBox(
+  nodes: FlowNode[],
+  config: { nodeWidth: number; nodeHeight: number; colSpacing: number; rowSpacing: number },
+  compact = false,
+): FlowViewBox {
+  if (nodes.length === 0) return { x: 0, y: 0, w: 600, h: 400 };
+
+  const xs = nodes.map((n) => n.x * config.colSpacing);
+  const ys = nodes.map((n) => n.y * config.rowSpacing);
+
+  const contentMinX = Math.min(...xs) - config.nodeWidth / 2 - 40;
+  const contentMaxX = Math.max(...xs) + config.nodeWidth / 2 + 40;
+  const contentMinY = Math.min(...ys) - config.nodeHeight / 2 - 30;
+  const contentMaxY = Math.max(...ys) + config.nodeHeight / 2 + 30;
+
+  let w = contentMaxX - contentMinX;
+  let h = contentMaxY - contentMinY;
+
+  const minW = compact ? 300 : 600;
+  const minH = compact ? 200 : 400;
+
+  let x = contentMinX;
+  let y = contentMinY;
+  if (w < minW) {
+    const cx = contentMinX + w / 2;
+    x = cx - minW / 2;
+    w = minW;
+  }
+  if (h < minH) {
+    const cy = contentMinY + h / 2;
+    y = cy - minH / 2;
+    h = minH;
+  }
+
+  return { x, y, w, h };
+}
+
 interface FlowGraphProps {
   nodes: FlowNode[];
   edges: FlowEdge[];
@@ -19,6 +64,8 @@ interface FlowGraphProps {
   nodeStatuses?: Record<string, NodeStatus>;
   selectedNodeId?: string;
   onNodeSelect?: (id: string) => void;
+  /** When provided, overrides the auto-calculated viewBox (for external pan/zoom control) */
+  viewBoxOverride?: string;
 }
 
 /**
@@ -33,6 +80,7 @@ export function FlowGraph({
   nodeStatuses,
   selectedNodeId,
   onNodeSelect,
+  viewBoxOverride,
 }: FlowGraphProps) {
   const graphConfig = CONFIG.flowGraph;
 
@@ -44,25 +92,18 @@ export function FlowGraph({
     edgeStroke: graphConfig.edgeStroke,
   }), [compact, graphConfig]);
 
-  // Calculate viewBox from node positions
-  const viewBox = useMemo(() => {
-    if (nodes.length === 0) return '0 0 400 300';
+  const naturalViewBox = useMemo(() => computeFlowViewBox(nodes, config, compact), [nodes, config, compact]);
 
-    const xs = nodes.map((n) => n.x * config.colSpacing);
-    const ys = nodes.map((n) => n.y * config.rowSpacing);
-
-    const minX = Math.min(...xs) - config.nodeWidth / 2 - 40;
-    const maxX = Math.max(...xs) + config.nodeWidth / 2 + 40;
-    const minY = Math.min(...ys) - config.nodeHeight / 2 - 30;
-    const maxY = Math.max(...ys) + config.nodeHeight / 2 + 30;
-
-    return `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
-  }, [nodes, config]);
+  const viewBox = viewBoxOverride ?? `${naturalViewBox.x} ${naturalViewBox.y} ${naturalViewBox.w} ${naturalViewBox.h}`;
 
   return (
     <svg
       viewBox={viewBox}
-      className={cn('block max-w-full h-auto', compact && 'cursor-default')}
+      className={cn(
+        'block',
+        viewBoxOverride ? 'w-full h-full' : 'max-w-full h-auto',
+        compact && 'cursor-default',
+      )}
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="Workflow flow graph"

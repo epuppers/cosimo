@@ -2,10 +2,10 @@
 // TemplateDetail — Main container for workflow template detail view
 // ============================================
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
-import { Play, MoreHorizontal, Sparkles, Copy, Archive } from 'lucide-react';
+import { Play, MoreHorizontal, Sparkles, Copy, Archive, Maximize2 } from 'lucide-react';
 import { findRunThread } from '~/services/workflows';
 import {
   DropdownMenu,
@@ -14,7 +14,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '~/components/ui/dropdown-menu';
-import { FlowGraph } from '~/components/workflows/flow-graph';
+import { FlowGraph, computeFlowViewBox } from '~/components/workflows/flow-graph';
+import { CONFIG } from '~/data/config';
 import { NodePopover } from '~/components/workflows/node-popover';
 import { OverviewTab } from '~/components/workflows/overview-tab';
 import { SchemaTab } from '~/components/workflows/schema-tab';
@@ -74,6 +75,111 @@ export function TemplateDetail({ template, run }: TemplateDetailProps) {
 
   const graphContainerRef = useRef<HTMLDivElement>(null);
   const [anchorPosition, setAnchorPosition] = useState({ x: 0, y: 0 });
+
+  // Compute natural viewBox synchronously so pan/zoom is interactive on first render
+  const graphConfig = CONFIG.flowGraph;
+  const flowConfig = useMemo(() => ({
+    nodeWidth: graphConfig.nodeWidth,
+    nodeHeight: graphConfig.nodeHeight,
+    colSpacing: graphConfig.colSpacing,
+    rowSpacing: graphConfig.rowSpacing,
+  }), [graphConfig]);
+  const naturalViewBox = useMemo(
+    () => computeFlowViewBox(template.nodes, flowConfig),
+    [template.nodes, flowConfig],
+  );
+
+  // Pan/zoom state for the flow graph — initialized from naturalViewBox immediately
+  const [graphViewBox, setGraphViewBox] = useState(naturalViewBox);
+  const [isPanning, setIsPanning] = useState(false);
+  const panStart = useRef({ x: 0, y: 0, vbX: 0, vbY: 0 });
+
+  // Reset viewBox when template changes (naturalViewBox will have new value)
+  const prevTemplateId = useRef(template.id);
+  if (prevTemplateId.current !== template.id) {
+    prevTemplateId.current = template.id;
+    setGraphViewBox(naturalViewBox);
+  }
+
+  const handleGraphWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
+    setGraphViewBox((prev) => {
+      const newW = prev.w * zoomFactor;
+      const newH = prev.h * zoomFactor;
+      const dx = (prev.w - newW) / 2;
+      const dy = (prev.h - newH) / 2;
+      return {
+        x: prev.x + dx,
+        y: prev.y + dy,
+        w: Math.max(200, Math.min(3000, newW)),
+        h: Math.max(150, Math.min(2400, newH)),
+      };
+    });
+  }, []);
+
+  const handleGraphMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.button !== 0) return;
+      // Don't start pan if clicking on a node
+      const target = e.target as Element;
+      if (target.closest('[role="button"]')) return;
+      setIsPanning(true);
+      panStart.current = {
+        x: e.clientX,
+        y: e.clientY,
+        vbX: graphViewBox.x,
+        vbY: graphViewBox.y,
+      };
+    },
+    [graphViewBox.x, graphViewBox.y]
+  );
+
+  const handleGraphMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isPanning) return;
+      const container = graphContainerRef.current;
+      const svg = container?.querySelector('svg');
+      if (!svg) return;
+      const rect = svg.getBoundingClientRect();
+      const scaleX = graphViewBox.w / rect.width;
+      const scaleY = graphViewBox.h / rect.height;
+      const dx = (e.clientX - panStart.current.x) * scaleX;
+      const dy = (e.clientY - panStart.current.y) * scaleY;
+      setGraphViewBox((prev) => ({
+        ...prev,
+        x: panStart.current.vbX - dx,
+        y: panStart.current.vbY - dy,
+      }));
+    },
+    [isPanning, graphViewBox.w, graphViewBox.h]
+  );
+
+  const handleGraphMouseUp = useCallback(() => {
+    setIsPanning(false);
+  }, []);
+
+  const handleGraphZoom = useCallback((direction: 'in' | 'out') => {
+    const factor = direction === 'in' ? 0.8 : 1.25;
+    setGraphViewBox((prev) => {
+      const newW = prev.w * factor;
+      const newH = prev.h * factor;
+      const dx = (prev.w - newW) / 2;
+      const dy = (prev.h - newH) / 2;
+      return {
+        x: prev.x + dx,
+        y: prev.y + dy,
+        w: Math.max(200, Math.min(3000, newW)),
+        h: Math.max(150, Math.min(2400, newH)),
+      };
+    });
+  }, []);
+
+  const handleGraphFit = useCallback(() => {
+    setGraphViewBox({ ...naturalViewBox });
+  }, [naturalViewBox]);
+
+  const viewBoxOverride = `${graphViewBox.x} ${graphViewBox.y} ${graphViewBox.w} ${graphViewBox.h}`;
 
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
@@ -213,13 +319,24 @@ export function TemplateDetail({ template, run }: TemplateDetailProps) {
       <div className="flex-1 flex gap-0 overflow-hidden">
         {/* Left column — Flow graph */}
         <div className="relative flex-[0_0_60%] flex flex-col py-4 pl-4 pr-0" ref={graphContainerRef}>
-          <div className="flex-1 border-2 border-solid [border-color:var(--taupe-3)_var(--taupe-1)_var(--taupe-1)_var(--taupe-3)] bg-[var(--off-white)] overflow-hidden relative rounded-[var(--r-lg)] cursor-grab active:cursor-grabbing dark:[border-color:var(--surface-3)] dark:bg-[var(--surface-1)]">
+          <div
+            className={cn(
+              'flex-1 border-2 border-solid [border-color:var(--taupe-3)_var(--taupe-1)_var(--taupe-1)_var(--taupe-3)] bg-[var(--off-white)] overflow-hidden relative rounded-[var(--r-lg)] dark:[border-color:var(--surface-3)] dark:bg-[var(--surface-1)]',
+              isPanning ? 'cursor-grabbing' : 'cursor-grab',
+            )}
+            onWheel={handleGraphWheel}
+            onMouseDown={handleGraphMouseDown}
+            onMouseMove={handleGraphMouseMove}
+            onMouseUp={handleGraphMouseUp}
+            onMouseLeave={handleGraphMouseUp}
+          >
             <FlowGraph
               nodes={template.nodes}
               edges={template.edges}
               selectedNodeId={selectedNodeId ?? undefined}
               onNodeSelect={handleNodeSelect}
               nodeStatuses={run?.nodeStatuses}
+              viewBoxOverride={viewBoxOverride}
             />
 
             {/* Node popover */}
@@ -232,13 +349,41 @@ export function TemplateDetail({ template, run }: TemplateDetailProps) {
                 anchorPosition={anchorPosition}
               />
             )}
+
+            {/* Zoom controls */}
+            <div className="absolute bottom-3 right-3 flex flex-col gap-0.5 z-[4]">
+              <button
+                type="button"
+                className="size-7 flex items-center justify-center bg-white dark:bg-surface-2 border border-solid border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 dark:border-taupe-2 rounded-r-md font-mono text-sm font-bold text-taupe-4 cursor-pointer transition-all hover:bg-violet-1 hover:text-violet-3 hover:border-violet-2 focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-2"
+                onClick={() => handleGraphZoom('in')}
+                aria-label="Zoom in"
+              >
+                +
+              </button>
+              <button
+                type="button"
+                className="size-7 flex items-center justify-center bg-white dark:bg-surface-2 border border-solid border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 dark:border-taupe-2 rounded-r-md font-mono text-sm font-bold text-taupe-4 cursor-pointer transition-all hover:bg-violet-1 hover:text-violet-3 hover:border-violet-2 focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-2"
+                onClick={() => handleGraphZoom('out')}
+                aria-label="Zoom out"
+              >
+                −
+              </button>
+              <button
+                type="button"
+                className="size-7 flex items-center justify-center bg-white dark:bg-surface-2 border border-solid border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 dark:border-taupe-2 rounded-r-md font-mono text-sm font-bold text-taupe-4 cursor-pointer transition-all hover:bg-violet-1 hover:text-violet-3 hover:border-violet-2 focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-2"
+                onClick={handleGraphFit}
+                aria-label="Fit to view"
+              >
+                <Maximize2 className="size-3.5" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Right column — Tabs */}
         <div className="flex-[0_0_40%] flex flex-col overflow-hidden pt-3.5 px-4 pb-0 border-l border-taupe-1 dark:border-surface-3">
-          <Tabs value={activeTab} onValueChange={(val) => setTab(val as typeof activeTab)}>
-            <TabsList variant="line" className="flex gap-0 border-b border-taupe-2 dark:border-surface-3 relative">
+          <Tabs value={activeTab} onValueChange={(val) => setTab(val as typeof activeTab)} className="flex-1 min-h-0">
+            <TabsList variant="line" className="flex gap-0 border-b border-taupe-2 dark:border-surface-3 relative shrink-0">
               {TAB_KEYS.map((key) => (
                 <TabsTrigger key={key} value={key} className="tab-btn p-[8px_16px] font-mono text-[0.6875rem] font-semibold text-taupe-3 bg-taupe-1 dark:bg-black/25 border border-taupe-2 dark:border-surface-3 border-b-taupe-2 cursor-pointer uppercase tracking-[0.08em] transition-[color,background] duration-150 rounded-t-[var(--r-md)] mb-[-1px] relative z-[1] hover:text-taupe-5 hover:bg-berry-1 dark:hover:text-taupe-5 dark:hover:bg-berry-1 focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-[-2px] data-active:text-violet-3 data-active:bg-off-white dark:data-active:bg-off-white data-active:border-taupe-2 data-active:border-b-transparent dark:data-active:border-surface-3 dark:data-active:border-b-transparent data-active:z-[2]">
                   {TAB_LABELS[key]}
