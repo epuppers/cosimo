@@ -263,8 +263,8 @@
         "npx tsc --noEmit passes with zero errors"
       ],
       "priority": 14,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fixed 3 issues: (1) cloud-file-list.tsx missing group class on file row button for folder chevron hover, (2) 5 buttons missing cursor-pointer in cloud-storage-settings.tsx, (3) hover:text-red-500/red-400 replaced with project token hover:text-red. All other files passed review — no inline styles, no missing dark variants, no missing focus-visible, no @ts-ignore or any types. Typecheck clean."
     },
     {
       "id": "US-015",
