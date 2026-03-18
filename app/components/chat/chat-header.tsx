@@ -1,7 +1,8 @@
 import { FolderOpen, Download, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
-import { useChatStore } from "~/stores/chat-store";
+import { useChatStore, EMPTY_ATTACHMENTS } from "~/stores/chat-store";
+import { cn } from "~/lib/utils";
 import type { Thread } from "~/services/types";
 
 // Shared header button classes
@@ -17,7 +18,9 @@ const headerLabelCls = "hidden [[data-a11y-labels=show]_&]:inline font-[family-n
 /** Chat thread header — title + action buttons (Files, Export, Share) */
 export function ChatHeader({ thread }: { thread: Thread }) {
   const openFilePanel = useChatStore((s) => s.openFilePanel);
-  const hasFiles = !!thread.hasFiles;
+  const pendingFiles = useChatStore((s) => s.pendingFilesByThread[s.activeThreadId ?? ''] ?? EMPTY_ATTACHMENTS);
+  const hasPending = pendingFiles.length > 0;
+  const hasFiles = !!thread.hasFiles || hasPending;
 
   return (
     <div
@@ -29,7 +32,7 @@ export function ChatHeader({ thread }: { thread: Thread }) {
         <Button
           variant="ghost"
           size="icon-sm"
-          className={headerBtnCls}
+          className={cn(headerBtnCls, hasPending && '!text-violet-3 !border-violet-3 !bg-[rgba(var(--violet-3-rgb),0.08)] dark:!bg-[rgba(var(--violet-3-rgb),0.12)]')}
           disabled={!hasFiles}
           title="Files"
           aria-label="Files"

@@ -1,4 +1,8 @@
 import { create } from 'zustand';
+import type { Attachment } from '~/services/types';
+
+/** Stable empty array to avoid infinite re-renders in Zustand selectors */
+export const EMPTY_ATTACHMENTS: Attachment[] = [];
 
 type FilePanelTab = 'spreadsheet' | 'folder' | 'cloud';
 
@@ -8,10 +12,8 @@ export type BreadcrumbSegment = { id: string; name: string };
 interface ChatState {
   /** Currently selected thread ID */
   activeThreadId: string | null;
-  /** Whether the file panel is open */
-  filePanelOpen: boolean;
-  /** Active tab in the file panel */
-  filePanelTab: FilePanelTab;
+  /** File panel open/tab state keyed by thread ID */
+  filePanelByThread: Record<string, { open: boolean; tab: FilePanelTab }>;
   /** Whether the workflow context panel is open */
   workflowPanelOpen: boolean;
   /** Active workflow run ID shown in the workflow context panel */
@@ -34,6 +36,8 @@ interface ChatState {
   cloudSearchQuery: string;
   /** Whether search results are being shown in cloud drive */
   cloudSearchActive: boolean;
+  /** Files attached but not yet submitted, keyed by thread ID */
+  pendingFilesByThread: Record<string, Attachment[]>;
 
   selectThread: (threadId: string | null) => void;
   openFilePanel: (tab?: FilePanelTab) => void;
@@ -52,13 +56,15 @@ interface ChatState {
   clearCloudSelection: () => void;
   setCloudSearchQuery: (query: string) => void;
   setCloudSearchActive: (active: boolean) => void;
+  addPendingFiles: (files: Attachment[]) => void;
+  removePendingFile: (index: number) => void;
+  clearPendingFiles: () => void;
 }
 
 /** Chat view state store */
 export const useChatStore = create<ChatState>((set) => ({
   activeThreadId: null,
-  filePanelOpen: false,
-  filePanelTab: 'spreadsheet',
+  filePanelByThread: {},
   workflowPanelOpen: false,
   activeWorkflowRunId: null,
   autocompleteOpen: false,
@@ -70,36 +76,65 @@ export const useChatStore = create<ChatState>((set) => ({
   cloudBreadcrumb: [],
   cloudSearchQuery: '',
   cloudSearchActive: false,
+  pendingFilesByThread: {},
 
   selectThread: (threadId) => set({
     activeThreadId: threadId,
-    filePanelOpen: false,
     workflowPanelOpen: false,
     activeWorkflowRunId: null,
     autocompleteOpen: false,
     autocompleteIndex: 0,
+    selectedCloudFiles: [],
+    cloudDriveMode: 'browse' as const,
+    cloudSearchQuery: '',
+    cloudSearchActive: false,
   }),
-  openFilePanel: (tab) => set({ filePanelOpen: true, workflowPanelOpen: false, ...(tab ? { filePanelTab: tab } : {}) }),
-  closeFilePanel: () => set({ filePanelOpen: false }),
-  setFilePanelTab: (tab) => set({ filePanelTab: tab }),
-  openWorkflowPanel: (runId) => set({
-    workflowPanelOpen: true,
-    activeWorkflowRunId: runId,
-    filePanelOpen: false,
+  openFilePanel: (tab) => set((state) => {
+    const key = state.activeThreadId ?? '';
+    const current = state.filePanelByThread[key];
+    return {
+      filePanelByThread: { ...state.filePanelByThread, [key]: { open: true, tab: tab ?? current?.tab ?? 'spreadsheet' } },
+      workflowPanelOpen: false,
+    };
+  }),
+  closeFilePanel: () => set((state) => {
+    const key = state.activeThreadId ?? '';
+    const current = state.filePanelByThread[key];
+    return {
+      filePanelByThread: { ...state.filePanelByThread, [key]: { tab: current?.tab ?? 'spreadsheet', open: false } },
+    };
+  }),
+  setFilePanelTab: (tab) => set((state) => {
+    const key = state.activeThreadId ?? '';
+    const current = state.filePanelByThread[key];
+    return {
+      filePanelByThread: { ...state.filePanelByThread, [key]: { open: current?.open ?? false, tab } },
+    };
+  }),
+  openWorkflowPanel: (runId) => set((state) => {
+    const key = state.activeThreadId ?? '';
+    const current = state.filePanelByThread[key];
+    return {
+      workflowPanelOpen: true,
+      activeWorkflowRunId: runId,
+      filePanelByThread: { ...state.filePanelByThread, [key]: { tab: current?.tab ?? 'spreadsheet', open: false } },
+    };
   }),
   closeWorkflowPanel: () => set({ workflowPanelOpen: false, activeWorkflowRunId: null }),
   showAutocomplete: () => set({ autocompleteOpen: true, autocompleteIndex: 0 }),
   hideAutocomplete: () => set({ autocompleteOpen: false, autocompleteIndex: 0 }),
   setAutocompleteIndex: (index) => set({ autocompleteIndex: index }),
   setStreaming: (streaming) => set({ isStreaming: streaming }),
-  openCloudDrive: (mode) => set({
-    filePanelOpen: true,
-    filePanelTab: 'cloud',
-    cloudDriveMode: mode,
-    workflowPanelOpen: false,
-    selectedCloudFiles: [],
-    cloudSearchQuery: '',
-    cloudSearchActive: false,
+  openCloudDrive: (mode) => set((state) => {
+    const key = state.activeThreadId ?? '';
+    return {
+      filePanelByThread: { ...state.filePanelByThread, [key]: { open: true, tab: 'cloud' as FilePanelTab } },
+      cloudDriveMode: mode,
+      workflowPanelOpen: false,
+      selectedCloudFiles: [],
+      cloudSearchQuery: '',
+      cloudSearchActive: false,
+    };
   }),
   setCloudActiveSource: (sourceId) => set({ cloudActiveSourceId: sourceId }),
   setCloudBreadcrumb: (crumbs) => set({ cloudBreadcrumb: crumbs }),
@@ -111,4 +146,19 @@ export const useChatStore = create<ChatState>((set) => ({
   clearCloudSelection: () => set({ selectedCloudFiles: [] }),
   setCloudSearchQuery: (query) => set({ cloudSearchQuery: query }),
   setCloudSearchActive: (active) => set({ cloudSearchActive: active }),
+  addPendingFiles: (files) => set((state) => {
+    const key = state.activeThreadId ?? '';
+    const current = state.pendingFilesByThread[key] ?? [];
+    return { pendingFilesByThread: { ...state.pendingFilesByThread, [key]: [...current, ...files] } };
+  }),
+  removePendingFile: (index) => set((state) => {
+    const key = state.activeThreadId ?? '';
+    const current = state.pendingFilesByThread[key] ?? [];
+    return { pendingFilesByThread: { ...state.pendingFilesByThread, [key]: current.filter((_, i) => i !== index) } };
+  }),
+  clearPendingFiles: () => set((state) => {
+    const key = state.activeThreadId ?? '';
+    const { [key]: _, ...rest } = state.pendingFilesByThread;
+    return { pendingFilesByThread: rest };
+  }),
 }));

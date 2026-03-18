@@ -35,7 +35,8 @@ export function useKeyboard() {
         }
 
         // 3. Close file or workflow panel
-        if (chatState.filePanelOpen) {
+        const filePanelState = chatState.filePanelByThread[chatState.activeThreadId ?? ''];
+        if (filePanelState?.open) {
           chatState.closeFilePanel();
           return;
         }

@@ -6,8 +6,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMatches } from 'react-router';
-import { FileCheck, FileCode, FileImage, FileSpreadsheet, FileText, Folder, Mail, Paperclip, Presentation, type LucideIcon } from 'lucide-react';
-import { useChatStore, type BreadcrumbSegment } from '~/stores/chat-store';
+import { FileCheck, FileCode, FileImage, FileSpreadsheet, FileText, Folder, Mail, Paperclip, Presentation, X, type LucideIcon } from 'lucide-react';
+import { useChatStore, EMPTY_ATTACHMENTS, type BreadcrumbSegment } from '~/stores/chat-store';
 import { useResizePanel } from '~/hooks/use-resize-panel';
 import { getSpreadsheet } from '~/services/panels';
 import type { SpreadsheetData, CloudSource, CloudFile, Attachment, Thread } from '~/services/types';
@@ -23,20 +23,29 @@ import { getCloudSources, getCloudFiles, getRecentCloudFiles, searchCloudFiles }
  * Controlled by useChatStore.filePanelOpen.
  */
 export function FilePanel() {
-  const isOpen = useChatStore((s) => s.filePanelOpen);
+  const isOpen = useChatStore((s) => s.filePanelByThread[s.activeThreadId ?? '']?.open ?? false);
   const close = useChatStore((s) => s.closeFilePanel);
-  const activeTab = useChatStore((s) => s.filePanelTab);
+  const activeTab = useChatStore((s) => s.filePanelByThread[s.activeThreadId ?? '']?.tab ?? 'spreadsheet');
   const setActiveTab = useChatStore((s) => s.setFilePanelTab);
+  const pendingFiles = useChatStore((s) => s.pendingFilesByThread[s.activeThreadId ?? ''] ?? EMPTY_ATTACHMENTS);
+  const removePendingFile = useChatStore((s) => s.removePendingFile);
 
   // Get thread data from route match (same pattern as _app.chat.tsx)
   const matches = useMatches();
   const threadMatch = matches.find((m) => m.id === 'routes/_app.chat.$threadId');
   const thread = (threadMatch?.data as { thread?: Thread } | undefined)?.thread;
 
-  // Collect all attachments from the active thread's messages
-  const threadAttachments = useMemo(() => {
-    if (!thread) return [];
-    return thread.messages.flatMap((m) => m.attachments ?? []);
+  // Split thread attachments by message origin (user-uploaded vs AI-created)
+  const { userAttachments, aiAttachments } = useMemo(() => {
+    if (!thread) return { userAttachments: [], aiAttachments: [] };
+    const user: Attachment[] = [];
+    const ai: Attachment[] = [];
+    for (const m of thread.messages) {
+      if (!m.attachments) continue;
+      if (m.type === 'user') user.push(...m.attachments);
+      else ai.push(...m.attachments);
+    }
+    return { userAttachments: user, aiAttachments: ai };
   }, [thread]);
 
   const [spreadsheet, setSpreadsheet] = useState<SpreadsheetData | null>(null);
@@ -141,7 +150,13 @@ export function FilePanel() {
           )
         )}
         {activeTab === 'folder' && (
-          <FolderView attachments={threadAttachments} onFileClick={(att) => { setSelectedFile(att); setActiveTab('spreadsheet'); }} />
+          <FolderView
+            pendingFiles={pendingFiles}
+            uploadedFiles={userAttachments}
+            createdFiles={aiAttachments}
+            onFileClick={(att) => { setSelectedFile(att); setActiveTab('spreadsheet'); }}
+            onRemovePending={removePendingFile}
+          />
         )}
         {activeTab === 'cloud' && (
           <CloudDriveContent />
@@ -372,29 +387,36 @@ function fileSubtitle(att: Attachment): string {
   return parts.join(' \u00B7 ');
 }
 
-/** Folder file list filtered to current thread's attachments. */
-function FolderView({ attachments, onFileClick }: { attachments: Attachment[]; onFileClick: (att: Attachment) => void }) {
-  const fileCount = attachments.length;
+/** A section of files with a header label and file list */
+function FileSection({ label, files, onFileClick, onRemove, variant = 'default' }: {
+  label: string;
+  files: Attachment[];
+  onFileClick: (att: Attachment) => void;
+  onRemove?: (index: number) => void;
+  variant?: 'pending' | 'default';
+}) {
+  if (files.length === 0) return null;
+  const isPending = variant === 'pending';
 
   return (
-    <>
-      <div className="flex items-center justify-between p-[10px_12px] bg-off-white dark:bg-surface-1 border-b border-taupe-2 dark:border-surface-3">
-        <span className="font-mono text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-taupe-3">Thread Files</span>
-        <span className="font-mono text-[0.625rem] text-taupe-3">{fileCount} {fileCount === 1 ? 'file' : 'files'}</span>
+    <div>
+      <div className="flex items-center justify-between px-3 py-2 bg-off-white dark:bg-surface-1 border-b border-taupe-2 dark:border-surface-3">
+        <span className="font-mono text-[0.625rem] font-bold uppercase tracking-[0.1em] text-taupe-3">{label}</span>
+        <span className="font-mono text-[0.5625rem] text-taupe-3">{files.length}</span>
       </div>
-      {fileCount === 0 ? (
-        <div className="flex flex-1 items-center justify-center p-6">
-          <span className="font-mono text-[0.6875rem] text-taupe-3">No files in this thread</span>
-        </div>
-      ) : (
-        <div className="p-1.5 flex flex-col gap-1.5">
-          {attachments.map((att, i) => {
-            const Icon = getFileTypeIcon(att.type);
-            return (
+      <div className="p-1.5 flex flex-col gap-1.5">
+        {files.map((att, i) => {
+          const Icon = getFileTypeIcon(att.type);
+          return (
             <div
               key={`${att.name}-${i}`}
-              className="flex items-center gap-2.5 p-2.5 border border-solid cursor-pointer transition-all duration-[120ms] rounded-[var(--r-md)] bg-off-white dark:bg-surface-2 border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 dark:border-taupe-2 hover:bg-berry-1 hover:border-taupe-2 dark:hover:bg-surface-2 dark:hover:border-surface-3"
-              onClick={() => onFileClick(att)}
+              className={cn(
+                'flex items-center gap-2.5 p-2.5 border transition-all duration-[120ms] rounded-[var(--r-md)] bg-off-white dark:bg-surface-2 border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 dark:border-taupe-2',
+                isPending
+                  ? 'border-dashed opacity-50'
+                  : 'border-solid cursor-pointer hover:bg-berry-1 hover:border-taupe-2 dark:hover:bg-surface-2 dark:hover:border-surface-3',
+              )}
+              onClick={isPending ? undefined : () => onFileClick(att)}
             >
               <div className={cn('w-7 h-7 flex items-center justify-center text-white dark:text-off-white shrink-0 rounded-[var(--r-md)]', fileIconBg(att.type))}>
                 <Icon className="h-3.5 w-3.5" />
@@ -405,8 +427,50 @@ function FolderView({ attachments, onFileClick }: { attachments: Attachment[]; o
                   <div className="font-mono text-[0.625rem] text-taupe-3 mt-0.5">{fileSubtitle(att)}</div>
                 )}
               </div>
+              {isPending && onRemove && (
+                <button
+                  type="button"
+                  onClick={() => onRemove(i)}
+                  className="flex items-center justify-center w-5 h-5 p-0 bg-transparent border border-transparent rounded-[var(--r-sm)] text-taupe-3 cursor-pointer shrink-0 opacity-100 hover:bg-[rgba(var(--red-rgb),0.1)] hover:border-red hover:text-red active:bg-[rgba(var(--red-rgb),0.2)] focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-1 dark:hover:bg-[rgba(var(--red-rgb),0.15)]"
+                  title={`Remove ${att.name}`}
+                  aria-label={`Remove ${att.name}`}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
             </div>
-            ); })}
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Folder file list split into pending, uploaded, and created sections. */
+function FolderView({ pendingFiles, uploadedFiles, createdFiles, onFileClick, onRemovePending }: {
+  pendingFiles: Attachment[];
+  uploadedFiles: Attachment[];
+  createdFiles: Attachment[];
+  onFileClick: (att: Attachment) => void;
+  onRemovePending: (index: number) => void;
+}) {
+  const totalCount = pendingFiles.length + uploadedFiles.length + createdFiles.length;
+
+  return (
+    <>
+      <div className="flex items-center justify-between p-[10px_12px] bg-off-white dark:bg-surface-1 border-b border-taupe-2 dark:border-surface-3">
+        <span className="font-mono text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-taupe-3">Thread Files</span>
+        <span className="font-mono text-[0.625rem] text-taupe-3">{totalCount} {totalCount === 1 ? 'file' : 'files'}</span>
+      </div>
+      {totalCount === 0 ? (
+        <div className="flex flex-1 items-center justify-center p-6">
+          <span className="font-mono text-[0.6875rem] text-taupe-3">No files in this thread</span>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto">
+          <FileSection label="Pending" files={pendingFiles} onFileClick={onFileClick} onRemove={onRemovePending} variant="pending" />
+          <FileSection label="Uploaded" files={uploadedFiles} onFileClick={onFileClick} />
+          <FileSection label="Created by Cosimo" files={createdFiles} onFileClick={onFileClick} />
         </div>
       )}
     </>
@@ -583,9 +647,18 @@ function CloudDriveContent() {
     setCloudSearchActive(false);
   };
 
+  const addPendingFiles = useChatStore((s) => s.addPendingFiles);
+  const closeFilePanel = useChatStore((s) => s.closeFilePanel);
+
   const handleAttach = () => {
-    console.log('Attaching cloud files:', selectedFileIds);
+    const converted: Attachment[] = selectedFiles.map((f) => ({
+      name: f.name,
+      type: f.type,
+      size: f.size,
+    }));
+    addPendingFiles(converted);
     clearCloudSelection();
+    closeFilePanel();
   };
 
   return (

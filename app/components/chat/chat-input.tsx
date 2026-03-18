@@ -16,6 +16,7 @@ import { cn } from '~/lib/utils';
 import { SendButton } from '~/components/ui/send-button';
 import { AttachButton } from '~/components/ui/attach-button';
 import { useCommandAutocomplete } from '~/hooks/use-command-autocomplete';
+import { getFileTypeIcon, fileIconBevelClasses } from '~/components/chat/file-panel';
 import type { WorkflowCommand } from '~/services/types';
 
 // ============================================
@@ -70,12 +71,10 @@ const MODEL_OPTIONS: ModelOption[] = [
   { id: 'expert', name: 'Expert', description: 'Complex analysis and long-form deliverables' },
 ];
 
-/** Get file icon emoji based on file type/extension */
-function getFileIconEmoji(fileName: string): string {
-  const ext = fileName.split('.').pop()?.toLowerCase();
-  if (ext === 'pdf') return '📄';
-  if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') return '📊';
-  return '📎';
+/** Returns grid column classes for staged file layout, capped at 4 columns */
+function stagedFileGridCols(count: number): string {
+  const cols = Math.min(count, 4);
+  return `grid ${['', 'grid-cols-1', 'grid-cols-2', 'grid-cols-3', 'grid-cols-4'][cols]} gap-1.5`;
 }
 
 // ============================================
@@ -219,28 +218,35 @@ export function ChatInput({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      {/* File strip */}
+      {/* File grid */}
       {stagedFiles.length > 0 && (
-        <div className="flex gap-1.5 mb-2 overflow-x-auto pb-0.5">
-          {stagedFiles.map((file, i) => (
-            <div key={`${file.name}-${i}`} className="inline-flex items-center gap-1.5 shrink-0 px-2 py-1 bg-off-white border border-solid border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 rounded-[var(--r-sm)] hover:bg-taupe-1 dark:bg-surface-2 dark:border-t-taupe-3 dark:border-l-taupe-3 dark:border-b-taupe-4 dark:border-r-taupe-4 dark:hover:bg-surface-3">
-              <span className="text-xs shrink-0">{getFileIconEmoji(file.name)}</span>
-              <span className="font-[family-name:var(--mono)] text-[0.6875rem] font-semibold text-taupe-5 max-w-40 overflow-hidden text-ellipsis whitespace-nowrap">{file.name}</span>
-              <span className="font-[family-name:var(--mono)] text-[0.625rem] text-taupe-3 shrink-0">{file.size}</span>
-              {onRemoveFile && (
-                <button
-                  type="button"
-                  onClick={() => onRemoveFile(i)}
-                  className="flex items-center justify-center w-4 h-4 p-0 bg-transparent border border-transparent rounded-[var(--r-sm)] text-xs leading-none text-taupe-3 cursor-pointer shrink-0 hover:bg-[rgba(var(--red-rgb),0.1)] hover:border-red hover:text-red active:bg-[rgba(var(--red-rgb),0.2)] focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-1 dark:hover:bg-[rgba(var(--red-rgb),0.15)]"
-                  title={`Remove ${file.name}`}
-                  aria-label={`Remove ${file.name}`}
-                >
-                  <X className="h-2.5 w-2.5" />
-                  <span className="a11y-label">Remove</span>
-                </button>
-              )}
-            </div>
-          ))}
+        <div className={cn(stagedFileGridCols(stagedFiles.length), 'mb-2 max-h-[126px] overflow-y-auto')}>
+          {stagedFiles.map((file, i) => {
+            const Icon = getFileTypeIcon(file.type);
+            return (
+              <div key={`${file.name}-${i}`} className="flex items-center gap-2 px-2.5 py-1.5 bg-off-white border border-solid border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 rounded-[var(--r-sm)] hover:bg-taupe-1 dark:bg-surface-2 dark:border-t-taupe-3 dark:border-l-taupe-3 dark:border-b-taupe-4 dark:border-r-taupe-4 dark:hover:bg-surface-3 min-w-0">
+                <div className={cn('w-6 h-6 flex items-center justify-center text-white shrink-0 rounded-[var(--r-sm)] border', fileIconBevelClasses(file.type))}>
+                  <Icon className="h-3 w-3" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-[family-name:var(--mono)] text-[0.6875rem] font-semibold text-taupe-5 truncate">{file.name}</div>
+                  <div className="font-[family-name:var(--mono)] text-[0.5625rem] text-taupe-3">{file.size}</div>
+                </div>
+                {onRemoveFile && (
+                  <button
+                    type="button"
+                    onClick={() => onRemoveFile(i)}
+                    className="flex items-center justify-center w-4 h-4 p-0 bg-transparent border border-transparent rounded-[var(--r-sm)] text-xs leading-none text-taupe-3 cursor-pointer shrink-0 hover:bg-[rgba(var(--red-rgb),0.1)] hover:border-red hover:text-red active:bg-[rgba(var(--red-rgb),0.2)] focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-1 dark:hover:bg-[rgba(var(--red-rgb),0.15)]"
+                    title={`Remove ${file.name}`}
+                    aria-label={`Remove ${file.name}`}
+                  >
+                    <X className="h-2.5 w-2.5" />
+                    <span className="a11y-label">Remove</span>
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 

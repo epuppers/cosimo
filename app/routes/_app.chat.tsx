@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Outlet, useMatches } from "react-router";
 import { ChatHeader } from "~/components/chat/chat-header";
 import { ChatInput } from "~/components/chat/chat-input";
@@ -7,7 +7,8 @@ import { WorkflowPanel } from "~/components/chat/workflow-panel";
 import { useChatStore } from "~/stores/chat-store";
 import { useGreeting } from "~/hooks/use-greeting";
 import { MOCK_USER } from "~/data/mock-user";
-import type { Thread, WorkflowRun } from "~/services/types";
+import type { Thread, WorkflowRun, Attachment } from "~/services/types";
+import { EMPTY_ATTACHMENTS } from "~/stores/chat-store";
 
 /** Suggestion chips for the empty thread state */
 const SUGGESTIONS = [
@@ -33,9 +34,21 @@ export default function ChatRoute() {
   const thread = threadData?.thread;
   const run = threadData?.run;
 
+  // Sync store activeThreadId with the route so per-thread state works
+  const selectThread = useChatStore((s) => s.selectThread);
+  const routeThreadId = thread?.id ?? null;
+  useEffect(() => {
+    selectThread(routeThreadId);
+  }, [routeThreadId, selectThread]);
+
   const { salutation, phrase } = useGreeting(MOCK_USER.firstName);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const openCloudDrive = useChatStore((s) => s.openCloudDrive);
+  const addPendingFiles = useChatStore((s) => s.addPendingFiles);
+  const clearPendingFiles = useChatStore((s) => s.clearPendingFiles);
+  const pendingFiles = useChatStore((s) => s.pendingFilesByThread[s.activeThreadId ?? ''] ?? EMPTY_ATTACHMENTS);
+  const removePendingFile = useChatStore((s) => s.removePendingFile);
+  const openFilePanel = useChatStore((s) => s.openFilePanel);
 
   const handleAttach = useCallback(
     (type: 'computer' | 'drive') => {
@@ -47,6 +60,35 @@ export default function ChatRoute() {
     },
     [openCloudDrive],
   );
+
+  /** Format bytes to a human-readable string */
+  const formatFileSize = useCallback((bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }, []);
+
+  /** Extract file extension from name */
+  const getFileType = useCallback((name: string): string => {
+    const ext = name.split('.').pop()?.toLowerCase();
+    return ext ?? 'file';
+  }, []);
+
+  const handleFileInputChange = useCallback(() => {
+    const input = fileInputRef.current;
+    if (!input?.files?.length) return;
+    const converted: Attachment[] = Array.from(input.files).map((f) => ({
+      name: f.name,
+      type: getFileType(f.name),
+      size: formatFileSize(f.size),
+    }));
+    addPendingFiles(converted);
+    input.value = '';
+  }, [addPendingFiles, openFilePanel, formatFileSize, getFileType]);
+
+  const handleSend = useCallback(() => {
+    clearPendingFiles();
+  }, [clearPendingFiles]);
 
   return (
     <div className="flex flex-1 overflow-hidden">
@@ -78,8 +120,10 @@ export default function ChatRoute() {
           )}
         </div>
         <ChatInput
-          onSend={() => {}}
+          onSend={handleSend}
           onAttach={handleAttach}
+          stagedFiles={pendingFiles.map((f) => ({ name: f.name, type: f.type, size: f.size ?? '' }))}
+          onRemoveFile={removePendingFile}
           placeholder="Ask Cosimo anything..."
         />
       </div>
@@ -88,9 +132,7 @@ export default function ChatRoute() {
         type="file"
         multiple
         className="hidden"
-        onChange={() => {
-          // TODO: handle selected files
-        }}
+        onChange={handleFileInputChange}
       />
       <FilePanel />
       {run && <WorkflowPanel run={run} />}
