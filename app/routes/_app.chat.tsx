@@ -1,8 +1,10 @@
+import { useCallback } from "react";
 import { Outlet, useMatches } from "react-router";
 import { ChatHeader } from "~/components/chat/chat-header";
 import { ChatInput } from "~/components/chat/chat-input";
 import { FilePanel } from "~/components/chat/file-panel";
 import { WorkflowPanel } from "~/components/chat/workflow-panel";
+import { useChatStore } from "~/stores/chat-store";
 import type { Thread, WorkflowRun } from "~/services/types";
 
 /** Suggestion chips for the empty thread state */
@@ -28,6 +30,19 @@ export default function ChatRoute() {
   const threadData = threadMatch?.data as { thread?: Thread; run?: WorkflowRun | null } | undefined;
   const thread = threadData?.thread;
   const run = threadData?.run;
+
+  const openCloudDrive = useChatStore((s) => s.openCloudDrive);
+
+  const handleAttach = useCallback(
+    (type: 'computer' | 'drive') => {
+      if (type === 'drive') {
+        openCloudDrive('attach');
+      } else {
+        console.log('Native file picker — TODO');
+      }
+    },
+    [openCloudDrive],
+  );
 
   return (
     <div className="flex flex-1 overflow-hidden">
@@ -60,6 +75,7 @@ export default function ChatRoute() {
         </div>
         <ChatInput
           onSend={() => {}}
+          onAttach={handleAttach}
           placeholder="Ask Cosimo anything..."
         />
       </div>

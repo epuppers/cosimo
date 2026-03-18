@@ -141,3 +141,14 @@ Learnings:
 - CloudDriveContent sub-component follows SpreadsheetView/FolderView pattern (local sub-component in same file)
 - Source tree traversal for breadcrumb building: max 3 levels deep (root → child → grandchild)
 - Cloud file effects depend on store state (cloudActiveSourceId, cloudSearchActive, cloudSearchQuery)
+
+---
+[Iteration 10] Story US-010: Wire attach button to cloud drive tab
+Date: 2026-03-18
+Summary: Wired the 'From cloud drive' attach menu to open the file panel on Cloud tab in attach mode. Added useChatStore import and openCloudDrive selector in _app.chat.tsx. Created handleAttach callback that calls openCloudDrive('attach') for 'drive' type and console.log for 'computer' type. Passed handleAttach as onAttach prop to ChatInput.
+Files modified:
+- /app/routes/_app.chat.tsx
+Learnings:
+- ChatInput already has onAttach prop typed as (type: 'computer' | 'drive') => void and passes it through to AttachButton
+- No changes needed in chat-input.tsx or attach-button.tsx — just wire at the route level
+- useCallback with openCloudDrive dependency for stable reference
