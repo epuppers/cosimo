@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type FilePanelTab = 'spreadsheet' | 'folder';
+type FilePanelTab = 'spreadsheet' | 'folder' | 'cloud';
 
 interface ChatState {
   /** Currently selected thread ID */
@@ -19,6 +19,18 @@ interface ChatState {
   autocompleteIndex: number;
   /** Whether a streaming response is in progress */
   isStreaming: boolean;
+  /** Whether cloud drive is in browse or attach mode */
+  cloudDriveMode: 'browse' | 'attach';
+  /** Array of selected CloudFile IDs for multi-select in attach mode */
+  selectedCloudFiles: string[];
+  /** Currently selected source in the cloud source tree */
+  cloudActiveSourceId: string | null;
+  /** Array of folder names for breadcrumb display */
+  cloudBreadcrumb: string[];
+  /** Current search input value in cloud drive */
+  cloudSearchQuery: string;
+  /** Whether search results are being shown in cloud drive */
+  cloudSearchActive: boolean;
 
   selectThread: (threadId: string | null) => void;
   openFilePanel: (tab?: FilePanelTab) => void;
@@ -30,6 +42,13 @@ interface ChatState {
   hideAutocomplete: () => void;
   setAutocompleteIndex: (index: number) => void;
   setStreaming: (streaming: boolean) => void;
+  openCloudDrive: (mode: 'browse' | 'attach') => void;
+  setCloudActiveSource: (sourceId: string | null) => void;
+  setCloudBreadcrumb: (crumbs: string[]) => void;
+  toggleCloudFileSelection: (fileId: string) => void;
+  clearCloudSelection: () => void;
+  setCloudSearchQuery: (query: string) => void;
+  setCloudSearchActive: (active: boolean) => void;
 }
 
 /** Chat view state store */
@@ -42,6 +61,12 @@ export const useChatStore = create<ChatState>((set) => ({
   autocompleteOpen: false,
   autocompleteIndex: 0,
   isStreaming: false,
+  cloudDriveMode: 'browse',
+  selectedCloudFiles: [],
+  cloudActiveSourceId: null,
+  cloudBreadcrumb: [],
+  cloudSearchQuery: '',
+  cloudSearchActive: false,
 
   selectThread: (threadId) => set({
     activeThreadId: threadId,
@@ -64,4 +89,23 @@ export const useChatStore = create<ChatState>((set) => ({
   hideAutocomplete: () => set({ autocompleteOpen: false, autocompleteIndex: 0 }),
   setAutocompleteIndex: (index) => set({ autocompleteIndex: index }),
   setStreaming: (streaming) => set({ isStreaming: streaming }),
+  openCloudDrive: (mode) => set({
+    filePanelOpen: true,
+    filePanelTab: 'cloud',
+    cloudDriveMode: mode,
+    workflowPanelOpen: false,
+    selectedCloudFiles: [],
+    cloudSearchQuery: '',
+    cloudSearchActive: false,
+  }),
+  setCloudActiveSource: (sourceId) => set({ cloudActiveSourceId: sourceId }),
+  setCloudBreadcrumb: (crumbs) => set({ cloudBreadcrumb: crumbs }),
+  toggleCloudFileSelection: (fileId) => set((state) => ({
+    selectedCloudFiles: state.selectedCloudFiles.includes(fileId)
+      ? state.selectedCloudFiles.filter((id) => id !== fileId)
+      : [...state.selectedCloudFiles, fileId],
+  })),
+  clearCloudSelection: () => set({ selectedCloudFiles: [] }),
+  setCloudSearchQuery: (query) => set({ cloudSearchQuery: query }),
+  setCloudSearchActive: (active) => set({ cloudSearchActive: active }),
 }));

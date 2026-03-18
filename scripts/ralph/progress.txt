@@ -69,3 +69,14 @@ Learnings:
 - Service files spread-copy arrays ([...MOCK_*]) to prevent mutation of mock data
 - searchCloudFiles uses Object.values().flat().filter() to search across all keyed file entries
 - Pattern: file header uses // ==== blocks, then import mock data, import types separately
+
+---
+[Iteration 4] Story US-004: Expand chat store for cloud drive state
+Date: 2026-03-18
+Summary: Added cloud drive state fields and actions to chat-store.ts. Expanded FilePanelTab to include 'cloud'. Added 6 state fields (cloudDriveMode, selectedCloudFiles, cloudActiveSourceId, cloudBreadcrumb, cloudSearchQuery, cloudSearchActive) and 7 actions (openCloudDrive, setCloudActiveSource, setCloudBreadcrumb, toggleCloudFileSelection, clearCloudSelection, setCloudSearchQuery, setCloudSearchActive).
+Files modified:
+- /app/stores/chat-store.ts
+Learnings:
+- Store uses set() with object spread for simple updates, set((state) => ...) for state-dependent updates (toggleCloudFileSelection)
+- openCloudDrive clears search state and selection to ensure clean tab switch
+- No existing code was modified — all additions only
