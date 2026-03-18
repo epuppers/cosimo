@@ -116,3 +116,15 @@ Learnings:
 - SearchFilterBar pattern: Search icon absolute positioned left, input with pl for icon space
 - Breadcrumb segments use array index for navigation callback
 - searchActive state swaps breadcrumb display to "Search results" text
+
+---
+[Iteration 8] Story US-008: Cloud selection bar component
+Date: 2026-03-18
+Summary: Created /app/components/chat/cloud-selection-bar.tsx with CloudSelectionBar component. Bottom action bar for attach mode with file count/total size display, Clear ghost button, and Attach Files primary button with beveled 3D violet styling and Paperclip icon. Includes size parsing/formatting helpers. Disabled state when no selection.
+Files modified:
+- /app/components/chat/cloud-selection-bar.tsx
+Learnings:
+- Beveled button pattern: bg-violet-3 border-t-violet-2 border-l-violet-2 border-b-violet-5 border-r-violet-5
+- Ghost button pattern: bg-transparent text-taupe-4 hover:text-taupe-5
+- Disabled state: opacity-50 cursor-default pointer-events-none (not actual disabled attr alone)
+- Size parsing from human-readable strings (KB/MB/GB) needed for total calculation
