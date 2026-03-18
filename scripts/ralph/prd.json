@@ -139,8 +139,8 @@
         "npx tsc --noEmit passes with zero errors"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "CloudSelectionBar component with file count/size display, Clear ghost button, Attach Files beveled violet button with Paperclip icon, disabled state. Size helpers for parsing/formatting. Typecheck clean."
     },
     {
       "id": "US-009",
