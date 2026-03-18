@@ -128,3 +128,16 @@ Learnings:
 - Ghost button pattern: bg-transparent text-taupe-4 hover:text-taupe-5
 - Disabled state: opacity-50 cursor-default pointer-events-none (not actual disabled attr alone)
 - Size parsing from human-readable strings (KB/MB/GB) needed for total calculation
+
+---
+[Iteration 9] Story US-009: Assemble cloud drive tab in FilePanel
+Date: 2026-03-18
+Summary: Modified /app/components/chat/file-panel.tsx to add Cloud Drive tab. Added third "Cloud" tab button with matching className. Imported and wired CloudSourceTree, CloudFileList, CloudNavBar, CloudSelectionBar. Added cloud state selectors from useChatStore. Added useState for cloudSources, cloudFiles, cloudLoading. Added useEffects to load sources on mount and files when source/search changes. Created local CloudDriveContent sub-component with left rail (140px source tree) + right area (nav bar + file list + optional selection bar). Updated initialWidth to 560. Added helper functions for provider label resolution and breadcrumb building.
+Files modified:
+- /app/components/chat/file-panel.tsx
+Learnings:
+- Content switching changed from ternary to three independent conditional renders ({activeTab === 'x' && ...})
+- Helper functions (findProviderLabel, containsSource, buildSourceBreadcrumb) placed outside the component as pure functions
+- CloudDriveContent sub-component follows SpreadsheetView/FolderView pattern (local sub-component in same file)
+- Source tree traversal for breadcrumb building: max 3 levels deep (root → child → grandchild)
+- Cloud file effects depend on store state (cloudActiveSourceId, cloudSearchActive, cloudSearchQuery)
