@@ -80,3 +80,15 @@ Learnings:
 - Store uses set() with object spread for simple updates, set((state) => ...) for state-dependent updates (toggleCloudFileSelection)
 - openCloudDrive clears search state and selection to ensure clean tab switch
 - No existing code was modified — all additions only
+
+---
+[Iteration 5] Story US-005: Cloud source tree component
+Date: 2026-03-18
+Summary: Created /app/components/chat/cloud-source-tree.tsx with CloudSourceTree and SourceItem sub-component. Groups sources by provider with uppercase headers (SHAREPOINT/GOOGLE) and colored left borders (violet-3/blue-3). Supports nested children with indentation, active source highlighting, and proper focus-visible states.
+Files modified:
+- /app/components/chat/cloud-source-tree.tsx
+Learnings:
+- Provider headers use border-l-[3px] with provider-specific colors (violet-3 for Microsoft, blue-3 for Google)
+- Depth-based indentation: pl-3.5 for sites, pl-6 for libraries
+- Active state: bg-berry-1 text-berry-5 (light), bg-[rgba(var(--violet-3-rgb),0.08)] text-violet-3 (dark)
+- Small dot indicator (●) for sources with children
