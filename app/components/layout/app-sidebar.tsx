@@ -82,19 +82,31 @@ function BrainNav() {
   }
 
   return (
-    <div className="brain-nav mt-auto flex flex-col border-t border-taupe-4 px-1.5 pb-1" style={{ minHeight: '91px' }}>
-      <div className="flex items-center justify-between">
-        <div className="font-[family-name:var(--mono)] text-[0.6875rem] font-semibold tracking-[0.18em] uppercase text-taupe-3 px-3 pt-4 pb-1.5 group-data-[collapsible=icon]:hidden px-2 pt-0.5 pb-0.5">Brain</div>
-        <button
-          onClick={toggleBrainNav}
-          aria-label={brainNavCollapsed ? "Expand Brain nav" : "Collapse Brain nav"}
-          className="brain-nav-toggle mr-1.5 flex size-5 items-center justify-center rounded-[var(--r-sm)] border-none bg-transparent text-taupe-3 transition-colors hover:bg-[rgba(var(--white-pure-rgb),0.08)] hover:text-taupe-1 focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-1 active:bg-[rgba(var(--white-pure-rgb),0.12)]"
-        >
-          <ChevronDown className={cn("size-2.5 a11y-keep transition-transform", brainNavCollapsed && "rotate-180")} />
-        </button>
-      </div>
+    <div className="brain-nav mt-auto flex flex-col border-t border-taupe-4 pb-1 min-h-[91px]">
+      <button
+        onClick={toggleBrainNav}
+        aria-label={brainNavCollapsed ? "Expand Brain nav" : "Collapse Brain nav"}
+        className={cn(
+          "flex w-full items-center justify-between px-3.5 py-1.5",
+          "bg-transparent border-none cursor-pointer",
+          "transition-colors",
+          "hover:bg-[rgba(var(--white-pure-rgb),0.06)]",
+          "active:bg-[rgba(var(--white-pure-rgb),0.10)]",
+          "focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-[-2px]"
+        )}
+      >
+        <span className="font-[family-name:var(--mono)] text-[0.6875rem] font-semibold tracking-[0.18em] uppercase text-taupe-3">
+          Brain
+        </span>
+        <ChevronDown
+          className={cn(
+            "size-3 text-taupe-3 a11y-keep transition-transform duration-200",
+            brainNavCollapsed && "rotate-180"
+          )}
+        />
+      </button>
       {!brainNavCollapsed && (
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-0.5 px-1.5">
           {brainItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -115,7 +127,7 @@ function BrainNav() {
           })}
         </div>
       )}
-      <div className="mt-auto px-2 pb-1 font-[family-name:var(--mono)] text-[9px] uppercase tracking-[0.1em] text-taupe-3 opacity-60">
+      <div className="mt-auto px-3.5 pb-1 pt-3 font-[family-name:var(--mono)] text-[9px] uppercase tracking-[0.1em] text-taupe-3 opacity-60">
         Cosimo v2.1
       </div>
     </div>
