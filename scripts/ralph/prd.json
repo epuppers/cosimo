@@ -202,8 +202,8 @@
         "npx tsc --noEmit passes with zero errors"
       ],
       "priority": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "CloudStorageSettings dialog with ProviderCard sub-component. SharePoint: expandable sites with library Switch toggles, Remove/Add site links. Google Drive: service account with copy button, shared folders with file counts. Connected badge, ADMIN badge, Connect a service link. All toggle state local. Typecheck clean."
     },
     {
       "id": "US-012",
