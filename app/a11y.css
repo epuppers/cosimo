@@ -35,54 +35,10 @@
 
 html[data-a11y-font="dyslexia"] {
   --font-sans: 'OpenDyslexic', sans-serif;
-  --font-mono: 'OpenDyslexic', sans-serif;
-  --font-pixel: 'OpenDyslexic', sans-serif;
   --sans: 'OpenDyslexic', sans-serif;
-  --mono: 'OpenDyslexic', sans-serif;
-  --pixel: 'OpenDyslexic', sans-serif;
 }
 
-/* ---- Dyslexia hierarchy: Display tier (was --pixel) ---- */
-/* These elements used ChicagoFLF for a chunky display look.
-   With OpenDyslexic: bold + letter-spacing recreates that weight. */
-html[data-a11y-font="dyslexia"] h1,
-html[data-a11y-font="dyslexia"] h2,
-html[data-a11y-font="dyslexia"] h3,
-html[data-a11y-font="dyslexia"] h4 {
-  font-weight: 700;
-}
-
-html[data-a11y-font="dyslexia"] .header-title,
-html[data-a11y-font="dyslexia"] .lesson-block h3 {
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-/* ---- Dyslexia hierarchy: Label tier (was --mono) ---- */
-/* Sender names, model badges, section labels — need to feel
-   distinct from body prose. Lean on weight + spacing. */
-html[data-a11y-font="dyslexia"] .msg-sender {
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  font-size: 0.6875rem;
-}
-
-html[data-a11y-font="dyslexia"] .model-badge {
-  font-weight: 700;
-  letter-spacing: 0.06em;
-}
-
-/* sidebar-section-label dyslexia override — ported to Tailwind inline */
-
-html[data-a11y-font="dyslexia"] .msg-timestamp {
-  font-size: 0.625rem;
-  letter-spacing: 0.03em;
-  opacity: 0.7;
-}
-
-
-/* ---- Dyslexia hierarchy: Body tier (was --sans) ---- */
+/* ---- Dyslexia hierarchy: Body tier ---- */
 /* Message content and descriptions — prioritise readability.
    OpenDyslexic benefits from extra line-height and word-spacing. */
 html[data-a11y-font="dyslexia"] .msg-body {
@@ -95,20 +51,6 @@ html[data-a11y-font="dyslexia"] .lesson-block p,
 html[data-a11y-font="dyslexia"] .lesson-block li {
   line-height: 1.65;
   word-spacing: 0.05em;
-}
-
-/* ---- Data tables ---- */
-html[data-a11y-font="dyslexia"] .data-tbl th {
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.6875rem;
-}
-
-/* ---- Logo wordmark ---- */
-html[data-a11y-font="dyslexia"] [data-sidebar="header"] .font-\[family-name\:var\(--pixel\)\] {
-  font-weight: 700;
-  letter-spacing: 0.08em;
 }
 
 /* ======== Reduced Motion ======== */

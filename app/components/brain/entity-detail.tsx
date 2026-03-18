@@ -77,7 +77,7 @@ export function EntityDetail({
         {/* Facts */}
         <div className="flex flex-col gap-1 mb-3">
           {entity.facts.map((fact, i) => (
-            <div key={i} className="flex items-start gap-2 px-2.5 py-1.5 bg-off-white dark:bg-surface-2 border border-taupe-1 dark:border-taupe-3 rounded-r-md font-mono text-[0.6875rem] text-taupe-4 dark:text-taupe-3 leading-relaxed transition-colors hover:border-taupe-2">
+            <div key={i} className="flex items-start gap-2 px-2.5 py-1.5 bg-off-white dark:bg-surface-2 border border-taupe-1 dark:border-taupe-3 rounded-r-md font-sans text-[0.6875rem] text-taupe-4 dark:text-taupe-3 leading-relaxed transition-colors hover:border-taupe-2">
               <span className="text-taupe-2 shrink-0 leading-relaxed">&bull;</span>
               <span className="flex-1">{fact}</span>
             </div>

@@ -87,7 +87,7 @@ export function WorkflowCard({ template, lessonNames, onSelect, onRun }: Workflo
 
       {/* Body: description */}
       <div className="px-[14px] py-[10px] flex gap-6">
-        <span className="flex-1 text-[0.8125rem] text-taupe-4 leading-relaxed dark:text-taupe-3">{template.description}</span>
+        <span className="flex-1 font-sans text-[0.8125rem] text-taupe-4 leading-relaxed dark:text-taupe-3">{template.description}</span>
       </div>
 
       {/* Footer: lesson chip + run status */}

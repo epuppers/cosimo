@@ -324,11 +324,6 @@
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
 
-  /* Medici design tokens — fonts */
-  --font-pixel: 'ChicagoFLF', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
-  --font-sans: 'DM Sans', sans-serif;
-
   /* Medici design tokens — border radii */
   --radius-r-xs: 2px;
   --radius-r-sm: 3px;

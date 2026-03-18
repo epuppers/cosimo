@@ -103,7 +103,7 @@ export function MemoryFactCard({ fact, onEntityClick }: MemoryFactProps) {
       </div>
 
       {/* Fact text */}
-      <p className="font-mono text-xs leading-relaxed text-taupe-5 mb-1.5">{fact.text}</p>
+      <p className="font-sans text-xs leading-relaxed text-taupe-5 mb-1.5">{fact.text}</p>
 
       {/* Entity chips */}
       {fact.linkedEntities && fact.linkedEntities.length > 0 && (

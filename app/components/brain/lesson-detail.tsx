@@ -27,7 +27,7 @@ function LessonSectionBlock({ section, isEditing }: { section: LessonSection; is
       <h3 className="font-pixel text-sm text-taupe-5 tracking-[0.3px] mb-2">{section.heading}</h3>
 
       {section.type === 'text' && section.body && (
-        <p className="font-mono text-xs leading-[1.7] text-taupe-4">{section.body}</p>
+        <p className="font-sans text-xs leading-[1.7] text-taupe-4">{section.body}</p>
       )}
 
       {section.type === 'table' && section.columns && section.rows && (
@@ -55,13 +55,13 @@ function LessonSectionBlock({ section, isEditing }: { section: LessonSection; is
         section.listStyle === 'ordered' ? (
           <ol className="pl-5 flex flex-col gap-1">
             {section.items.map((item, i) => (
-              <li key={i} className="font-mono text-xs leading-[1.7] text-taupe-4">{item}</li>
+              <li key={i} className="font-sans text-xs leading-[1.7] text-taupe-4">{item}</li>
             ))}
           </ol>
         ) : (
           <ul className="pl-5 flex flex-col gap-1">
             {section.items.map((item, i) => (
-              <li key={i} className="font-mono text-xs leading-[1.7] text-taupe-4">{item}</li>
+              <li key={i} className="font-sans text-xs leading-[1.7] text-taupe-4">{item}</li>
             ))}
           </ul>
         )
@@ -192,7 +192,7 @@ export function LessonDetail({ lesson, onBack }: LessonDetailProps) {
           <div className={isEditing
             ? 'border border-dashed border-violet-2 rounded-r-md p-3 bg-[rgba(var(--violet-3-rgb),0.02)] dark:bg-[rgba(var(--violet-3-rgb),0.06)]'
             : 'border-2 border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 rounded-r-md p-3 bg-white'}>
-            <p className="font-mono text-xs leading-[1.7] text-taupe-4">{lesson.preview}</p>
+            <p className="font-sans text-xs leading-[1.7] text-taupe-4">{lesson.preview}</p>
           </div>
         )}
       </div>

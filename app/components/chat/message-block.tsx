@@ -197,7 +197,7 @@ function AIMessage({ message }: { message: Message }) {
               <div className="w-[22px] h-[22px] flex items-center justify-center font-mono text-[0.8125rem] font-extrabold text-white bg-red border shrink-0 rounded-r-md">!</div>
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-bold text-red mb-1.5">{message.error.title}</div>
-                <div className="font-mono text-xs leading-[1.6] text-taupe-4 mb-2 dark:text-taupe-3">{message.error.detail}</div>
+                <div className="font-sans text-xs leading-[1.6] text-taupe-4 mb-2 dark:text-taupe-3">{message.error.detail}</div>
                 <div className="font-mono text-[0.625rem] text-taupe-3 tracking-[0.05em]">{message.error.meta}</div>
               </div>
               <button className="flex items-center gap-1.5 px-3.5 py-1.5 text-[0.6875rem] font-semibold text-taupe-5 bg-taupe-1 border border-t-white border-l-white border-r-taupe-3 border-b-taupe-3 cursor-pointer shrink-0 self-center transition-all duration-150 rounded-r-md hover:bg-berry-1 hover:text-berry-5 hover:border-t-berry-2 hover:border-l-berry-2 hover:border-r-berry-4 hover:border-b-berry-4 active:border-t-taupe-3 active:border-l-taupe-3 active:border-r-white active:border-b-white focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-2 font-mono text-[0.625rem] uppercase tracking-[0.05em] dark:text-taupe-4 dark:hover:text-berry-3" aria-label="Retry request">

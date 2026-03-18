@@ -346,7 +346,7 @@ function ReasoningPanel({
                     <div
                       key={thoughtIdx}
                       className={cn(
-                        'font-mono text-[0.6875rem] leading-[1.6] text-taupe-4 py-[3px]',
+                        'font-sans text-[0.6875rem] leading-[1.6] text-taupe-4 py-[3px]',
                         'transition-all duration-300 ease-in-out',
                         thoughtIdx < thoughtCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
                       )}

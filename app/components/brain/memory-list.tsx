@@ -65,7 +65,7 @@ export function MemoryList({ memory }: MemoryListProps) {
         <h3 className="font-mono text-[0.6875rem] font-bold text-taupe-3 uppercase tracking-[0.08em] mb-2">What Describes Your Work</h3>
         <div className="bg-white border-2 border-t-taupe-2 border-l-taupe-2 border-b-taupe-3 border-r-taupe-3 rounded-[var(--r-md)] px-3.5 py-3 dark:bg-surface-1 dark:border-taupe-3">
           <div
-            className="mem-role-text font-mono text-xs leading-[1.7] text-taupe-5 outline-none min-h-[40px] focus:border-violet-3"
+            className="mem-role-text font-sans text-xs leading-[1.7] text-taupe-5 outline-none min-h-[40px] focus:border-violet-3"
             contentEditable
             suppressContentEditableWarning
             role="textbox"
@@ -112,7 +112,7 @@ export function MemoryList({ memory }: MemoryListProps) {
             <div className="bg-white dark:bg-surface-1 border-2 border-t-violet-2 border-l-violet-2 border-r-violet-3 border-b-violet-3 dark:border-violet-2 rounded-[var(--r-md)] p-[12px_14px]">
               <input
                 type="text"
-                className="w-full p-[8px_10px] font-mono text-xs text-taupe-5 bg-off-white dark:bg-surface-2 border border-taupe-2 dark:border-taupe-3 rounded-[var(--r-md)] outline-none mb-2 focus:border-violet-3 dark:text-taupe-3"
+                className="w-full p-[8px_10px] font-sans text-xs text-taupe-5 bg-off-white dark:bg-surface-2 border border-taupe-2 dark:border-taupe-3 rounded-[var(--r-md)] outline-none mb-2 focus:border-violet-3 dark:text-taupe-3"
                 placeholder="Type a fact Cosimo should remember..."
                 value={newFactText}
                 onChange={(e) => setNewFactText(e.target.value)}

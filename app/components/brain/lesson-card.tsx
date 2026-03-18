@@ -51,7 +51,7 @@ export function LessonCard({ lesson, onSelect }: LessonCardProps) {
       </h4>
 
       {/* Preview */}
-      <p className="font-[family-name:var(--mono)] text-[11px] text-taupe-3 leading-[1.5] line-clamp-2 mb-2">
+      <p className="font-sans text-[11px] text-taupe-3 leading-[1.5] line-clamp-2 mb-2">
         {lesson.preview}
       </p>
 
