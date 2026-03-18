@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { toast } from "sonner";
 import {
   ChevronRight,
   ArrowLeft,
@@ -14,6 +13,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { cn } from "~/lib/utils";
+import { CloudStorageSettings } from "~/components/settings/cloud-storage-settings";
 import { useUIStore } from "~/stores/ui-store";
 import { useThemeStore } from "~/stores/theme-store";
 import { getTasks, getCalendar, getUsage } from "~/services/panels";
@@ -499,6 +499,7 @@ function ProfileAvatar() {
   const profileMenuOpen = useUIStore((s) => s.profileMenuOpen);
   const toggleProfileMenu = useUIStore((s) => s.toggleProfileMenu);
   const [view, setView] = useState<"main" | "appearance">("main");
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   /** Reset to main view when dropdown opens */
   const handleOpenChange = useCallback(
@@ -510,10 +511,12 @@ function ProfileAvatar() {
   );
 
   const handleAccountSettings = useCallback(() => {
-    toast("Coming soon");
-  }, []);
+    setSettingsOpen(true);
+    if (profileMenuOpen) toggleProfileMenu();
+  }, [profileMenuOpen, toggleProfileMenu]);
 
   return (
+    <>
     <Popover open={profileMenuOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger
         aria-label="Profile menu"
@@ -574,6 +577,9 @@ function ProfileAvatar() {
         )}
       </PopoverContent>
     </Popover>
+
+    <CloudStorageSettings open={settingsOpen} onOpenChange={setSettingsOpen} />
+    </>
   );
 }
 

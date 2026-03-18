@@ -165,3 +165,14 @@ Learnings:
 - Green badge uses border-green-500/30 bg pattern with rgba for background
 - Provider subtitle computed from settings data (site count, library count, folder count, file count)
 - Local state for library toggles uses Record<string, boolean> initialized from mock data
+
+---
+[Iteration 12] Story US-012: Wire settings modal to app header
+Date: 2026-03-18
+Summary: Connected CloudStorageSettings modal to the profile dropdown in app-header.tsx. Added settingsOpen state to ProfileAvatar, changed handleAccountSettings to open the modal and close the popover, rendered CloudStorageSettings outside the Popover. Removed unused toast import.
+Files modified:
+- /app/components/layout/app-header.tsx
+Learnings:
+- ProfileAvatar returns JSX fragment to render both Popover and Dialog as siblings
+- Close popover before opening dialog by calling toggleProfileMenu() when profileMenuOpen is true
+- toast import from sonner was only used for placeholder — removed when real functionality added
