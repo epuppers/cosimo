@@ -9,7 +9,6 @@ import { getEntitySchema, getEntities } from "~/services/entities";
 import { useEntityStore } from "~/stores/entity-store";
 import { EntityListItem } from "~/components/rolodex/entity-list-item";
 import { EntityCard } from "~/components/rolodex/entity-card";
-import { EntityDetailPanel } from "~/components/rolodex/entity-detail-panel";
 import { FilterPill } from "~/components/ui/filter-pill";
 import { EmptyState } from "~/components/ui/empty-state";
 import { Button } from "~/components/ui/button";
@@ -36,7 +35,6 @@ export default function RolodexRoute({ loaderData }: Route.ComponentProps) {
   const searchQuery = useEntityStore((s) => s.searchQuery);
   const setSearchQuery = useEntityStore((s) => s.setSearchQuery);
   const sortBy = useEntityStore((s) => s.sortBy);
-  const selectedEntityId = useEntityStore((s) => s.selectedEntityId);
   const selectEntity = useEntityStore((s) => s.selectEntity);
 
   // Filter entities
@@ -84,11 +82,6 @@ export default function RolodexRoute({ loaderData }: Route.ComponentProps) {
     { mode: 'grid' as const, icon: Grid3x3 },
     { mode: 'graph' as const, icon: GitGraph },
   ];
-
-  // Find selected entity for detail panel
-  const selectedEntity = selectedEntityId
-    ? entities.find((e) => e.id === selectedEntityId) ?? null
-    : null;
 
   return (
     <div className="flex h-full flex-col bg-off-white dark:bg-surface-0">
@@ -191,27 +184,6 @@ export default function RolodexRoute({ loaderData }: Route.ComponentProps) {
         )}
       </div>
 
-      {/* Entity detail slide-over */}
-      {selectedEntity && (
-        <div
-          className="fixed inset-0 z-50 flex justify-end"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) selectEntity(null);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') selectEntity(null);
-          }}
-        >
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/20" aria-hidden="true" />
-          {/* Panel */}
-          <div className={cn(
-            "relative w-[480px] max-w-[90vw] h-full bg-white dark:bg-surface-1 shadow-xl overflow-y-auto"
-          )}>
-            <EntityDetailPanel entity={selectedEntity} schema={schema} />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
