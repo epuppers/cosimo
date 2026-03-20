@@ -21,6 +21,7 @@ import type { Entity, EntitySchema, EntityActionDefinition } from '~/services/ty
 import { useEntityStore } from '~/stores/entity-store';
 import { EntityInsightBar } from '~/components/rolodex/entity-insight-bar';
 import { EntityPropertySection } from '~/components/rolodex/entity-property-section';
+import { ActivityTimeline } from '~/components/rolodex/activity-timeline';
 import { Button } from '~/components/ui/button';
 import { EmptyState } from '~/components/ui/empty-state';
 import {
@@ -260,7 +261,7 @@ export function EntityDetailPanel({ entity, schema, className }: EntityDetailPan
         )}
 
         {detailTab === 'timeline' && (
-          <EmptyState title="Timeline coming next" />
+          <ActivityTimeline entityId={entity.id} />
         )}
 
         {detailTab === 'relationships' && (
