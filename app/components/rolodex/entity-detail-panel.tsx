@@ -22,8 +22,9 @@ import { useEntityStore } from '~/stores/entity-store';
 import { EntityInsightBar } from '~/components/rolodex/entity-insight-bar';
 import { EntityPropertySection } from '~/components/rolodex/entity-property-section';
 import { ActivityTimeline } from '~/components/rolodex/activity-timeline';
+import { RelationshipsTab } from '~/components/rolodex/relationships-tab';
+import { LinkedTab } from '~/components/rolodex/linked-tab';
 import { Button } from '~/components/ui/button';
-import { EmptyState } from '~/components/ui/empty-state';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -265,11 +266,15 @@ export function EntityDetailPanel({ entity, schema, className }: EntityDetailPan
         )}
 
         {detailTab === 'relationships' && (
-          <EmptyState title="Relationships coming next" />
+          <RelationshipsTab
+            entity={entity}
+            schema={schema}
+            onEntityClick={(id) => selectEntity(id)}
+          />
         )}
 
         {detailTab === 'linked' && (
-          <EmptyState title="Linked items coming next" />
+          <LinkedTab entity={entity} />
         )}
       </div>
     </div>
