@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import {
   ChevronDown,
@@ -5,14 +6,15 @@ import {
   Plus,
   Brain,
   BookOpen,
-  Network,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { LogoMark } from "~/components/layout/logo";
 import { useUIStore } from "~/stores/ui-store";
+import { useEntityStore } from "~/stores/entity-store";
 import { ThreadList } from "~/components/chat/thread-list";
 import { WorkflowList } from "~/components/workflows/workflow-list";
-import type { Thread, WorkflowRun, WorkflowTemplate } from "~/services/types";
+import { getEntitySchema, getEntities } from "~/services/entities";
+import type { Thread, WorkflowRun, WorkflowTemplate, EntitySchema, Entity } from "~/services/types";
 import {
   Sidebar,
   SidebarContent,
@@ -87,7 +89,6 @@ function BrainNav() {
   const brainItems = [
     { label: "Memory", icon: Brain, path: "/brain/memory" },
     { label: "Lessons", icon: BookOpen, path: "/brain/lessons" },
-    { label: "Graphs", icon: Network, path: "/brain/graph" },
   ] as const;
 
   return (
@@ -95,7 +96,7 @@ function BrainNav() {
       {/* Toggle button — collapses to zero height when sidebar collapsed */}
       <button
         onClick={toggleBrainNav}
-        aria-label={brainNavCollapsed ? "Expand Brain nav" : "Collapse Brain nav"}
+        aria-label={brainNavCollapsed ? "Expand Knowledge nav" : "Collapse Knowledge nav"}
         className={cn(
           "flex w-full items-center justify-between px-3.5 py-1.5 max-h-8",
           "bg-transparent border-none cursor-pointer overflow-hidden",
@@ -107,7 +108,7 @@ function BrainNav() {
         )}
       >
         <span className="font-[family-name:var(--mono)] text-[0.6875rem] font-semibold tracking-[0.18em] uppercase text-taupe-3">
-          Brain
+          Knowledge
         </span>
         <ChevronDown
           className={cn(
@@ -159,6 +160,73 @@ function BrainNav() {
   );
 }
 
+// ======== Rolodex Quick List ========
+
+/** Inline entity quick-list for the rolodex sidebar view */
+function RolodexQuickList({
+  schema,
+  entities,
+  selectedEntityId,
+  onSelect,
+}: {
+  schema: EntitySchema;
+  entities: Entity[];
+  selectedEntityId: string | null;
+  onSelect: (entityId: string | null) => void;
+}) {
+  // Group entities by type, in navOrder
+  const navTypes = schema.entityTypes
+    .filter((t) => t.showInNav)
+    .sort((a, b) => a.navOrder - b.navOrder);
+
+  const grouped = navTypes.map((typeDef) => ({
+    typeDef,
+    items: entities.filter((e) => e.typeId === typeDef.id),
+  }));
+
+  const healthDotColor: Record<string, string> = {
+    healthy: 'bg-green',
+    warning: 'bg-amber-400',
+    critical: 'bg-red',
+  };
+
+  return (
+    <div className="flex flex-col gap-1 transition-opacity duration-200 ease-linear group-data-[collapsible=icon]:opacity-0">
+      {grouped.map(({ typeDef, items }) => (
+        <div key={typeDef.id}>
+          <div className="px-2.5 py-1 font-[family-name:var(--mono)] text-[9px] font-bold uppercase tracking-[0.12em] text-taupe-3">
+            {typeDef.labelPlural}
+          </div>
+          {items.map((entity) => {
+            const isSelected = entity.id === selectedEntityId;
+            return (
+              <button
+                key={entity.id}
+                type="button"
+                onClick={() => onSelect(entity.id)}
+                className={cn(
+                  "brain-nav-btn flex w-full items-center gap-2 rounded-[var(--r-md)] px-2.5 py-[7px] font-[family-name:var(--mono)] text-[11px] text-taupe-2 dark:text-taupe-4 border-none bg-transparent cursor-pointer",
+                  "transition-[padding,gap,width,height] duration-200 ease-linear",
+                  "hover:bg-[rgba(var(--white-pure-rgb),0.06)] hover:text-taupe-1 dark:hover:text-taupe-5",
+                  "focus-visible:outline-2 focus-visible:outline-violet-3 focus-visible:outline-offset-1",
+                  isSelected && "bg-berry-5 text-berry-1 dark:text-berry-3",
+                  "group-data-[collapsible=icon]:hidden"
+                )}
+              >
+                <span className={cn(
+                  "size-1.5 rounded-full shrink-0",
+                  (entity.health && healthDotColor[entity.health]) ?? 'bg-taupe-3'
+                )} />
+                <span className="truncate">{entity.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ======== Main Sidebar Component ========
 
 /** Props for the AppSidebar */
@@ -177,7 +245,23 @@ export function AppSidebar({ threads, runs, templates }: AppSidebarProps) {
   const isCollapsed = state === "collapsed";
   const location = useLocation();
   const navigate = useNavigate();
+  const isRolodexView = location.pathname.startsWith("/rolodex");
   const isWorkflowsView = location.pathname.startsWith("/workflows");
+  const selectEntity = useEntityStore((s) => s.selectEntity);
+  const selectedEntityId = useEntityStore((s) => s.selectedEntityId);
+
+  // Load entity data for sidebar when in rolodex view
+  const [sidebarSchema, setSidebarSchema] = useState<EntitySchema | null>(null);
+  const [sidebarEntities, setSidebarEntities] = useState<Entity[]>([]);
+
+  useEffect(() => {
+    if (isRolodexView) {
+      Promise.all([getEntitySchema(), getEntities()]).then(([schema, entities]) => {
+        setSidebarSchema(schema);
+        setSidebarEntities(entities);
+      });
+    }
+  }, [isRolodexView]);
 
   return (
     <Sidebar
@@ -247,7 +331,20 @@ export function AppSidebar({ threads, runs, templates }: AppSidebarProps) {
       <SidebarContent>
         <SidebarGroup className="flex-1 px-1.5">
           <SidebarGroupContent>
-            {isWorkflowsView ? (
+            {isRolodexView ? (
+              sidebarSchema && sidebarEntities.length > 0 ? (
+                <RolodexQuickList
+                  schema={sidebarSchema}
+                  entities={sidebarEntities}
+                  selectedEntityId={selectedEntityId}
+                  onSelect={selectEntity}
+                />
+              ) : (
+                <div className="px-2 py-1 font-[family-name:var(--mono)] text-xs text-taupe-3 transition-opacity duration-200 ease-linear group-data-[collapsible=icon]:opacity-0">
+                  No entities yet
+                </div>
+              )
+            ) : isWorkflowsView ? (
               templates && templates.length > 0 ? (
                 <WorkflowList templates={templates} runs={runs} />
               ) : (

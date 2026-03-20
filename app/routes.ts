@@ -10,6 +10,7 @@ export default [
     route("workflows", "routes/_app.workflows.tsx", [
       route(":id", "routes/_app.workflows.$id.tsx"),
     ]),
+    route("rolodex", "routes/_app.rolodex.tsx"),
     layout("routes/_app.brain.tsx", [
       route("brain/memory", "routes/_app.brain.memory.tsx"),
       route("brain/lessons", "routes/_app.brain.lessons.tsx", [
